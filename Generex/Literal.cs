@@ -10,22 +10,15 @@ namespace Generex
     {
         public T Value { get; }
 
-        public Literal(T value, IEqualityComparer<T>? comparer = null) : base(comparer)
+        public Literal(T value, IEqualityComparer<T>? equalityComparer = null) : base(equalityComparer)
         {
             Value = value;
         }
 
-        public static implicit operator Literal<T>(T value) => new(value);
-
-        protected override IEnumerable<Match<T>> MatchNextInternal(Match<T> match, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement match, T value)
         {
-            if (!Comparer.Equals(Value, value))
-                yield break;
-
-            var foundMatch = new Match<T>(match);
-            foundMatch.Add(value);
-
-            yield return foundMatch;
+            if (EqualityComparer.Equals(Value, value))
+                yield return match.Next(value);
         }
     }
 }

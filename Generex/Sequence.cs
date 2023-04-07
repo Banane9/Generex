@@ -18,7 +18,7 @@ namespace Generex
             }
         }
 
-        public Sequence(params Atom<T>[] atoms) : base(atoms.First().Comparer)
+        public Sequence(params Atom<T>[] atoms) : base(atoms.First().EqualityComparer)
         {
             this.atoms = atoms;
         }
@@ -34,30 +34,26 @@ namespace Generex
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Atoms).GetEnumerator();
 
-        protected override IEnumerable<Match<T>> MatchNextInternal(Match<T> match, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement match, T value)
         {
             return matchNext(match, value);
         }
 
-        private Func<Match<T>, T, IEnumerable<Match<T>>> generateNextMatch(int currentSequenceIndex)
+        private MatchNextValue generateNextMatch(int currentSequenceIndex)
         {
             return (match, value) => matchNext(match, value, currentSequenceIndex);
         }
 
-        private IEnumerable<Match<T>> matchNext(Match<T> match, T value, int currentSequenceIndex = 0)
+        private IEnumerable<MatchElement> matchNext(MatchElement match, T value, int currentSequenceIndex = 0)
         {
             foreach (var newMatch in MatchNext(atoms[currentSequenceIndex], match, value))
             {
-                if (!newMatch.Finished)
-                {
-                    yield return new Match<T>(newMatch, generateNextMatch(currentSequenceIndex));
-                    continue;
-                }
+                if (!newMatch.IsDone)
+                    newMatch.MatchNextValue = generateNextMatch(currentSequenceIndex);
+                else if (currentSequenceIndex + 1 < atoms.Length)
+                    newMatch.MatchNextValue = generateNextMatch(currentSequenceIndex + 1);
 
-                if (++currentSequenceIndex < atoms.Length)
-                    yield return new Match<T>(newMatch, generateNextMatch(currentSequenceIndex));
-                else
-                    yield return newMatch;
+                yield return newMatch;
             }
         }
     }

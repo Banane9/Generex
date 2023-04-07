@@ -1,14 +1,14 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Generex
 {
-    public class Match<T>
+    public class Match<T> : IEnumerable<T>
     {
-        private readonly List<T> matchSequence;
-
-        public bool Finished { get; }
+        private readonly T[] matchSequence;
 
         public IEnumerable<T> MatchedSequence
         {
@@ -19,31 +19,19 @@ namespace Generex
             }
         }
 
-        private Func<Match<T>, T, IEnumerable<Match<T>>>? matchNext { get; }
-
-        internal Match(Func<Match<T>, T, IEnumerable<Match<T>>> matchNext)
+        internal Match(IEnumerable<T> matchSequence)
         {
-            matchSequence = new();
-            this.matchNext = matchNext;
+            this.matchSequence = matchSequence.ToArray();
         }
 
-        internal Match(Match<T> match, Func<Match<T>, T, IEnumerable<Match<T>>> matchNext)
+        public IEnumerator<T> GetEnumerator()
         {
-            matchSequence = new(match.MatchedSequence);
-            this.matchNext = matchNext;
+            return ((IEnumerable<T>)matchSequence).GetEnumerator();
         }
 
-        internal Match(Match<T> match)
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            matchSequence = new(match.MatchedSequence);
-            Finished = true;
+            return matchSequence.GetEnumerator();
         }
-
-        internal void Add(T value)
-        {
-            matchSequence.Add(value);
-        }
-
-        internal IEnumerable<Match<T>> MatchNext(T value) => matchNext!(this, value);
     }
 }

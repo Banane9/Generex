@@ -19,7 +19,7 @@ namespace Generex
             }
         }
 
-        public Alternative(params Atom<T>[] atoms) : base(atoms.First().Comparer)
+        public Alternative(params Atom<T>[] atoms) : base(atoms.First().EqualityComparer)
         {
             this.atoms = atoms;
         }
@@ -30,5 +30,10 @@ namespace Generex
         public IEnumerator<Atom<T>> GetEnumerator() => Atoms.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Atoms).GetEnumerator();
+
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement match, T value)
+        {
+            return atoms.SelectMany(atom => MatchNext(atom, match, value));
+        }
     }
 }

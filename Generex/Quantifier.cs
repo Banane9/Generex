@@ -8,7 +8,7 @@ namespace Generex
     {
         public Atom<T> Atom { get; }
 
-        public Quantifier(Atom<T> atom) : base(atom.Comparer)
+        public Quantifier(Atom<T> atom) : base(atom.EqualityComparer)
         {
             Atom = atom;
         }
