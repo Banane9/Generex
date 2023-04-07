@@ -16,5 +16,16 @@ namespace Generex
         }
 
         public static implicit operator Literal<T>(T value) => new(value);
+
+        protected override IEnumerable<Match<T>> MatchNextInternal(Match<T> match, T value)
+        {
+            if (!Comparer.Equals(Value, value))
+                yield break;
+
+            var foundMatch = new Match<T>(match);
+            foundMatch.Add(value);
+
+            yield return foundMatch;
+        }
     }
 }
