@@ -31,9 +31,18 @@ namespace Generex
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Atoms).GetEnumerator();
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement match, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
-            return atoms.SelectMany(atom => MatchNext(atom, match, value));
+            if (currentMatch.TryGetLatestState(this, out int option))
+                return MatchNext(atoms[option], currentMatch, value);
+
+            return atoms.SelectMany((atom, index) =>
+                MatchNext(atom, currentMatch, value)
+                   .Select(nextMatch =>
+                       {
+                           nextMatch.SetState(this, index);
+                           return nextMatch;
+                       }));
         }
     }
 }

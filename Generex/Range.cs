@@ -20,10 +20,10 @@ namespace Generex
 
         // Version for IComparable<T>?
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement match, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
             if (Comparer.Compare(Minimum, value) <= 0 && Comparer.Compare(Maximum, value) >= 0)
-                yield return match.Next(value);
+                yield return currentMatch.DoneWithNext(value);
         }
 
         private sealed class ComparerEquality : IEqualityComparer<T>

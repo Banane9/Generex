@@ -13,27 +13,35 @@ namespace Generex
         {
             private readonly Lazy<Dictionary<Atom<T>, object>> matchState = new();
 
-            public bool IsDone => MatchNextValue == null;
+            public bool IsDone { get; set; }
 
             public bool IsStart => Previous == null;
-
-            public MatchNextValue? MatchNextValue { get; set; }
 
             public MatchElement? Previous { get; }
 
             public T? Value { get; }
 
-            public MatchElement(MatchNextValue? matchNextValue = null)
-            {
-                MatchNextValue = matchNextValue;
-            }
+            public MatchElement()
+            { }
 
-            public MatchElement(MatchElement previous, T value, MatchNextValue? matchNextValue = null)
-                : this(matchNextValue)
+            public MatchElement(MatchElement previous, T value)
             {
                 Previous = previous;
                 Value = value;
             }
+
+            public MatchElement Clone()
+            {
+                var clone = new MatchElement(Previous!, Value!);
+
+                if (matchState.IsValueCreated)
+                    foreach (var state in matchState.Value)
+                        clone.SetState(state.Key, state.Value);
+
+                return clone;
+            }
+
+            public MatchElement DoneWithNext(T value) => new(this, value) { IsDone = true };
 
             public TState? GetLatestState<TState>(Atom<T> atom, TState? defaultState = default)
             {
@@ -62,9 +70,7 @@ namespace Generex
                 return matchStack.ToArray();
             }
 
-            public IEnumerable<MatchElement> MatchNext(T value) => MatchNextValue?.Invoke(this, value) ?? new[] { this };
-
-            public MatchElement Next(T value, MatchNextValue? matchNextValue = null) => new(this, value, matchNextValue);
+            public MatchElement Next(T value) => new(this, value);
 
             public void SetState<TState>(Atom<T> atom, TState state) => matchState.Value[atom] = state!;
 

@@ -26,34 +26,28 @@ namespace Generex
         public Sequence(IEnumerable<Atom<T>> atoms) : this(atoms.ToArray())
         { }
 
-        public static implicit operator Sequence<T>(Atom<T>[] atoms) => new(atoms);
-
-        public static implicit operator Sequence<T>(T[] values) => values.Select(v => new Literal<T>(v)).ToArray();
-
         public IEnumerator<Atom<T>> GetEnumerator() => Atoms.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Atoms).GetEnumerator();
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement match, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
-            return matchNext(match, value);
-        }
+            var progress = currentMatch.GetLatestState(this, 0);
 
-        private MatchNextValue generateMatchNext(int currentSequenceIndex)
-        {
-            return (match, value) => matchNext(match, value, currentSequenceIndex);
-        }
+            if (progress >= atoms.Length)
+                yield break;
 
-        private IEnumerable<MatchElement> matchNext(MatchElement match, T value, int currentSequenceIndex = 0)
-        {
-            foreach (var newMatch in MatchNext(atoms[currentSequenceIndex], match, value))
+            foreach (var nextMatch in MatchNext(atoms[progress], currentMatch, value))
             {
-                if (!newMatch.IsDone)
-                    newMatch.MatchNextValue = generateMatchNext(currentSequenceIndex);
-                else if (currentSequenceIndex + 1 < atoms.Length)
-                    newMatch.MatchNextValue = generateMatchNext(currentSequenceIndex + 1);
+                // Advance progress when nested match is complete
+                if (nextMatch.IsDone)
+                {
+                    var newProgress = progress + 1;
+                    nextMatch.SetState(this, newProgress);
+                    nextMatch.IsDone = newProgress >= atoms.Length;
+                }
 
-                yield return newMatch;
+                yield return nextMatch;
             }
         }
     }

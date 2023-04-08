@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Generex
@@ -15,6 +16,10 @@ namespace Generex
 
         public static implicit operator Atom<T>(T value) => new Literal<T>(value);
 
+        public static implicit operator Atom<T>(Atom<T>[] atoms) => new Sequence<T>(atoms);
+
+        public static implicit operator Atom<T>(T[] values) => values.Select(v => new Literal<T>(v)).ToArray();
+
         public static Atom<T> operator |(Atom<T> leftAtom, Atom<T> rightAtom) => new Alternative<T>(leftAtom, rightAtom);
 
         public static Atom<T> operator +(Atom<T> leftAtom, Atom<T> rightAtom) => new Sequence<T>(leftAtom, rightAtom);
@@ -22,7 +27,7 @@ namespace Generex
         public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, bool fromStartOnly = false)
         {
             var currentQueue = new Queue<MatchElement>();
-            currentQueue.Enqueue(new MatchElement(MatchNextInternal));
+            currentQueue.Enqueue(new MatchElement());
 
             var nextQueue = new Queue<MatchElement>();
 
@@ -32,12 +37,12 @@ namespace Generex
                 {
                     var currentMatch = currentQueue.Dequeue();
 
-                    foreach (var match in currentMatch.MatchNext(value))
+                    foreach (var nextMatch in MatchNextInternal(currentMatch, value))
                     {
-                        if (match.IsDone)
-                            yield return match.GetMatch();
+                        if (nextMatch.IsDone)
+                            yield return nextMatch.GetMatch();
                         else
-                            nextQueue.Enqueue(match);
+                            nextQueue.Enqueue(nextMatch);
                     }
                 }
 
@@ -45,14 +50,14 @@ namespace Generex
                     if (fromStartOnly)
                         yield break;
                     else
-                        nextQueue.Enqueue(new MatchElement(MatchNextInternal));
+                        nextQueue.Enqueue(new MatchElement());
 
                 (nextQueue, currentQueue) = (currentQueue, nextQueue);
             }
         }
 
-        protected static IEnumerable<MatchElement> MatchNext(Atom<T> instance, MatchElement match, T value) => instance.MatchNextInternal(match, value);
+        protected static IEnumerable<MatchElement> MatchNext(Atom<T> instance, MatchElement currentMatch, T value) => instance.MatchNextInternal(currentMatch, value);
 
-        protected abstract IEnumerable<MatchElement> MatchNextInternal(MatchElement match, T value);
+        protected abstract IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value);
     }
 }

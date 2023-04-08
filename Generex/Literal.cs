@@ -15,10 +15,10 @@ namespace Generex
             Value = value;
         }
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement match, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
             if (EqualityComparer.Equals(Value, value))
-                yield return match.Next(value);
+                yield return currentMatch.DoneWithNext(value);
         }
     }
 }

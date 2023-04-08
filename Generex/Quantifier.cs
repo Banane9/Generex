@@ -27,31 +27,37 @@ namespace Generex
         public Quantifier(Atom<T> atom, int exactly) : this(atom, exactly, exactly)
         { }
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement match, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
-            var progress = match.GetLatestState(this, 0);
+            var progress = currentMatch.GetLatestState(this, 0);
 
             if (progress >= Maximum)
                 yield break;
 
-            foreach (var nextMatch in MatchNext(Atom, match, value))
+            foreach (var nextMatch in MatchNext(Atom, currentMatch, value))
             {
                 if (nextMatch.IsDone)
                 {
-                    nextMatch.SetState(this, progress + 1);
-                    nextMatch
+                    // Advance progress and return match(es)
+                    var newProgress = progress + 1;
+                    nextMatch.SetState(this, newProgress);
+
+                    // Return complete match whenever progress fits the quantifier
+                    if (newProgress >= Minimum && newProgress <= Maximum)
+                        yield return nextMatch;
+
+                    // Return (additional) incomplete match whenever progress isn't at the max yet
+                    if (newProgress < Maximum)
+                    {
+                        var nextMatchClone = nextMatch.Clone();
+                        nextMatchClone.IsDone = false;
+
+                        yield return nextMatchClone;
+                    }
                 }
+                else
+                    yield return nextMatch;
             }
-        }
-
-        private MatchNextValue generateMatchNext(int count)
-        {
-            return (match, value) => matchNext(match, value, count);
-        }
-
-        private IEnumerable<MatchElement> matchNext(MatchElement match, T value, int count = 0)
-        {
-            MatchNext(Atom, ma)
         }
     }
 }
