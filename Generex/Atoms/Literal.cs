@@ -4,7 +4,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 
-namespace Generex
+namespace Generex.Atoms
 {
     public class Literal<T> : Atom<T>
     {

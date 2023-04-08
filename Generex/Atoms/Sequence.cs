@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Generex
+namespace Generex.Atoms
 {
     public class Sequence<T> : Atom<T>, IEnumerable<Atom<T>>
     {

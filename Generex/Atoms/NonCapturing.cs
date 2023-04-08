@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Generex
+namespace Generex.Atoms
 {
     public class NonCapturing<T> : Atom<T>
     {
