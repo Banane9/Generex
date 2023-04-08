@@ -10,6 +10,9 @@ namespace Generex
     {
         private readonly T[] matchSequence;
 
+        public int EndIndex { get; }
+        public int Length => matchSequence.Length;
+
         public IEnumerable<T> MatchedSequence
         {
             get
@@ -19,9 +22,15 @@ namespace Generex
             }
         }
 
-        internal Match(IEnumerable<T> matchSequence)
+        public int StartIndex { get; }
+
+        public T this[int index] => matchSequence[index];
+
+        internal Match(IEnumerable<T> matchSequence, int start, int end)
         {
             this.matchSequence = matchSequence.ToArray();
+            StartIndex = start;
+            EndIndex = end;
         }
 
         public IEnumerator<T> GetEnumerator()

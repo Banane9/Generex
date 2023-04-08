@@ -31,6 +31,7 @@ namespace Generex
 
             var nextQueue = new Queue<MatchElement>();
 
+            var index = 0;
             foreach (var value in inputSequence)
             {
                 while (currentQueue.Count > 0)
@@ -46,12 +47,12 @@ namespace Generex
                     }
                 }
 
-                if (nextQueue.Count == 0)
-                    if (fromStartOnly)
-                        yield break;
-                    else
-                        nextQueue.Enqueue(new MatchElement());
+                if (nextQueue.Count == 0 && fromStartOnly)
+                    yield break;
 
+                nextQueue.Enqueue(new MatchElement(index));
+
+                ++index;
                 (nextQueue, currentQueue) = (currentQueue, nextQueue);
             }
         }
