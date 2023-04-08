@@ -44,16 +44,31 @@ namespace Generex
 
         protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
-            if (currentMatch.TryGetLatestState(this, out int option))
-                return MatchNext(atoms[option], currentMatch, value);
+            if (currentMatch.TryGetLatestState(this, out int option) && option >= 0)
+            {
+                foreach (var nextMatch in MatchNext(atoms[option], currentMatch, value))
+                {
+                    // Reset state when done so this can be used again
+                    if (nextMatch.IsDone)
+                        nextMatch.SetState(this, -1);
 
-            return atoms.SelectMany((atom, index) =>
-                MatchNext(atom, currentMatch, value)
-                   .Select(nextMatch =>
-                       {
-                           nextMatch.SetState(this, index);
-                           return nextMatch;
-                       }));
+                    yield return nextMatch;
+                }
+
+                yield break;
+            }
+
+            for (var i = 0; i < atoms.Length; ++i)
+            {
+                foreach (var nextMatch in MatchNext(atoms[i], currentMatch, value))
+                {
+                    // Only set state when not done so this can be used again
+                    if (!nextMatch.IsDone)
+                        nextMatch.SetState(this, i);
+
+                    yield return nextMatch;
+                }
+            }
         }
     }
 }

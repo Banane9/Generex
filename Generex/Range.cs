@@ -10,18 +10,21 @@ namespace Generex
         public T Maximum { get; }
         public T Minimum { get; }
 
-        public Range(T minimum, T maximum, IComparer<T> comparer, IEqualityComparer<T>? equalityComparer = null)
+        public Range(T minimum, T maximum, IComparer<T>? comparer = null, IEqualityComparer<T>? equalityComparer = null)
             : base(equalityComparer ?? new ComparerEquality(comparer))
         {
             Minimum = minimum;
             Maximum = maximum;
-            Comparer = comparer;
+            Comparer = comparer ?? Comparer<T>.Default;
         }
 
         // Version for IComparable<T>?
 
         public override string ToString()
         {
+            if (Comparer.Compare(Minimum, Maximum) == 0)
+                return (Minimum ?? Maximum)?.ToString() ?? "null";
+
             return $"[{Minimum}-{Maximum}]";
         }
 
@@ -35,9 +38,9 @@ namespace Generex
         {
             private readonly IComparer<T> comparer;
 
-            public ComparerEquality(IComparer<T> comparer)
+            public ComparerEquality(IComparer<T>? comparer)
             {
-                this.comparer = comparer;
+                this.comparer = comparer ?? Comparer<T>.Default;
             }
 
             public bool Equals(T x, T y) => comparer.Compare(x, y) == 0;

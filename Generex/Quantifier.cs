@@ -47,28 +47,34 @@ namespace Generex
         {
             var progress = currentMatch.GetLatestState(this, 0);
 
+            // Shouldn't happen, but just to be sure
             if (progress >= Maximum)
                 yield break;
 
             foreach (var nextMatch in MatchNext(Atom, currentMatch, value))
             {
+                // Advance progress and return match(es) when inner is done
                 if (nextMatch.IsDone)
                 {
-                    // Advance progress and return match(es)
                     var newProgress = progress + 1;
-                    nextMatch.SetState(this, newProgress);
 
-                    // Return complete match whenever progress fits the quantifier
-                    if (newProgress >= Minimum && newProgress <= Maximum)
-                        yield return nextMatch;
-
-                    // Return (additional) incomplete match whenever progress isn't at the max yet
+                    // Return incomplete match whenever progress isn't at the max yet
+                    // This has to be done first, because otherwise the state may be changed and cloned wrongly
                     if (newProgress < Maximum)
                     {
                         var nextMatchClone = nextMatch.Clone();
+                        nextMatchClone.SetState(this, newProgress);
                         nextMatchClone.IsDone = false;
 
                         yield return nextMatchClone;
+                    }
+
+                    // Return (additional) complete match whenever progress fits the quantifier
+                    if (newProgress >= Minimum && newProgress <= Maximum)
+                    {
+                        // Reset state so this can be used again
+                        nextMatch.SetState(this, 0);
+                        yield return nextMatch;
                     }
                 }
                 else

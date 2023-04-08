@@ -13,11 +13,11 @@ namespace Generex
         {
             private readonly Lazy<Dictionary<Atom<T>, object>> matchState = new();
 
+            public bool Capturing { get; set; } = true;
             public int Index { get; set; }
             public bool IsDone { get; set; }
 
             public bool IsStart => Previous == null;
-
             public MatchElement? Previous { get; }
 
             public T? Value { get; }
@@ -60,7 +60,7 @@ namespace Generex
                 var start = IsStart ? Index : matchSequence[0].Index;
                 var end = matchSequence[^1].Index;
 
-                return new Match<T>(matchSequence.Select(element => element.Value!), start, end);
+                return new Match<T>(matchSequence.Select(element => element.Value!), matchSequence.Where(element => element.Capturing).Select(element => element.Value!), start, end);
             }
 
             public IEnumerable<MatchElement> GetMatchSequence()

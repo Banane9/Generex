@@ -54,8 +54,15 @@ namespace Generex
                 if (nextMatch.IsDone)
                 {
                     var newProgress = progress + 1;
-                    nextMatch.SetState(this, newProgress);
-                    nextMatch.IsDone = newProgress >= atoms.Length;
+
+                    if (newProgress < atoms.Length)
+                    {
+                        nextMatch.IsDone = false;
+                        nextMatch.SetState(this, newProgress);
+                    }
+                    else
+                        // Reset state so this can be used again
+                        nextMatch.SetState(this, 0);
                 }
 
                 yield return nextMatch;
