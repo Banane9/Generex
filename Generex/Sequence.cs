@@ -39,7 +39,7 @@ namespace Generex
             return matchNext(match, value);
         }
 
-        private MatchNextValue generateNextMatch(int currentSequenceIndex)
+        private MatchNextValue generateMatchNext(int currentSequenceIndex)
         {
             return (match, value) => matchNext(match, value, currentSequenceIndex);
         }
@@ -49,9 +49,9 @@ namespace Generex
             foreach (var newMatch in MatchNext(atoms[currentSequenceIndex], match, value))
             {
                 if (!newMatch.IsDone)
-                    newMatch.MatchNextValue = generateNextMatch(currentSequenceIndex);
+                    newMatch.MatchNextValue = generateMatchNext(currentSequenceIndex);
                 else if (currentSequenceIndex + 1 < atoms.Length)
-                    newMatch.MatchNextValue = generateNextMatch(currentSequenceIndex + 1);
+                    newMatch.MatchNextValue = generateMatchNext(currentSequenceIndex + 1);
 
                 yield return newMatch;
             }

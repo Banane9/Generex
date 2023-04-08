@@ -19,7 +19,7 @@ namespace Generex
 
         public static Atom<T> operator +(Atom<T> leftAtom, Atom<T> rightAtom) => new Sequence<T>(leftAtom, rightAtom);
 
-        public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence)
+        public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, bool fromStartOnly = false)
         {
             var currentQueue = new Queue<MatchElement>();
             currentQueue.Enqueue(new MatchElement(MatchNextInternal));
@@ -37,14 +37,15 @@ namespace Generex
                         if (match.IsDone)
                             yield return match.GetMatch();
                         else
-                        {
                             nextQueue.Enqueue(match);
-                        }
                     }
                 }
 
                 if (nextQueue.Count == 0)
-                    nextQueue.Enqueue(new MatchElement(MatchNextInternal));
+                    if (fromStartOnly)
+                        yield break;
+                    else
+                        nextQueue.Enqueue(new MatchElement(MatchNextInternal));
 
                 (nextQueue, currentQueue) = (currentQueue, nextQueue);
             }
