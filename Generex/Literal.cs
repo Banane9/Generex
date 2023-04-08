@@ -15,6 +15,11 @@ namespace Generex
             Value = value;
         }
 
+        public override string ToString()
+        {
+            return Value?.ToString() ?? "null";
+        }
+
         protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
             if (EqualityComparer.Equals(Value, value))

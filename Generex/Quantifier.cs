@@ -27,6 +27,22 @@ namespace Generex
         public Quantifier(Atom<T> atom, int exactly) : this(atom, exactly, exactly)
         { }
 
+        public override string ToString()
+        {
+            if (Minimum == Maximum)
+                return $"{Atom}{{{Minimum}}}";
+
+            if (Maximum == int.MaxValue)
+                if (Minimum == 0)
+                    return $"{Atom}*";
+                else if (Minimum == 1)
+                    return $"{Atom}+";
+                else
+                    return $"{Atom}{{{Minimum},}}";
+
+            return $"{Atom}{{{Minimum},{Maximum}}}";
+        }
+
         protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
             var progress = currentMatch.GetLatestState(this, 0);

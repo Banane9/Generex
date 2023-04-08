@@ -20,6 +20,9 @@ namespace Generex
 
         public Sequence(params Atom<T>[] atoms) : base(atoms.First().EqualityComparer)
         {
+            if (atoms.Length == 0)
+                throw new ArgumentOutOfRangeException(nameof(atoms), "Sequence must have at least one element!");
+
             this.atoms = atoms;
         }
 
@@ -29,6 +32,14 @@ namespace Generex
         public IEnumerator<Atom<T>> GetEnumerator() => Atoms.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Atoms).GetEnumerator();
+
+        public override string ToString()
+        {
+            if (atoms.Length == 1)
+                return atoms[0].ToString();
+
+            return $"({string.Join("⋅", atoms.Select(atom => atom.ToString()))})";
+        }
 
         protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {

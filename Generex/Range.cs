@@ -20,6 +20,11 @@ namespace Generex
 
         // Version for IComparable<T>?
 
+        public override string ToString()
+        {
+            return $"[{Minimum}-{Maximum}]";
+        }
+
         protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
             if (Comparer.Compare(Minimum, value) <= 0 && Comparer.Compare(Maximum, value) >= 0)

@@ -57,6 +57,8 @@ namespace Generex
             }
         }
 
+        public abstract override string ToString();
+
         protected static IEnumerable<MatchElement> MatchNext(Atom<T> instance, MatchElement currentMatch, T value) => instance.MatchNextInternal(currentMatch, value);
 
         protected abstract IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value);
