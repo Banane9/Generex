@@ -1,37 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Generex.Atoms
 {
-    public class Range<T> : Atom<T>
+    public class Range<T> : Atom<T>, IEnumerable<LiteralRange<T>>
     {
-        public IComparer<T> Comparer { get; }
-        public T Maximum { get; }
-        public T Minimum { get; }
+        private readonly LiteralRange<T>[] ranges;
 
-        public Range(T minimum, T maximum, IComparer<T>? comparer = null, IEqualityComparer<T>? equalityComparer = null)
-            : base(equalityComparer ?? new ComparerEquality(comparer))
+        public int Length => ranges.Length;
+
+        public IEnumerable<LiteralRange<T>> Ranges
         {
-            Minimum = minimum;
-            Maximum = maximum;
-            Comparer = comparer ?? Comparer<T>.Default;
+            get
+            {
+                foreach (var range in ranges)
+                    yield return range;
+            }
+        }
+
+        public Range(IEnumerable<LiteralRange<T>> ranges)
+            : base(new ComparerEquality(ranges.First().Comparer))
+        {
+            this.ranges = ranges.ToArray();
         }
 
         // Version for IComparable<T>?
 
+        public IEnumerator<LiteralRange<T>> GetEnumerator()
+        {
+            return ((IEnumerable<LiteralRange<T>>)ranges).GetEnumerator();
+        }
+
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+        {
+            return ranges.GetEnumerator();
+        }
+
         public override string ToString()
         {
-            if (Comparer.Compare(Minimum, Maximum) == 0)
-                return (Minimum ?? Maximum)?.ToString() ?? "null";
+            if (Length == 1)
+                return ranges[0].ToString();
 
-            return $"[{Minimum}-{Maximum}]";
+            return $"[{string.Join("|", ranges.Select(range => range.ToString()))}]";
         }
 
         protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
-            if (Comparer.Compare(Minimum, value) <= 0 && Comparer.Compare(Maximum, value) >= 0)
-                yield return currentMatch.DoneWithNext(value);
+            foreach (var range in ranges)
+            {
+                if (range.Contains(value))
+                    yield return currentMatch.DoneWithNext(value);
+            }
         }
 
         private sealed class ComparerEquality : IEqualityComparer<T>

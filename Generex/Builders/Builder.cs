@@ -7,9 +7,9 @@ namespace Generex.Builders
 {
     public abstract class Builder<T>
     {
-        public CaptureBuilder<T>.InProgress Capture => new(this);
+        public CaptureBuilder<T>.InProgress CaptureAll => new(this);
 
-        public QuantifierBuilder<T>.InProgress Repeat => new(this);
+        public QuantifierBuilder<T>.InProgress RepeatAll => new(this);
 
         public abstract Atom<T> Finish();
 
@@ -17,9 +17,9 @@ namespace Generex.Builders
             where TBuilder : Builder<T>
             where TOpenBuilder : OpenBuilder<TBuilder, TOpenBuilder>
         {
-            public CaptureBuilder<T>.InProgress Capture => new(End());
+            public CaptureBuilder<T>.InProgress CaptureAll => new(End());
 
-            public QuantifierBuilder<T>.InProgress Repeat => new(End());
+            public QuantifierBuilder<T>.InProgress RepeatAll => new(End());
 
             public abstract TBuilder End();
 

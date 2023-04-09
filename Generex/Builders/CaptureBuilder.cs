@@ -9,19 +9,18 @@ namespace Generex.Builders
     {
         private readonly Builder<T> builder;
 
-        // Make this a special object used for referring back to a group
-        private readonly object? captureIdentifier;
+        private readonly CaptureReference? captureReference;
 
-        private CaptureBuilder(Builder<T> builder, object? captureIdentifier = null)
+        private CaptureBuilder(Builder<T> builder, CaptureReference? captureReference = null)
         {
             this.builder = builder;
-            this.captureIdentifier = captureIdentifier;
+            this.captureReference = captureReference;
         }
 
         public override Atom<T> Finish()
         {
-            if (captureIdentifier == null)
-                return new NonCapturing<T>(builder.Finish());
+            if (captureReference == null)
+                return new NonCapturingGroup<T>(builder.Finish());
 
             throw new NotImplementedException();
         }
@@ -30,17 +29,17 @@ namespace Generex.Builders
         {
             private readonly Builder<T> builder;
 
-            public CaptureBuilder<T> Nothing => new(builder);
+            public CaptureBuilder<T> AsNothing => new(builder);
 
             internal InProgress(Builder<T> builder)
             {
                 this.builder = builder;
             }
 
-            public CaptureBuilder<T> As(out object captureIdentifier)
+            public CaptureBuilder<T> As(out CaptureReference captureReference)
             {
-                captureIdentifier = new object();
-                return new(builder, captureIdentifier);
+                captureReference = new CaptureReference();
+                return new(builder, captureReference);
             }
         }
     }
