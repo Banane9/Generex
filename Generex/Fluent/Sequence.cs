@@ -29,7 +29,7 @@ namespace Generex.Fluent
         ISequenceNext<T> FollowedBy { get; }
     }
 
-    internal interface ISequenceParentAtom<T> : ISequenceNext<T>
+    internal interface ISequenceParentAtom<T> : ISequenceNext<T>, IFinishableAtom<T>
     {
         ISequenceGroup<T> WrapInGroup(IFinishableAtom<T> child);
 
@@ -69,14 +69,6 @@ namespace Generex.Fluent
 
         public void AddRange(IEnumerable<IFinishableAtom<T>> atoms) => this.atoms.AddRange(atoms);
 
-        public override Generex<T> Finish()
-        {
-            if (atoms.Count == 1)
-                return atoms[0].Finish();
-
-            return new Atoms.Sequence<T>(atoms.Select(atom => atom.Finish()));
-        }
-
         public ISequenceGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var index = atoms.LastIndexOf(child);
@@ -98,5 +90,13 @@ namespace Generex.Fluent
         }
 
         IRepeatStart<T> IParentAtom<T>.WrapInRepeat(IFinishableAtom<T> child) => (IRepeatStart<T>)WrapInRepeat(child);
+
+        protected override Generex<T> FinishInternal()
+        {
+            if (atoms.Count == 1)
+                return FinishInternal(atoms[0]);
+
+            return new Atoms.Sequence<T>(atoms.Select(FinishInternal));
+        }
     }
 }

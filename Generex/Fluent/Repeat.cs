@@ -192,9 +192,6 @@ namespace Generex.Fluent
         ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.Exactly(int times)
             => (ISequenceRepeatedAtom<T>)Exactly(times);
 
-        public override Generex<T> Finish()
-            => new Quantifier<T>(atom.Finish(), minimum, maximum);
-
         public IRepeatedAtom<T> MaybeAtMost(int maximum)
         {
             minimum = 0;
@@ -223,5 +220,8 @@ namespace Generex.Fluent
 
             return repeat;
         }
+
+        protected override Generex<T> FinishInternal()
+            => new Quantifier<T>(FinishInternal(atom), minimum, maximum);
     }
 }

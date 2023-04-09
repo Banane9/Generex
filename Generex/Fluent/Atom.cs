@@ -95,12 +95,24 @@ namespace Generex.Fluent
             this.parent = parent;
         }
 
-        public abstract Generex<T> Finish();
+        public Generex<T> Finish()
+        {
+            var current = this;
+            while (current.parent != null)
+                current = (Atom<T>)current.parent;
+
+            return current.FinishInternal();
+        }
+
+        protected static Generex<T> FinishInternal(IFinishableAtom<T> atom)
+            => ((Atom<T>)atom).FinishInternal();
 
         protected static void SetParent(IFinishableAtom<T> atom, IParentAtom<T> parent) => ((Atom<T>)atom).parent = parent;
+
+        protected abstract Generex<T> FinishInternal();
     }
 
-    internal interface IParentAtom<T>
+    internal interface IParentAtom<T> : IFinishableAtom<T>
     {
         IGroup<T> WrapInGroup(IFinishableAtom<T> child);
 

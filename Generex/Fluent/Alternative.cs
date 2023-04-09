@@ -58,14 +58,6 @@ namespace Generex.Fluent
             atoms.Add(atom);
         }
 
-        public override Generex<T> Finish()
-        {
-            if (atoms.Count == 1)
-                return atoms[0].Finish();
-
-            return new Atoms.Alternative<T>(atoms.Select(atom => atom.Finish()));
-        }
-
         public IAlternativeGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var group = new Group<T>(this, child);
@@ -91,9 +83,17 @@ namespace Generex.Fluent
         }
 
         IRepeatStart<T> IParentAtom<T>.WrapInRepeat(IFinishableAtom<T> child) => (IRepeatStart<T>)WrapInRepeat(child);
+
+        protected override Generex<T> FinishInternal()
+        {
+            if (atoms.Count == 1)
+                return FinishInternal(atoms[0]);
+
+            return new Atoms.Alternative<T>(atoms.Select(FinishInternal));
+        }
     }
 
-    internal interface IAlternativeParentAtom<T> : IAlternativeNext<T>
+    internal interface IAlternativeParentAtom<T> : IAlternativeNext<T>, IFinishableAtom<T>
     {
         IAlternativeGroup<T> WrapInGroup(IFinishableAtom<T> child);
 

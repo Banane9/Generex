@@ -97,14 +97,6 @@ namespace Generex.Fluent
             return this;
         }
 
-        public override Generex<T> Finish()
-        {
-            if (literals.Count == 1)
-                return new Atoms.Literal<T>(literals[0], equalityComparer);
-
-            return new Atoms.Sequence<T>(literals.Select(literal => new Atoms.Literal<T>(literal, equalityComparer)));
-        }
-
         ISequenceLiteral<T> ISequenceComparingLiteral<T>.Of(IEnumerable<T> literals)
                     => ((ISequenceLiteral<T>)this).And(literals);
 
@@ -137,6 +129,14 @@ namespace Generex.Fluent
         {
             this.equalityComparer = equalityComparer;
             return this;
+        }
+
+        protected override Generex<T> FinishInternal()
+        {
+            if (literals.Count == 1)
+                return new Atoms.Literal<T>(literals[0], equalityComparer);
+
+            return new Atoms.Sequence<T>(literals.Select(literal => new Atoms.Literal<T>(literal, equalityComparer)));
         }
     }
 }

@@ -99,9 +99,6 @@ namespace Generex.Fluent
         public Range(IParentAtom<T>? parentSequence = null) : base(parentSequence)
         { }
 
-        public override Generex<T> Finish()
-            => new Atoms.Range<T>(ranges);
-
         public IOpenRange<T> From(T minimum)
         {
             capturedMinium = minimum;
@@ -165,5 +162,8 @@ namespace Generex.Fluent
 
         ISequenceRange<T> ISequenceRangeAddition<T>.With(T exactly)
             => (ISequenceRange<T>)With(exactly);
+
+        protected override Generex<T> FinishInternal()
+            => new Atoms.Range<T>(ranges);
     }
 }

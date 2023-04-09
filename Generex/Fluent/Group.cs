@@ -53,14 +53,6 @@ namespace Generex.Fluent
         ISequenceCapturedAtom<T> ISequenceGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
             => (ISequenceCapturedAtom<T>)CapturingGroup(out captureReference);
 
-        public override Generex<T> Finish()
-        {
-            if (captureReference == null)
-                return new Atoms.NonCapturingGroup<T>(atom.Finish());
-
-            throw new NotImplementedException();
-        }
-
         public IGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var group = new Group<T>(this, child);
@@ -75,6 +67,14 @@ namespace Generex.Fluent
             atom = repeat;
 
             return repeat;
+        }
+
+        protected override Generex<T> FinishInternal()
+        {
+            if (captureReference == null)
+                return new Atoms.NonCapturingGroup<T>(FinishInternal(atom));
+
+            throw new NotImplementedException();
         }
     }
 }
