@@ -4,11 +4,11 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class NonCapturingGroup<T> : Atom<T>
+    public class NonCapturingGroup<T> : Generex<T>
     {
-        public Atom<T> Atom { get; }
+        public Generex<T> Atom { get; }
 
-        public NonCapturingGroup(Atom<T> atom) : base(atom.EqualityComparer)
+        public NonCapturingGroup(Generex<T> atom) : base(atom.EqualityComparer)
         {
             Atom = atom;
         }

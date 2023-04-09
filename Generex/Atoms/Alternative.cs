@@ -6,11 +6,11 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class Alternative<T> : Atom<T>, IEnumerable<Atom<T>>
+    public class Alternative<T> : Generex<T>, IEnumerable<Generex<T>>
     {
-        private readonly Atom<T>[] atoms;
+        private readonly Generex<T>[] atoms;
 
-        public IEnumerable<Atom<T>> Atoms
+        public IEnumerable<Generex<T>> Atoms
         {
             get
             {
@@ -21,15 +21,15 @@ namespace Generex.Atoms
 
         public int Length => atoms.Length;
 
-        public Alternative(Atom<T> atom, params Atom<T>[] furtherAtoms) : this(atom.Yield().Concat(furtherAtoms))
+        public Alternative(Generex<T> atom, params Generex<T>[] furtherAtoms) : this(atom.Yield().Concat(furtherAtoms))
         { }
 
-        public Alternative(IEnumerable<Atom<T>> atoms) : base(atoms.First().EqualityComparer)
+        public Alternative(IEnumerable<Generex<T>> atoms) : base(atoms.First().EqualityComparer)
         {
             this.atoms = atoms.ToArray();
         }
 
-        public IEnumerator<Atom<T>> GetEnumerator() => Atoms.GetEnumerator();
+        public IEnumerator<Generex<T>> GetEnumerator() => Atoms.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Atoms).GetEnumerator();
 

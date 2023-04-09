@@ -5,11 +5,11 @@ using System.Linq;
 
 namespace Generex.Atoms
 {
-    public class Sequence<T> : Atom<T>, IEnumerable<Atom<T>>
+    public class Sequence<T> : Generex<T>, IEnumerable<Generex<T>>
     {
-        private readonly Atom<T>[] atoms;
+        private readonly Generex<T>[] atoms;
 
-        public IEnumerable<Atom<T>> Atoms
+        public IEnumerable<Generex<T>> Atoms
         {
             get
             {
@@ -20,15 +20,15 @@ namespace Generex.Atoms
 
         public int Length => atoms.Length;
 
-        public Sequence(Atom<T> atom, params Atom<T>[] furtherAtoms) : this(atom.Yield().Concat(furtherAtoms))
+        public Sequence(Generex<T> atom, params Generex<T>[] furtherAtoms) : this(atom.Yield().Concat(furtherAtoms))
         { }
 
-        public Sequence(IEnumerable<Atom<T>> atoms) : base(atoms.First().EqualityComparer)
+        public Sequence(IEnumerable<Generex<T>> atoms) : base(atoms.First().EqualityComparer)
         {
             this.atoms = atoms.ToArray();
         }
 
-        public IEnumerator<Atom<T>> GetEnumerator() => Atoms.GetEnumerator();
+        public IEnumerator<Generex<T>> GetEnumerator() => Atoms.GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Atoms).GetEnumerator();
 

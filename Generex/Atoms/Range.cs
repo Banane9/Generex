@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class Range<T> : Atom<T>, IEnumerable<LiteralRange<T>>
+    public class Range<T> : Generex<T>, IEnumerable<LiteralRange<T>>
     {
         private readonly LiteralRange<T>[] ranges;
 

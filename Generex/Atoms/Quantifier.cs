@@ -4,14 +4,14 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class Quantifier<T> : Atom<T>
+    public class Quantifier<T> : Generex<T>
     {
-        public Atom<T> Atom { get; }
+        public Generex<T> Atom { get; }
 
         public int Maximum { get; }
         public int Minimum { get; }
 
-        public Quantifier(Atom<T> atom, int minimum, int maximum) : base(atom.EqualityComparer)
+        public Quantifier(Generex<T> atom, int minimum, int maximum) : base(atom.EqualityComparer)
         {
             if (minimum < 0)
                 throw new ArgumentOutOfRangeException(nameof(minimum), "Minimum must be at least 0.");
@@ -24,7 +24,7 @@ namespace Generex.Atoms
             Maximum = maximum;
         }
 
-        public Quantifier(Atom<T> atom, int exactly) : this(atom, exactly, exactly)
+        public Quantifier(Generex<T> atom, int exactly) : this(atom, exactly, exactly)
         { }
 
         public override string ToString()

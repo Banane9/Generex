@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class Literal<T> : Atom<T>
+    public class Literal<T> : Generex<T>
     {
         public T Value { get; }
 

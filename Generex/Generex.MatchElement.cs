@@ -6,13 +6,13 @@ using System.Text;
 
 namespace Generex
 {
-    public abstract partial class Atom<T>
+    public abstract partial class Generex<T>
     {
         protected delegate IEnumerable<MatchElement> MatchNextValue(MatchElement currentMatch, T value);
 
         protected class MatchElement
         {
-            private readonly Lazy<Dictionary<Atom<T>, object>> matchState = new();
+            private readonly Lazy<Dictionary<Generex<T>, object>> matchState = new();
 
             public bool Capturing { get; set; } = true;
             public int Index { get; set; }
@@ -47,7 +47,7 @@ namespace Generex
 
             public MatchElement DoneWithNext(T value) => new(this, value) { IsDone = true };
 
-            public TState? GetLatestState<TState>(Atom<T> atom, TState? defaultState = default)
+            public TState? GetLatestState<TState>(Generex<T> atom, TState? defaultState = default)
             {
                 if (TryGetLatestState<TState>(atom, out var state))
                     return state;
@@ -80,9 +80,9 @@ namespace Generex
 
             public MatchElement Next(T value) => new(this, value);
 
-            public void SetState<TState>(Atom<T> atom, TState state) => matchState.Value[atom] = state!;
+            public void SetState<TState>(Generex<T> atom, TState state) => matchState.Value[atom] = state!;
 
-            public bool TryGetLatestState<TState>(Atom<T> atom, out TState? state)
+            public bool TryGetLatestState<TState>(Generex<T> atom, out TState? state)
             {
                 foreach (var matchElement in GetParentSequence())
                     if (matchElement.TryGetState(atom, out state))
@@ -92,7 +92,7 @@ namespace Generex
                 return false;
             }
 
-            public bool TryGetState<TState>(Atom<T> atom, out TState? state)
+            public bool TryGetState<TState>(Generex<T> atom, out TState? state)
             {
                 if (matchState.IsValueCreated && matchState.Value.TryGetValue(atom, out var value))
                 {

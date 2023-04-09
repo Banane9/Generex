@@ -9,7 +9,7 @@ namespace Generex.Tests
 {
     public class SequenceTests
     {
-        private readonly Atom<int> fiveFivesMatcher = Enumerable.Repeat(5, 5).ToArray();
+        private readonly Generex<int> fiveFivesMatcher = Enumerable.Repeat(5, 5).ToArray();
 
         [TestCase(new int[] { 5, 5, 5, -1000, 5, 5 }, ExpectedResult = 0)]
         [TestCase(new int[] { 5000, 5, 5, 5, 5, 5, 10, -5, 5, 6, 5, 5, 5, 5, 5, 5 }, ExpectedResult = 3)]

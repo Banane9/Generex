@@ -10,7 +10,7 @@ namespace Generex.Tests
 {
     public class QuantifierTests
     {
-        private readonly Atom<int> fiveFivesMatcher = new Quantifier<int>(5, 5);
+        private readonly Generex<int> fiveFivesMatcher = new Quantifier<int>(5, 5);
 
         [TestCase(new int[] { 5, 5, 5, -1000, 5, 5 }, ExpectedResult = 0)]
         [TestCase(new int[] { 5000, 5, 5, 5, 5, 5, 10, -5, 5, 6, 5, 5, 5, 5, 5, 5 }, ExpectedResult = 3)]

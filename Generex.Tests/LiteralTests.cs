@@ -4,7 +4,7 @@ namespace Generex.Tests
 {
     public class LiteralTests
     {
-        private readonly Atom<int> fiveMatcher = 5;
+        private readonly Generex<int> fiveMatcher = 5;
 
         [TestCase(new int[] { 5000, 10, 50, -5 }, ExpectedResult = 0)]
         [TestCase(new int[] { 5, 10, 5, -1000, 50 }, ExpectedResult = 2)]

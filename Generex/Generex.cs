@@ -1,5 +1,4 @@
 ﻿using Generex.Atoms;
-using Generex.Fluent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,60 +6,62 @@ using System.Text;
 
 namespace Generex
 {
-    public static class Generex
+    public abstract partial class Generex<T>
     {
-        public static class From
+        public IEqualityComparer<T> EqualityComparer { get; }
+
+        public Generex(IEqualityComparer<T>? equalityComparer = null)
         {
-            public static Atom<T> Alternatives<T>(IEnumerable<Atom<T>> atoms) => new Atoms.Alternative<T>(atoms);
-
-            public static Atom<T> Alternatives<T>(Atom<T> atom, params Atom<T>[] furtherAtoms) => Alternatives(atom.Yield().Concat(furtherAtoms));
-
-            public static Atom<T> Literal<T>(T literal) => literal;
-
-            public static Atom<T> Literals<T>(IEnumerable<T> literals) => Sequence(literals.Select(Literal));
-
-            public static Atom<T> Literals<T>(T literal, params T[] extraLiterals) => Literals(literal.Yield().Concat(extraLiterals));
-
-            public static Atom<T> Sequence<T>(IEnumerable<Atom<T>> atoms) => new Atoms.Sequence<T>(atoms);
-
-            public static Atom<T> Sequence<T>(Atom<T> atom, params Atom<T>[] furtherAtoms) => Sequence(atom.Yield().Concat(furtherAtoms));
+            EqualityComparer = equalityComparer ?? EqualityComparer<T>.Default;
         }
 
-        public static class Literal
+        public static implicit operator Generex<T>(T value) => new Literal<T>(value);
+
+        public static implicit operator Generex<T>(Generex<T>[] atoms) => new Sequence<T>((IEnumerable<Generex<T>>)atoms);
+
+        public static implicit operator Generex<T>(T[] values) => values.Select(v => new Literal<T>(v)).ToArray();
+
+        public static Generex<T> operator |(Generex<T> leftAtom, Generex<T> rightAtom) => new Alternative<T>(leftAtom, rightAtom);
+
+        public static Generex<T> operator +(Generex<T> leftAtom, Generex<T> rightAtom) => new Sequence<T>(leftAtom, rightAtom);
+
+        public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, bool fromStartOnly = false)
         {
-            public static ILiteral<T> Of<T>(IEnumerable<T> literals) => new Fluent.Literal<T>().Of(literals);
+            var currentQueue = new Queue<MatchElement>();
+            currentQueue.Enqueue(new MatchElement());
 
-            public static ILiteral<T> Of<T>(T literal, params T[] extraLiterals) => new Fluent.Literal<T>().Of(literal.Yield().Concat(extraLiterals));
+            var nextQueue = new Queue<MatchElement>();
 
-            public static IComparingLiteral<T> Using<T>(IEqualityComparer<T> equalityComparer) => new Fluent.Literal<T>().Using(equalityComparer);
-        }
-
-        public static class Range
-        {
-            public static IOpenRange<T> From<T>(T minium) => new Fluent.Range<T>().From(minium);
-
-            public static IRange<T> Of<T>(T literal) => new Fluent.Range<T>().Of(literal);
-
-            public static IRangeAddition<T> Using<T>(IComparer<T> comparer) => new Fluent.Range<T>().Using(comparer);
-        }
-
-        public static class Sequence
-        {
-            public static ISequenceAtom<T> Of<T>(IAtom<T> atom, params IAtom<T>[] furtherAtoms)
+            var index = 0;
+            foreach (var value in inputSequence)
             {
-                var sequence = new Fluent.Sequence<T>(atom);
-                sequence.AddRange(furtherAtoms);
+                while (currentQueue.Count > 0)
+                {
+                    var currentMatch = currentQueue.Dequeue();
 
-                return sequence;
-            }
+                    foreach (var nextMatch in MatchNextInternal(currentMatch, value))
+                    {
+                        if (nextMatch.IsDone)
+                            yield return nextMatch.GetMatch();
+                        else
+                            nextQueue.Enqueue(nextMatch);
+                    }
+                }
 
-            public static ISequenceAtom<T> Of<T>(IEnumerable<IAtom<T>> atoms)
-            {
-                var sequence = new Fluent.Sequence<T>(atoms.First());
-                sequence.AddRange(atoms.Skip(1));
+                if (nextQueue.Count == 0 && fromStartOnly)
+                    yield break;
 
-                return sequence;
+                nextQueue.Enqueue(new MatchElement(index));
+
+                ++index;
+                (nextQueue, currentQueue) = (currentQueue, nextQueue);
             }
         }
+
+        public abstract override string ToString();
+
+        protected static IEnumerable<MatchElement> MatchNext(Generex<T> instance, MatchElement currentMatch, T value) => instance.MatchNextInternal(currentMatch, value);
+
+        protected abstract IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value);
     }
 }
