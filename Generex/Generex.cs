@@ -1,5 +1,5 @@
 ﻿using Generex.Atoms;
-using Generex.Builders;
+using Generex.Fluent;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,27 +9,9 @@ namespace Generex
 {
     public static class Generex
     {
-        public static AlternativeBuilder<T>.InProgress Alternatives<T>(IEnumerable<Builder<T>> builders) => new(builders);
-
-        public static AlternativeBuilder<T>.InProgress Alternatives<T>(Builder<T> builder, params Builder<T>[] furtherBuilders) => new(builder.Yield().Concat(furtherBuilders));
-
-        public static Builder<T> Anything<T>() => Range(LiteralRange<T>.Wildcard).End();
-
-        public static LiteralBuilder<T>.InProgress Literal<T>(T literal, params T[] furtherLiterals) => new(literal.Yield().Concat(furtherLiterals));
-
-        public static LiteralBuilder<T>.InProgress Literal<T>(IEnumerable<T> literals) => new(literals);
-
-        public static RangeBuilder<T>.InProgress Range<T>(LiteralRange<T> range, params LiteralRange<T>[] furtherRanges) => new(range.Yield().Concat(furtherRanges));
-
-        public static RangeBuilder<T>.InProgress Range<T>(IEnumerable<LiteralRange<T>> ranges) => new(ranges);
-
-        public static SequenceBuilder<T>.InProgress Sequence<T>(Builder<T> builder, params Builder<T>[] furtherBuilders) => new(builder.Yield().Concat(furtherBuilders));
-
-        public static SequenceBuilder<T>.InProgress Sequence<T>(IEnumerable<Builder<T>> builders) => new(builders);
-
         public static class From
         {
-            public static Atom<T> Alternatives<T>(IEnumerable<Atom<T>> atoms) => new Alternative<T>(atoms);
+            public static Atom<T> Alternatives<T>(IEnumerable<Atom<T>> atoms) => new Atoms.Alternative<T>(atoms);
 
             public static Atom<T> Alternatives<T>(Atom<T> atom, params Atom<T>[] furtherAtoms) => Alternatives(atom.Yield().Concat(furtherAtoms));
 
@@ -39,12 +21,46 @@ namespace Generex
 
             public static Atom<T> Literals<T>(T literal, params T[] extraLiterals) => Literals(literal.Yield().Concat(extraLiterals));
 
-            public static Atom<T> Sequence<T>(IEnumerable<Atom<T>> atoms) => new Sequence<T>(atoms);
+            public static Atom<T> Sequence<T>(IEnumerable<Atom<T>> atoms) => new Atoms.Sequence<T>(atoms);
 
             public static Atom<T> Sequence<T>(Atom<T> atom, params Atom<T>[] furtherAtoms) => Sequence(atom.Yield().Concat(furtherAtoms));
         }
 
-        public static class Repeat
-        { }
+        public static class Literal
+        {
+            public static ILiteral<T> Of<T>(IEnumerable<T> literals) => new Fluent.Literal<T>().Of(literals);
+
+            public static ILiteral<T> Of<T>(T literal, params T[] extraLiterals) => new Fluent.Literal<T>().Of(literal.Yield().Concat(extraLiterals));
+
+            public static IComparingLiteral<T> Using<T>(IEqualityComparer<T> equalityComparer) => new Fluent.Literal<T>().Using(equalityComparer);
+        }
+
+        public static class Range
+        {
+            public static IOpenRange<T> From<T>(T minium) => new Fluent.Range<T>().From(minium);
+
+            public static IRange<T> Of<T>(T literal) => new Fluent.Range<T>().Of(literal);
+
+            public static IRangeAddition<T> Using<T>(IComparer<T> comparer) => new Fluent.Range<T>().Using(comparer);
+        }
+
+        public static class Sequence
+        {
+            public static ISequenceAtom<T> Of<T>(IAtom<T> atom, params IAtom<T>[] furtherAtoms)
+            {
+                var sequence = new Fluent.Sequence<T>(atom);
+                sequence.AddRange(furtherAtoms);
+
+                return sequence;
+            }
+
+            public static ISequenceAtom<T> Of<T>(IEnumerable<IAtom<T>> atoms)
+            {
+                var sequence = new Fluent.Sequence<T>(atoms.First());
+                sequence.AddRange(atoms.Skip(1));
+
+                return sequence;
+            }
+        }
     }
 }

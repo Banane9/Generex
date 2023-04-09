@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Generex
 {
-    public class CaptureReference
+    public class CaptureReference<T>
     {
         internal CaptureReference()
         { }
