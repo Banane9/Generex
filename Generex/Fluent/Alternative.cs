@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Generex.Fluent
 {
-    public interface IAlternativeAtom<T> : IAlternativeCapturedAtom<T>, IAlternativeRepeatedAtom<T>
+    public interface IAlternativeAtom<T> : IFinishableAtom<T>
     {
+        IAlternativeNext<T> Alternatively { get; }
+        IAlternativeGroup<T> As { get; }
         IAlternativeRepeatStart<T> Repeat { get; }
     }
 
-    public interface IAlternativeCapturedAtom<T>
+    public interface IAlternativeCapturedAtom<T> : IFinishableAtom<T>
     {
         IAlternativeNext<T> Alternatively { get; }
     }
@@ -20,7 +23,7 @@ namespace Generex.Fluent
         public IAlternativeRangeStart<T> Range { get; }
     }
 
-    public interface IAlternativeRepeatedAtom<T>
+    public interface IAlternativeRepeatedAtom<T> : IFinishableAtom<T>
     {
         IAlternativeNext<T> Alternatively { get; }
         IAlternativeGroup<T> As { get; }
@@ -28,7 +31,7 @@ namespace Generex.Fluent
 
     internal class Alternative<T> : Atom<T>, IParentAtom<T>, IAlternativeParentAtom<T>
     {
-        private readonly List<Atom<T>> atoms = new();
+        private readonly List<IFinishableAtom<T>> atoms = new();
 
         public IAlternativeLiteralStart<T> Literal
         {
@@ -50,12 +53,20 @@ namespace Generex.Fluent
             }
         }
 
-        public Alternative(Atom<T> atom) : base(null)
+        public Alternative(IFinishableAtom<T> atom) : base(null)
         {
             atoms.Add(atom);
         }
 
-        public IAlternativeGroup<T> WrapInGroup(Atom<T> child)
+        public override Generex<T> Finish()
+        {
+            if (atoms.Count == 1)
+                return atoms[0].Finish();
+
+            return new Atoms.Alternative<T>(atoms.Select(atom => atom.Finish()));
+        }
+
+        public IAlternativeGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var group = new Group<T>(this, child);
             SetParent(child, group);
@@ -66,9 +77,9 @@ namespace Generex.Fluent
             return group;
         }
 
-        IGroup<T> IParentAtom<T>.WrapInGroup(Atom<T> child) => (IGroup<T>)WrapInGroup(child);
+        IGroup<T> IParentAtom<T>.WrapInGroup(IFinishableAtom<T> child) => (IGroup<T>)WrapInGroup(child);
 
-        public IAlternativeRepeatStart<T> WrapInRepeat(Atom<T> child)
+        public IAlternativeRepeatStart<T> WrapInRepeat(IFinishableAtom<T> child)
         {
             var repeat = new Repeat<T>(this, child);
             SetParent(child, repeat);
@@ -79,13 +90,13 @@ namespace Generex.Fluent
             return repeat;
         }
 
-        IRepeatStart<T> IParentAtom<T>.WrapInRepeat(Atom<T> child) => (IRepeatStart<T>)WrapInRepeat(child);
+        IRepeatStart<T> IParentAtom<T>.WrapInRepeat(IFinishableAtom<T> child) => (IRepeatStart<T>)WrapInRepeat(child);
     }
 
     internal interface IAlternativeParentAtom<T> : IAlternativeNext<T>
     {
-        IAlternativeGroup<T> WrapInGroup(Atom<T> child);
+        IAlternativeGroup<T> WrapInGroup(IFinishableAtom<T> child);
 
-        IAlternativeRepeatStart<T> WrapInRepeat(Atom<T> child);
+        IAlternativeRepeatStart<T> WrapInRepeat(IFinishableAtom<T> child);
     }
 }

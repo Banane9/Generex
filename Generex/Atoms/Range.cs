@@ -26,8 +26,6 @@ namespace Generex.Atoms
             this.ranges = ranges.ToArray();
         }
 
-        // Version for IComparable<T>?
-
         public IEnumerator<LiteralRange<T>> GetEnumerator()
         {
             return ((IEnumerable<LiteralRange<T>>)ranges).GetEnumerator();

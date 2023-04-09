@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Generex.Fluent
 {
-    public interface IAtom<T>
+    public interface IAtom<T> : IFinishableAtom<T>
     {
         IAlternativeNext<T> Alternatively { get; }
         IGroup<T> As { get; }
@@ -12,20 +12,27 @@ namespace Generex.Fluent
         IRepeatStart<T> Repeat { get; }
     }
 
-    public interface ICapturedAtom<T>
+    public interface ICapturedAtom<T> : IFinishableAtom<T>
     {
         IAlternativeNext<T> Alternatively { get; }
         ISequenceNext<T> FollowedBy { get; }
     }
 
-    public interface IRepeatedAtom<T>
+    public interface IFinishableAtom<T>
+    {
+        Generex<T> Finish();
+    }
+
+    public interface IRepeatedAtom<T> : IFinishableAtom<T>
     {
         IAlternativeNext<T> Alternatively { get; }
         IGroup<T> As { get; }
         ISequenceNext<T> FollowedBy { get; }
     }
 
-    internal abstract class Atom<T> : IAtom<T>, ICapturedAtom<T>, IRepeatedAtom<T>, IAlternativeAtom<T>, ISequenceAtom<T>
+    internal abstract class Atom<T> : IAtom<T>, ICapturedAtom<T>, IRepeatedAtom<T>,
+        IAlternativeAtom<T>, IAlternativeCapturedAtom<T>, IAlternativeRepeatedAtom<T>,
+        ISequenceAtom<T>, ISequenceCapturedAtom<T>, ISequenceRepeatedAtom<T>
     {
         private IParentAtom<T>? parent;
 
@@ -46,6 +53,8 @@ namespace Generex.Fluent
 
         ISequenceGroup<T> ISequenceRepeatedAtom<T>.As => SequenceParent.WrapInGroup(this);
 
+        IAlternativeGroup<T> IAlternativeAtom<T>.As => AlternativeParent.WrapInGroup(this);
+        ISequenceGroup<T> ISequenceAtom<T>.As => SequenceParent.WrapInGroup(this);
         public ISequenceNext<T> FollowedBy => SequenceParent;
 
         public IRepeatStart<T> Repeat
@@ -86,13 +95,15 @@ namespace Generex.Fluent
             this.parent = parent;
         }
 
-        protected static void SetParent(Atom<T> atom, IParentAtom<T> parent) => atom.parent = parent;
+        public abstract Generex<T> Finish();
+
+        protected static void SetParent(IFinishableAtom<T> atom, IParentAtom<T> parent) => ((Atom<T>)atom).parent = parent;
     }
 
     internal interface IParentAtom<T>
     {
-        IGroup<T> WrapInGroup(Atom<T> child);
+        IGroup<T> WrapInGroup(IFinishableAtom<T> child);
 
-        IRepeatStart<T> WrapInRepeat(Atom<T> child);
+        IRepeatStart<T> WrapInRepeat(IFinishableAtom<T> child);
     }
 }

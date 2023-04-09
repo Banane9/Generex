@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Generex.Atoms;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -78,7 +79,7 @@ namespace Generex.Fluent
 
     internal class Repeat<T> : Atom<T>, IParentAtom<T>, IRepeatStart<T>, IRepeatEnd<T>, IAlternativeRepeatStart<T>, IAlternativeRepeatEnd<T>, ISequenceRepeatStart<T>, ISequenceRepeatEnd<T>
     {
-        private Atom<T> atom;
+        private IFinishableAtom<T> atom;
         private int maximum = -1;
         private int minimum = -1;
 
@@ -123,7 +124,7 @@ namespace Generex.Fluent
         IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.AtMostOnce => (IAlternativeRepeatedAtom<T>)AtMostOnce;
         ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.AtMostOnce => (ISequenceRepeatedAtom<T>)AtMostOnce;
 
-        public Repeat(IParentAtom<T>? parent, Atom<T> atom) : base(parent)
+        public Repeat(IParentAtom<T>? parent, IFinishableAtom<T> atom) : base(parent)
         {
             this.atom = atom;
         }
@@ -191,6 +192,9 @@ namespace Generex.Fluent
         ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.Exactly(int times)
             => (ISequenceRepeatedAtom<T>)Exactly(times);
 
+        public override Generex<T> Finish()
+            => new Quantifier<T>(atom.Finish(), minimum, maximum);
+
         public IRepeatedAtom<T> MaybeAtMost(int maximum)
         {
             minimum = 0;
@@ -204,7 +208,7 @@ namespace Generex.Fluent
         ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.MaybeAtMost(int maximum)
             => (ISequenceRepeatedAtom<T>)MaybeAtMost(maximum);
 
-        public IGroup<T> WrapInGroup(Atom<T> child)
+        public IGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var group = new Group<T>(this, child);
             atom = group;
@@ -212,7 +216,7 @@ namespace Generex.Fluent
             return group;
         }
 
-        public IRepeatStart<T> WrapInRepeat(Atom<T> child)
+        public IRepeatStart<T> WrapInRepeat(IFinishableAtom<T> child)
         {
             var repeat = new Repeat<T>(this, child);
             atom = repeat;

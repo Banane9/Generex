@@ -46,7 +46,7 @@ namespace Generex
 
         public static class Sequence
         {
-            public static ISequenceAtom<T> Of<T>(IAtom<T> atom, params IAtom<T>[] furtherAtoms)
+            public static ISequenceAtom<T> Of<T>(IFinishableAtom<T> atom, params IFinishableAtom<T>[] furtherAtoms)
             {
                 var sequence = new Fluent.Sequence<T>(atom);
                 sequence.AddRange(furtherAtoms);
@@ -54,7 +54,7 @@ namespace Generex
                 return sequence;
             }
 
-            public static ISequenceAtom<T> Of<T>(IEnumerable<IAtom<T>> atoms)
+            public static ISequenceAtom<T> Of<T>(IEnumerable<IFinishableAtom<T>> atoms)
             {
                 var sequence = new Fluent.Sequence<T>(atoms.First());
                 sequence.AddRange(atoms.Skip(1));

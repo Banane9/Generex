@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Generex.Fluent
 {
-    public interface ISequenceAtom<T> : ISequenceCapturedAtom<T>, ISequenceRepeatedAtom<T>
+    public interface ISequenceAtom<T> : IFinishableAtom<T>
     {
+        ISequenceGroup<T> As { get; }
+        ISequenceNext<T> FollowedBy { get; }
         ISequenceRepeatStart<T> Repeat { get; }
     }
 
-    public interface ISequenceCapturedAtom<T>
+    public interface ISequenceCapturedAtom<T> : IFinishableAtom<T>
     {
         ISequenceNext<T> FollowedBy { get; }
     }
@@ -20,7 +23,7 @@ namespace Generex.Fluent
         public ISequenceRangeStart<T> Range { get; }
     }
 
-    public interface ISequenceRepeatedAtom<T>
+    public interface ISequenceRepeatedAtom<T> : IFinishableAtom<T>
     {
         ISequenceGroup<T> As { get; }
         ISequenceNext<T> FollowedBy { get; }
@@ -28,14 +31,14 @@ namespace Generex.Fluent
 
     internal interface ISequenceParentAtom<T> : ISequenceNext<T>
     {
-        ISequenceGroup<T> WrapInGroup(Atom<T> child);
+        ISequenceGroup<T> WrapInGroup(IFinishableAtom<T> child);
 
-        ISequenceRepeatStart<T> WrapInRepeat(Atom<T> child);
+        ISequenceRepeatStart<T> WrapInRepeat(IFinishableAtom<T> child);
     }
 
     internal class Sequence<T> : Atom<T>, IParentAtom<T>, ISequenceParentAtom<T>
     {
-        private readonly List<IAtom<T>> atoms = new();
+        private readonly List<IFinishableAtom<T>> atoms = new();
 
         public ISequenceLiteralStart<T> Literal
         {
@@ -57,16 +60,24 @@ namespace Generex.Fluent
             }
         }
 
-        public Sequence(IAtom<T> atom) : base(null)
+        public Sequence(IFinishableAtom<T> atom) : base(null)
         {
             atoms.Add(atom);
         }
 
-        public void Add(IAtom<T> atom) => atoms.Add(atom);
+        public void Add(IFinishableAtom<T> atom) => atoms.Add(atom);
 
-        public void AddRange(IEnumerable<IAtom<T>> atoms) => this.atoms.AddRange(atoms);
+        public void AddRange(IEnumerable<IFinishableAtom<T>> atoms) => this.atoms.AddRange(atoms);
 
-        public ISequenceGroup<T> WrapInGroup(Atom<T> child)
+        public override Generex<T> Finish()
+        {
+            if (atoms.Count == 1)
+                return atoms[0].Finish();
+
+            return new Atoms.Sequence<T>(atoms.Select(atom => atom.Finish()));
+        }
+
+        public ISequenceGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var index = atoms.LastIndexOf(child);
             var group = new Group<T>(this, child);
@@ -75,9 +86,9 @@ namespace Generex.Fluent
             return group;
         }
 
-        IGroup<T> IParentAtom<T>.WrapInGroup(Atom<T> child) => (IGroup<T>)WrapInGroup(child);
+        IGroup<T> IParentAtom<T>.WrapInGroup(IFinishableAtom<T> child) => (IGroup<T>)WrapInGroup(child);
 
-        public ISequenceRepeatStart<T> WrapInRepeat(Atom<T> child)
+        public ISequenceRepeatStart<T> WrapInRepeat(IFinishableAtom<T> child)
         {
             var index = atoms.LastIndexOf(child);
             var repeat = new Repeat<T>(this, child);
@@ -86,6 +97,6 @@ namespace Generex.Fluent
             return repeat;
         }
 
-        IRepeatStart<T> IParentAtom<T>.WrapInRepeat(Atom<T> child) => (IRepeatStart<T>)WrapInRepeat(child);
+        IRepeatStart<T> IParentAtom<T>.WrapInRepeat(IFinishableAtom<T> child) => (IRepeatStart<T>)WrapInRepeat(child);
     }
 }

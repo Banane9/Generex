@@ -27,14 +27,14 @@ namespace Generex.Fluent
 
     internal class Group<T> : Atom<T>, IParentAtom<T>, IGroup<T>, IAlternativeGroup<T>, ISequenceGroup<T>
     {
-        private Atom<T> atom;
+        private IFinishableAtom<T> atom;
         private CaptureReference<T>? captureReference;
         public IAtom<T> NonCapturingGroup => this;
 
         IAlternativeAtom<T> IAlternativeGroup<T>.NonCapturingGroup => this;
         ISequenceAtom<T> ISequenceGroup<T>.NonCapturingGroup => this;
 
-        public Group(IParentAtom<T>? parent, Atom<T> atom) : base(parent)
+        public Group(IParentAtom<T>? parent, IFinishableAtom<T> atom) : base(parent)
         {
             this.atom = atom;
         }
@@ -53,7 +53,15 @@ namespace Generex.Fluent
         ISequenceCapturedAtom<T> ISequenceGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
             => (ISequenceCapturedAtom<T>)CapturingGroup(out captureReference);
 
-        public IGroup<T> WrapInGroup(Atom<T> child)
+        public override Generex<T> Finish()
+        {
+            if (captureReference == null)
+                return new Atoms.NonCapturingGroup<T>(atom.Finish());
+
+            throw new NotImplementedException();
+        }
+
+        public IGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var group = new Group<T>(this, child);
             atom = group;
@@ -61,7 +69,7 @@ namespace Generex.Fluent
             return group;
         }
 
-        public IRepeatStart<T> WrapInRepeat(Atom<T> child)
+        public IRepeatStart<T> WrapInRepeat(IFinishableAtom<T> child)
         {
             var repeat = new Repeat<T>(this, child);
             atom = repeat;

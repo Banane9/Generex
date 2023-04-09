@@ -43,12 +43,10 @@ namespace Generex.Tests
         [TestCase("0xFF", ExpectedResult = 255)]
         public int HexNumberFluentBuilder(string input)
         {
-            var hexNumberMatcher = Generex.Sequence(
-                Generex.Literal('0', 'x').CaptureAll.AsNothing,
-                Generex.Range(new LiteralRange<char>('a', 'f'), new LiteralRange<char>('A', 'F'), new LiteralRange<char>('0', '9')).RepeatAll.AtLeastOnce)
-                .Finish();
-
-            Generex.Literal.Of('0', 'x').FollowedBy.Range.From('a')
+            var hexNumberMatcher = Generex.Sequence.Of(
+                    Generex.Literal.Of('0', 'x').As.NonCapturingGroup,
+                    Generex.Range.From('0').To('F').And.From('a').To('f').And.From('A').To('F').Repeat.AtLeastOnce
+                ).Finish();
 
             var result = hexNumberMatcher.MatchAll(input).LastOrDefault();
 

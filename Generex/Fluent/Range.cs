@@ -99,6 +99,9 @@ namespace Generex.Fluent
         public Range(IParentAtom<T>? parentSequence = null) : base(parentSequence)
         { }
 
+        public override Generex<T> Finish()
+            => new Atoms.Range<T>(ranges);
+
         public IOpenRange<T> From(T minimum)
         {
             capturedMinium = minimum;
