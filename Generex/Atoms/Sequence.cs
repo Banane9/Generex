@@ -18,16 +18,15 @@ namespace Generex.Atoms
             }
         }
 
-        public Sequence(params Atom<T>[] atoms) : base(atoms.First().EqualityComparer)
-        {
-            if (atoms.Length == 0)
-                throw new ArgumentOutOfRangeException(nameof(atoms), "Sequence must have at least one element!");
+        public int Length => atoms.Length;
 
-            this.atoms = atoms;
-        }
-
-        public Sequence(IEnumerable<Atom<T>> atoms) : this(atoms.ToArray())
+        public Sequence(Atom<T> atom, params Atom<T>[] furtherAtoms) : this(atom.Yield().Concat(furtherAtoms))
         { }
+
+        public Sequence(IEnumerable<Atom<T>> atoms) : base(atoms.First().EqualityComparer)
+        {
+            this.atoms = atoms.ToArray();
+        }
 
         public IEnumerator<Atom<T>> GetEnumerator() => Atoms.GetEnumerator();
 
@@ -35,7 +34,7 @@ namespace Generex.Atoms
 
         public override string ToString()
         {
-            if (atoms.Length == 1)
+            if (Length == 1)
                 return atoms[0].ToString();
 
             return $"({string.Join("⋅", atoms.Select(atom => atom.ToString()))})";
@@ -45,7 +44,7 @@ namespace Generex.Atoms
         {
             var progress = currentMatch.GetLatestState(this, 0);
 
-            if (progress >= atoms.Length)
+            if (progress >= Length)
                 yield break;
 
             foreach (var nextMatch in MatchNext(atoms[progress], currentMatch, value))
@@ -55,7 +54,7 @@ namespace Generex.Atoms
                 {
                     var newProgress = progress + 1;
 
-                    if (newProgress < atoms.Length)
+                    if (newProgress < Length)
                     {
                         nextMatch.IsDone = false;
                         nextMatch.SetState(this, newProgress);

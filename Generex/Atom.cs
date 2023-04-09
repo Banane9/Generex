@@ -17,7 +17,7 @@ namespace Generex
 
         public static implicit operator Atom<T>(T value) => new Literal<T>(value);
 
-        public static implicit operator Atom<T>(Atom<T>[] atoms) => new Sequence<T>(atoms);
+        public static implicit operator Atom<T>(Atom<T>[] atoms) => new Sequence<T>((IEnumerable<Atom<T>>)atoms);
 
         public static implicit operator Atom<T>(T[] values) => values.Select(v => new Literal<T>(v)).ToArray();
 

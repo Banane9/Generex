@@ -19,16 +19,15 @@ namespace Generex.Atoms
             }
         }
 
-        public Alternative(params Atom<T>[] atoms) : base(atoms.First().EqualityComparer)
-        {
-            if (atoms.Length == 0)
-                throw new ArgumentOutOfRangeException(nameof(atoms), "Alternative must have at least one option.");
+        public int Length => atoms.Length;
 
-            this.atoms = atoms;
-        }
-
-        public Alternative(IEnumerable<Atom<T>> atoms) : this(atoms.ToArray())
+        public Alternative(Atom<T> atom, params Atom<T>[] furtherAtoms) : this(atom.Yield().Concat(furtherAtoms))
         { }
+
+        public Alternative(IEnumerable<Atom<T>> atoms) : base(atoms.First().EqualityComparer)
+        {
+            this.atoms = atoms.ToArray();
+        }
 
         public IEnumerator<Atom<T>> GetEnumerator() => Atoms.GetEnumerator();
 
@@ -36,7 +35,7 @@ namespace Generex.Atoms
 
         public override string ToString()
         {
-            if (atoms.Length == 1)
+            if (Length == 1)
                 return atoms[0].ToString();
 
             return $"({string.Join("|", atoms.Select(atom => atom.ToString()))})";
@@ -58,7 +57,7 @@ namespace Generex.Atoms
                 yield break;
             }
 
-            for (var i = 0; i < atoms.Length; ++i)
+            for (var i = 0; i < Length; ++i)
             {
                 foreach (var nextMatch in MatchNext(atoms[i], currentMatch, value))
                 {
