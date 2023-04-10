@@ -25,6 +25,10 @@ namespace Generex.Atoms
             this.ranges = ranges.ToArray();
         }
 
+        public Range(LiteralRange<T> range, params LiteralRange<T>[] furtherRanges)
+            : this(range.Yield().Concat(furtherRanges))
+        { }
+
         public IEnumerator<LiteralRange<T>> GetEnumerator()
         {
             return ((IEnumerable<LiteralRange<T>>)ranges).GetEnumerator();

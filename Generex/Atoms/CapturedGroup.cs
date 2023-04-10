@@ -17,7 +17,7 @@ namespace Generex.Atoms
         }
 
         public override string ToString()
-            => $"(?P={CaptureReference})";
+            => $"\\k'{CaptureReference}'";
 
         protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
