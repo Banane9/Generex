@@ -21,7 +21,6 @@ namespace Generex.Atoms
         }
 
         public Range(IEnumerable<LiteralRange<T>> ranges)
-            : base(new ComparerEquality(ranges.First().Comparer))
         {
             this.ranges = ranges.ToArray();
         }
@@ -51,20 +50,6 @@ namespace Generex.Atoms
                 if (range.Contains(value))
                     yield return currentMatch.DoneWithNext(value);
             }
-        }
-
-        private sealed class ComparerEquality : IEqualityComparer<T>
-        {
-            private readonly IComparer<T> comparer;
-
-            public ComparerEquality(IComparer<T>? comparer)
-            {
-                this.comparer = comparer ?? Comparer<T>.Default;
-            }
-
-            public bool Equals(T x, T y) => comparer.Compare(x, y) == 0;
-
-            public int GetHashCode(T obj) => EqualityComparer<T>.Default.GetHashCode(obj);
         }
     }
 }

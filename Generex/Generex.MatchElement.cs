@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 
 namespace Generex
@@ -12,8 +13,8 @@ namespace Generex
 
         protected class MatchElement
         {
+            private readonly Lazy<Dictionary<CaptureReference<T>, T?[]>> captureState = new();
             private readonly Lazy<Dictionary<Generex<T>, object>> matchState = new();
-
             public bool Capturing { get; set; } = true;
             public int Index { get; set; }
             public bool IsDone { get; set; }
@@ -41,6 +42,10 @@ namespace Generex
                 if (matchState.IsValueCreated)
                     foreach (var state in matchState.Value)
                         clone.SetState(state.Key, state.Value);
+
+                if (captureState.IsValueCreated)
+                    foreach (var state in captureState.Value)
+                        clone.SetCapture(state.Key, state.Value);
 
                 return clone;
             }
@@ -78,9 +83,50 @@ namespace Generex
                 return matchStack.ToArray();
             }
 
+            public IEnumerable<MatchElement> GetParentSequence()
+            {
+                var current = this;
+                while (!current!.IsStart)
+                {
+                    yield return current;
+                    current = current.Previous;
+                }
+            }
+
+            public TState? GetState<TState>(Generex<T> atom, TState? defaultState = default)
+            {
+                if (TryGetState<TState>(atom, out var state))
+                    return state;
+
+                return defaultState;
+            }
+
             public MatchElement Next(T value) => new(this, value);
 
-            public void SetState<TState>(Generex<T> atom, TState state) => matchState.Value[atom] = state!;
+            public void SetCapture(CaptureReference<T> captureReference, T?[] capture)
+                => captureState.Value[captureReference] = capture;
+
+            public void SetState<TState>(Generex<T> atom, TState state)
+                => matchState.Value[atom] = state!;
+
+            public bool TryGetCapture(CaptureReference<T> captureReference, out T?[] capture)
+            {
+                if (captureState.IsValueCreated && captureState.Value.TryGetValue(captureReference, out capture))
+                    return true;
+
+                capture = Array.Empty<T>();
+                return false;
+            }
+
+            public bool TryGetLatestCapture(CaptureReference<T> captureReference, out T?[] capture)
+            {
+                foreach (var matchElement in GetParentSequence())
+                    if (TryGetCapture(captureReference, out capture))
+                        return true;
+
+                capture = Array.Empty<T>();
+                return false;
+            }
 
             public bool TryGetLatestState<TState>(Generex<T> atom, out TState? state)
             {
@@ -102,16 +148,6 @@ namespace Generex
 
                 state = default;
                 return false;
-            }
-
-            protected IEnumerable<MatchElement> GetParentSequence()
-            {
-                var current = this;
-                while (!current!.IsStart)
-                {
-                    yield return current;
-                    current = current.Previous;
-                }
             }
         }
     }

@@ -8,7 +8,7 @@ namespace Generex.Atoms
     {
         public Generex<T> Atom { get; }
 
-        public NonCapturingGroup(Generex<T> atom) : base(atom.EqualityComparer)
+        public NonCapturingGroup(Generex<T> atom)
         {
             Atom = atom;
         }

@@ -8,11 +8,13 @@ namespace Generex.Atoms
 {
     public class Literal<T> : Generex<T>
     {
+        public IEqualityComparer<T> EqualityComparer { get; }
         public T Value { get; }
 
-        public Literal(T value, IEqualityComparer<T>? equalityComparer = null) : base(equalityComparer)
+        public Literal(T value, IEqualityComparer<T>? equalityComparer = null)
         {
             Value = value;
+            EqualityComparer = equalityComparer ?? EqualityComparer<T>.Default;
         }
 
         public override string ToString()

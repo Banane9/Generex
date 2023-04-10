@@ -8,13 +8,6 @@ namespace Generex
 {
     public abstract partial class Generex<T>
     {
-        public IEqualityComparer<T> EqualityComparer { get; }
-
-        public Generex(IEqualityComparer<T>? equalityComparer = null)
-        {
-            EqualityComparer = equalityComparer ?? EqualityComparer<T>.Default;
-        }
-
         public static implicit operator Generex<T>(T value) => new Literal<T>(value);
 
         public static implicit operator Generex<T>(Generex<T>[] atoms) => new Sequence<T>((IEnumerable<Generex<T>>)atoms);

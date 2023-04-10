@@ -23,7 +23,7 @@ namespace Generex.Atoms
         public Sequence(Generex<T> atom, params Generex<T>[] furtherAtoms) : this(atom.Yield().Concat(furtherAtoms))
         { }
 
-        public Sequence(IEnumerable<Generex<T>> atoms) : base(atoms.First().EqualityComparer)
+        public Sequence(IEnumerable<Generex<T>> atoms)
         {
             this.atoms = atoms.ToArray();
         }

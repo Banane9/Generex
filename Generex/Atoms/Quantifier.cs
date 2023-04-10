@@ -11,7 +11,7 @@ namespace Generex.Atoms
         public int Maximum { get; }
         public int Minimum { get; }
 
-        public Quantifier(Generex<T> atom, int minimum, int maximum) : base(atom.EqualityComparer)
+        public Quantifier(Generex<T> atom, int minimum, int maximum)
         {
             if (minimum < 0)
                 throw new ArgumentOutOfRangeException(nameof(minimum), "Minimum must be at least 0.");

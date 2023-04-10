@@ -24,7 +24,7 @@ namespace Generex.Atoms
         public Alternative(Generex<T> atom, params Generex<T>[] furtherAtoms) : this(atom.Yield().Concat(furtherAtoms))
         { }
 
-        public Alternative(IEnumerable<Generex<T>> atoms) : base(atoms.First().EqualityComparer)
+        public Alternative(IEnumerable<Generex<T>> atoms)
         {
             this.atoms = atoms.ToArray();
         }
