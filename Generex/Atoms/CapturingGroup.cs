@@ -25,20 +25,21 @@ namespace Generex.Atoms
         {
             foreach (var nextMatch in MatchNext(Atom, currentMatch, value))
             {
+                // Mark as part of the current capture
+                nextMatch.SetState(this, true);
+
                 if (nextMatch.IsDone)
                 {
                     nextMatch.SetCapture(CaptureReference,
                         nextMatch.GetParentSequence()
                             .TakeWhile(match => match.GetState(this, false))
-                            .Select(match => match.Value)
+                            .Select(match => match.Value!)
+                            .Reverse()
                             .ToArray());
 
                     // Set to false to break the TakeWhile of any later capture
                     nextMatch.SetState(this, false);
                 }
-                else
-                    // Mark as part of the current capture
-                    nextMatch.SetState(this, true);
 
                 yield return nextMatch;
             }

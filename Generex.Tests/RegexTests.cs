@@ -54,5 +54,21 @@ namespace Generex.Tests
 
             return value;
         }
+
+        [TestCase("1", ExpectedResult = new[] { 1 })]
+        [TestCase("111", ExpectedResult = new[] { 111, 11, 1 })]
+        [TestCase("aah99asd", ExpectedResult = new[] { 99, 9 })]
+        [TestCase("152455", ExpectedResult = new[] { 1, 5, 2, 4, 55, 5 })]
+        public int[] RepdigitFluentBuilder(string input)
+        {
+            var repdigitMatcher = Generex.Range.From('0').To('9').As.CapturingGroup(out var digit).Called("digit")
+                .FollowedBy.CapturedGroup.ReferringBackTo(digit).Repeat.AnyNumber
+                .Finish();
+
+            var results = repdigitMatcher.MatchAll(input);
+
+            var ints = results.Select(result => int.Parse(result.ToArray())).ToArray();
+            return ints;
+        }
     }
 }

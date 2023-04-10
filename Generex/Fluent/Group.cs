@@ -8,24 +8,26 @@ namespace Generex.Fluent
     {
         IAlternativeAtom<T> NonCapturingGroup { get; }
 
-        IAlternativeCapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference, string? name);
+        IAlternativeUnnamedCapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference);
     }
 
     public interface IGroup<T>
     {
         IAtom<T> NonCapturingGroup { get; }
 
-        ICapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference, string? name);
+        IUnnamedCapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference);
     }
 
     public interface ISequenceGroup<T>
     {
         ISequenceAtom<T> NonCapturingGroup { get; }
 
-        ISequenceCapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference, string? name);
+        ISequenceUnnamedCapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference);
     }
 
-    internal class Group<T> : Atom<T>, IParentAtom<T>, IGroup<T>, IAlternativeGroup<T>, ISequenceGroup<T>
+    internal class Group<T> : Atom<T>, IParentAtom<T>, IGroup<T>, IUnnamedCapturedAtom<T>,
+        IAlternativeGroup<T>, IAlternativeUnnamedCapturedAtom<T>,
+        ISequenceGroup<T>, ISequenceUnnamedCapturedAtom<T>
     {
         private IFinishableAtom<T> atom;
         private CaptureReference<T>? captureReference;
@@ -39,19 +41,31 @@ namespace Generex.Fluent
             this.atom = atom;
         }
 
-        public ICapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference, string? name)
+        public ICapturedAtom<T> Called(string name)
         {
-            captureReference = new CaptureReference<T>(name);
+            captureReference!.Name = name;
+            return this;
+        }
+
+        IAlternativeCapturedAtom<T> IAlternativeUnnamedCapturedAtom<T>.Called(string name)
+            => (IAlternativeCapturedAtom<T>)Called(name);
+
+        ISequenceCapturedAtom<T> ISequenceUnnamedCapturedAtom<T>.Called(string name)
+            => (ISequenceCapturedAtom<T>)Called(name);
+
+        public IUnnamedCapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference)
+        {
+            captureReference = new CaptureReference<T>();
             this.captureReference = captureReference;
 
             return this;
         }
 
-        IAlternativeCapturedAtom<T> IAlternativeGroup<T>.CapturingGroup(out CaptureReference<T> captureReference, string? name)
-            => (IAlternativeCapturedAtom<T>)CapturingGroup(out captureReference, name);
+        IAlternativeUnnamedCapturedAtom<T> IAlternativeGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
+            => (IAlternativeUnnamedCapturedAtom<T>)CapturingGroup(out captureReference);
 
-        ISequenceCapturedAtom<T> ISequenceGroup<T>.CapturingGroup(out CaptureReference<T> captureReference, string? name)
-            => (ISequenceCapturedAtom<T>)CapturingGroup(out captureReference, name);
+        ISequenceUnnamedCapturedAtom<T> ISequenceGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
+            => (ISequenceUnnamedCapturedAtom<T>)CapturingGroup(out captureReference);
 
         public IGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {

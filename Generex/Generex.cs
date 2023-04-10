@@ -18,12 +18,18 @@ namespace Generex
 
         public static Generex<T> operator +(Generex<T> leftAtom, Generex<T> rightAtom) => new Sequence<T>(leftAtom, rightAtom);
 
+        protected static string SequenceSeparator { get; } = typeof(T) == typeof(char) ? "" : "⋅";
+
         public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, bool fromStartOnly = false)
         {
+            var nextQueue = new Queue<MatchElement>();
+            var inputEnumerator = inputSequence.GetEnumerator();
+
             var currentQueue = new Queue<MatchElement>();
             currentQueue.Enqueue(new MatchElement());
 
-            var nextQueue = new Queue<MatchElement>();
+            if (!inputEnumerator.MoveNext())
+                yield break;
 
             var index = 0;
             foreach (var value in inputSequence)
@@ -41,20 +47,37 @@ namespace Generex
                     }
                 }
 
-                if (nextQueue.Count == 0 && fromStartOnly)
+                (nextQueue, currentQueue) = (currentQueue, nextQueue);
+
+                if (currentQueue.Count == 0 && fromStartOnly)
                     yield break;
 
-                nextQueue.Enqueue(new MatchElement(index));
-
+                currentQueue.Enqueue(new MatchElement(index));
                 ++index;
-                (nextQueue, currentQueue) = (currentQueue, nextQueue);
+            }
+
+            while (currentQueue.Count > 0)
+            {
+                var endMatch = currentQueue.Dequeue();
+
+                if (!MatchEndInternal(endMatch))
+                    continue;
+
+                endMatch.IsDone = true;
+                yield return endMatch.GetMatch();
             }
         }
 
         public abstract override string ToString();
 
-        protected static IEnumerable<MatchElement> MatchNext(Generex<T> instance, MatchElement currentMatch, T value) => instance.MatchNextInternal(currentMatch, value);
+        protected static IEnumerable<MatchElement> MatchNext(Generex<T> instance, MatchElement currentMatch, T value)
+            => instance.MatchNextInternal(currentMatch, value);
 
         protected abstract IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value);
+
+        protected virtual bool MatchEndInternal(MatchElement currentMatch) => false;
+
+        protected static bool MatchEnd(Generex<T> instance, MatchElement currentMatch)
+            => instance.MatchEndInternal(currentMatch);
     }
 }

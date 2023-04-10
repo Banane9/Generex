@@ -62,7 +62,9 @@ namespace Generex.Fluent
         ISequenceComparingLiteral<T> Using(IEqualityComparer<T> equalityComparer);
     }
 
-    internal class Literal<T> : Atom<T>, ILiteral<T>, ILiteralStart<T>, IAlternativeLiteral<T>, IAlternativeLiteralStart<T>, ISequenceLiteral<T>, ISequenceLiteralStart<T>
+    internal class Literal<T> : Atom<T>, ILiteral<T>, ILiteralStart<T>,
+        IAlternativeLiteral<T>, IAlternativeLiteralStart<T>,
+        ISequenceLiteral<T>, ISequenceLiteralStart<T>
     {
         private readonly List<T> literals = new();
         private IEqualityComparer<T> equalityComparer = EqualityComparer<T>.Default;

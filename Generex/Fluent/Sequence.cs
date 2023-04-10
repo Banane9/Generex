@@ -19,6 +19,7 @@ namespace Generex.Fluent
 
     public interface ISequenceNext<T>
     {
+        public ISequenceCapturedGroupStart<T> CapturedGroup { get; }
         public ISequenceLiteralStart<T> Literal { get; }
         public ISequenceRangeStart<T> Range { get; }
     }
@@ -27,6 +28,11 @@ namespace Generex.Fluent
     {
         ISequenceGroup<T> As { get; }
         ISequenceNext<T> FollowedBy { get; }
+    }
+
+    public interface ISequenceUnnamedCapturedAtom<T> : ISequenceCapturedAtom<T>
+    {
+        ISequenceCapturedAtom<T> Called(string name);
     }
 
     internal interface ISequenceParentAtom<T> : ISequenceNext<T>, IFinishableAtom<T>
@@ -39,6 +45,16 @@ namespace Generex.Fluent
     internal class Sequence<T> : Atom<T>, IParentAtom<T>, ISequenceParentAtom<T>
     {
         private readonly List<IFinishableAtom<T>> atoms = new();
+
+        public ISequenceCapturedGroupStart<T> CapturedGroup
+        {
+            get
+            {
+                var capturedGroup = new CapturedGroup<T>(this);
+                atoms.Add(capturedGroup);
+                return capturedGroup;
+            }
+        }
 
         public ISequenceLiteralStart<T> Literal
         {

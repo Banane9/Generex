@@ -30,6 +30,11 @@ namespace Generex.Fluent
         ISequenceNext<T> FollowedBy { get; }
     }
 
+    public interface IUnnamedCapturedAtom<T> : ICapturedAtom<T>
+    {
+        ICapturedAtom<T> Called(string name);
+    }
+
     internal abstract class Atom<T> : IAtom<T>, ICapturedAtom<T>, IRepeatedAtom<T>,
         IAlternativeAtom<T>, IAlternativeCapturedAtom<T>, IAlternativeRepeatedAtom<T>,
         ISequenceAtom<T>, ISequenceCapturedAtom<T>, ISequenceRepeatedAtom<T>

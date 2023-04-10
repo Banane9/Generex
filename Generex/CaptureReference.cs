@@ -6,11 +6,11 @@ namespace Generex
 {
     public class CaptureReference<T>
     {
-        public string? Name { get; }
+        public string Name { get; internal set; }
 
         public CaptureReference(string? name = null)
         {
-            Name = name;
+            Name = name ?? Guid.NewGuid().ToString();
         }
 
         public static bool operator !=(CaptureReference<T>? left, CaptureReference<T>? right)
@@ -23,9 +23,9 @@ namespace Generex
             => obj is CaptureReference<T> captureReference && captureReference == this;
 
         public override int GetHashCode()
-            => Name?.GetHashCode() ?? base.GetHashCode();
+            => Name.GetHashCode();
 
         public override string ToString()
-            => Name ?? "Unnamed Capture Reference";
+            => Name;
     }
 }

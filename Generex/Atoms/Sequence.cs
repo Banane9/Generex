@@ -37,7 +37,20 @@ namespace Generex.Atoms
             if (Length == 1)
                 return atoms[0].ToString();
 
-            return $"({string.Join("⋅", atoms.Select(atom => atom.ToString()))})";
+            return $"({string.Join(SequenceSeparator, atoms.Select(atom => atom.ToString()))})";
+        }
+
+        protected override bool MatchEndInternal(MatchElement currentMatch)
+        {
+            var progress = currentMatch.GetLatestState(this, 0);
+
+            if (progress >= Length)
+                throw new InvalidOperationException("Sequence can't be at progress >= Length!");
+
+            // Check if all remaining elements in the sequence accept an end match
+            while (MatchEnd(atoms[progress], currentMatch) && ++progress < Length) ;
+
+            return progress >= Length;
         }
 
         protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
@@ -45,26 +58,41 @@ namespace Generex.Atoms
             var progress = currentMatch.GetLatestState(this, 0);
 
             if (progress >= Length)
-                yield break;
+                throw new InvalidOperationException("Sequence can't be at progress >= Length!");
 
             foreach (var nextMatch in MatchNext(atoms[progress], currentMatch, value))
             {
-                // Advance progress when nested match is complete
-                if (nextMatch.IsDone)
+                // Nothing to do when nested atom isn't done
+                if (!nextMatch.IsDone)
                 {
-                    var newProgress = progress + 1;
-
-                    if (newProgress < Length)
-                    {
-                        nextMatch.IsDone = false;
-                        nextMatch.SetState(this, newProgress);
-                    }
-                    else
-                        // Reset state so this can be used again
-                        nextMatch.SetState(this, 0);
+                    yield return nextMatch;
+                    continue;
                 }
 
-                yield return nextMatch;
+                var newProgress = progress + 1;
+                if (newProgress >= Length)
+                {
+                    // Reset state when done, so this atom can be used again
+                    nextMatch.SetState(this, 0);
+                    yield return nextMatch;
+                    continue;
+                }
+
+                // Sequence not done - advance progress
+                nextMatch.IsDone = false;
+                nextMatch.SetState(this, newProgress);
+
+                if (nextMatch.Index > currentMatch.Index)
+                {
+                    yield return nextMatch;
+                    continue;
+                }
+
+                // Have to recurse to pass the value to the next atom in the sequence,
+                // if nextMatch is zero-width and this sequence isn't done.
+                // If this sequence is done, it's the parent's problem or the match is actually complete.
+                foreach (var nextNextMatch in MatchNextInternal(nextMatch, value))
+                    yield return nextNextMatch;
             }
         }
     }

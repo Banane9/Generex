@@ -38,9 +38,9 @@ namespace Generex.Atoms
         public override string ToString()
         {
             if (Length == 1)
-                return ranges[0].ToString();
+                return $"[{ranges[0]}]";
 
-            return $"[{string.Join("|", ranges.Select(range => range.ToString()))}]";
+            return $"[{string.Join(SequenceSeparator, ranges.Select(range => range.ToString()))}]";
         }
 
         protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)

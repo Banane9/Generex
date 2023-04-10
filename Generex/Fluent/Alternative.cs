@@ -19,6 +19,7 @@ namespace Generex.Fluent
 
     public interface IAlternativeNext<T>
     {
+        public IAlternativeCapturedGroupStart<T> CapturedGroup { get; }
         public IAlternativeLiteralStart<T> Literal { get; }
         public IAlternativeRangeStart<T> Range { get; }
     }
@@ -29,9 +30,24 @@ namespace Generex.Fluent
         IAlternativeGroup<T> As { get; }
     }
 
+    public interface IAlternativeUnnamedCapturedAtom<T> : IAlternativeCapturedAtom<T>
+    {
+        IAlternativeCapturedAtom<T> Called(string name);
+    }
+
     internal class Alternative<T> : Atom<T>, IParentAtom<T>, IAlternativeParentAtom<T>
     {
         private readonly List<IFinishableAtom<T>> atoms = new();
+
+        public IAlternativeCapturedGroupStart<T> CapturedGroup
+        {
+            get
+            {
+                var capturedGroup = new CapturedGroup<T>(this);
+                atoms.Add(capturedGroup);
+                return capturedGroup;
+            }
+        }
 
         public IAlternativeLiteralStart<T> Literal
         {

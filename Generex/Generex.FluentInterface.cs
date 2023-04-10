@@ -9,6 +9,11 @@ namespace Generex
 {
     public static class Generex
     {
+        public static class CapturedGroup
+        {
+            public static ICapturedGroupEnd<T> ReferringBackTo<T>(CaptureReference<T> captureReference) => new Fluent.CapturedGroup<T>().ReferringBackTo(captureReference);
+        }
+
         public static class From
         {
             public static Generex<T> Alternatives<T>(IEnumerable<Generex<T>> atoms) => new Atoms.Alternative<T>(atoms);

@@ -12,7 +12,7 @@ namespace Generex.Fluent
 
     public interface IAlternativeRepeatStart<T>
     {
-        public IAlternativeRepeatedAtom<T> Any { get; }
+        public IAlternativeRepeatedAtom<T> AnyNumber { get; }
 
         public IAlternativeRepeatedAtom<T> AtLeastOnce { get; }
 
@@ -36,7 +36,7 @@ namespace Generex.Fluent
 
     public interface IRepeatStart<T>
     {
-        public IRepeatedAtom<T> Any { get; }
+        public IRepeatedAtom<T> AnyNumber { get; }
 
         public IRepeatedAtom<T> AtLeastOnce { get; }
 
@@ -60,7 +60,7 @@ namespace Generex.Fluent
 
     public interface ISequenceRepeatStart<T>
     {
-        public ISequenceRepeatedAtom<T> Any { get; }
+        public ISequenceRepeatedAtom<T> AnyNumber { get; }
 
         public ISequenceRepeatedAtom<T> AtLeastOnce { get; }
 
@@ -77,13 +77,18 @@ namespace Generex.Fluent
         public ISequenceRepeatedAtom<T> MaybeAtMost(int maximum);
     }
 
-    internal class Repeat<T> : Atom<T>, IParentAtom<T>, IRepeatStart<T>, IRepeatEnd<T>, IAlternativeRepeatStart<T>, IAlternativeRepeatEnd<T>, ISequenceRepeatStart<T>, ISequenceRepeatEnd<T>
+    internal class Repeat<T> : Atom<T>, IParentAtom<T>, IRepeatStart<T>, IRepeatEnd<T>,
+        IAlternativeRepeatStart<T>, IAlternativeRepeatEnd<T>,
+        ISequenceRepeatStart<T>, ISequenceRepeatEnd<T>
     {
         private IFinishableAtom<T> atom;
         private int maximum = -1;
         private int minimum = -1;
 
-        public IRepeatedAtom<T> Any
+        ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.AnyNumber => (ISequenceRepeatedAtom<T>)AnyNumber;
+        IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.AnyNumber => (IAlternativeRepeatedAtom<T>)AnyNumber;
+
+        public IRepeatedAtom<T> AnyNumber
         {
             get
             {
@@ -92,10 +97,6 @@ namespace Generex.Fluent
                 return this;
             }
         }
-
-        IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.Any => (IAlternativeRepeatedAtom<T>)Any;
-
-        ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.Any => (ISequenceRepeatedAtom<T>)Any;
 
         public IRepeatedAtom<T> AtLeastOnce
         {

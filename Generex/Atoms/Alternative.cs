@@ -41,8 +41,19 @@ namespace Generex.Atoms
             return $"({string.Join("|", atoms.Select(atom => atom.ToString()))})";
         }
 
+        protected override bool MatchEndInternal(MatchElement currentMatch)
+        {
+            // Check if option matches if one was picked
+            if (currentMatch.TryGetLatestState(this, out int option) && option >= 0)
+                return MatchEnd(atoms[option], currentMatch);
+
+            // Any option matching is enough otherwise
+            return atoms.Any(atom => MatchEnd(atom, currentMatch));
+        }
+
         protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
+            // Check if option matches if one was picked
             if (currentMatch.TryGetLatestState(this, out int option) && option >= 0)
             {
                 foreach (var nextMatch in MatchNext(atoms[option], currentMatch, value))
@@ -57,6 +68,7 @@ namespace Generex.Atoms
                 yield break;
             }
 
+            // Attempt all options otherwise
             for (var i = 0; i < Length; ++i)
             {
                 foreach (var nextMatch in MatchNext(atoms[i], currentMatch, value))

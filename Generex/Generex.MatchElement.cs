@@ -13,7 +13,7 @@ namespace Generex
 
         protected class MatchElement
         {
-            private readonly Lazy<Dictionary<CaptureReference<T>, T?[]>> captureState = new();
+            private readonly Lazy<Dictionary<CaptureReference<T>, T[]>> captureState = new();
             private readonly Lazy<Dictionary<Generex<T>, object>> matchState = new();
             public bool Capturing { get; set; } = true;
             public int Index { get; set; }
@@ -103,13 +103,13 @@ namespace Generex
 
             public MatchElement Next(T value) => new(this, value);
 
-            public void SetCapture(CaptureReference<T> captureReference, T?[] capture)
+            public void SetCapture(CaptureReference<T> captureReference, T[] capture)
                 => captureState.Value[captureReference] = capture;
 
             public void SetState<TState>(Generex<T> atom, TState state)
                 => matchState.Value[atom] = state!;
 
-            public bool TryGetCapture(CaptureReference<T> captureReference, out T?[] capture)
+            public bool TryGetCapture(CaptureReference<T> captureReference, out T[] capture)
             {
                 if (captureState.IsValueCreated && captureState.Value.TryGetValue(captureReference, out capture))
                     return true;
@@ -118,7 +118,7 @@ namespace Generex
                 return false;
             }
 
-            public bool TryGetLatestCapture(CaptureReference<T> captureReference, out T?[] capture)
+            public bool TryGetLatestCapture(CaptureReference<T> captureReference, out T[] capture)
             {
                 foreach (var matchElement in GetParentSequence())
                     if (TryGetCapture(captureReference, out capture))

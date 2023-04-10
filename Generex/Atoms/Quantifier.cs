@@ -43,13 +43,29 @@ namespace Generex.Atoms
             return $"{Atom}{{{Minimum},{Maximum}}}";
         }
 
+        protected override bool MatchEndInternal(MatchElement currentMatch)
+        {
+            // Only approve zero-width matches at the end.
+            // Others were already returned in the last MatchNextInternal.
+            var progress = currentMatch.GetLatestState(this, 0);
+            return progress == 0 && Minimum == 0;
+        }
+
         protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
         {
             var progress = currentMatch.GetLatestState(this, 0);
 
-            // Shouldn't happen, but just to be sure
             if (progress >= Maximum)
-                yield break;
+                throw new InvalidOperationException("Quantifier can't be at progress >= Max!");
+
+            if (progress == 0 && Minimum == 0)
+            {
+                var newMatch = currentMatch.Clone();
+                newMatch.SetState(this, 0);
+                newMatch.IsDone = true;
+
+                yield return newMatch;
+            }
 
             foreach (var nextMatch in MatchNext(Atom, currentMatch, value))
             {
