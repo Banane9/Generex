@@ -21,25 +21,17 @@ namespace Generex.Atoms
             return $"(?'{CaptureReference}'{Atom})";
         }
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
         {
-            foreach (var nextMatch in MatchNext(Atom, currentMatch, value))
+            foreach (var nextMatch in MatchNext(Atom, currentMatch))
             {
-                // Mark as part of the current capture
-                nextMatch.SetState(this, true);
-
-                if (nextMatch.IsDone)
-                {
-                    nextMatch.SetCapture(CaptureReference,
-                        nextMatch.GetParentSequence()
-                            .TakeWhile(match => match.GetState(this, false))
-                            .Select(match => match.Value!)
-                            .Reverse()
-                            .ToArray());
-
-                    // Set to false to break the TakeWhile of any later capture
-                    nextMatch.SetState(this, false);
-                }
+                nextMatch.SetCapture(CaptureReference,
+                    nextMatch.GetParentSequence()
+                        .Skip(1)
+                        .TakeUntil(match => match != currentMatch)
+                        .Select(match => match.NextValue!)
+                        .Reverse()
+                        .ToArray());
 
                 yield return nextMatch;
             }

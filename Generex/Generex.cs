@@ -20,60 +20,86 @@ namespace Generex
 
         protected static string SequenceSeparator { get; } = typeof(T) == typeof(char) ? "" : "⋅";
 
-        public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, bool fromStartOnly = false)
+        public IEnumerable<Match<T>> MatchSequential(IEnumerable<T> inputSequence, bool fromStartOnly = false)
+            => MatchAll(inputSequence, false, fromStartOnly);
+
+        public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, bool restartFromEveryValue = true, bool fromStartOnly = false)
         {
-            var nextQueue = new Queue<MatchElement>();
-            var inputEnumerator = inputSequence.GetEnumerator();
+            var startMatch = new MatchElement(inputSequence);
+            bool tryWithoutNext;
 
-            var currentQueue = new Queue<MatchElement>();
-            currentQueue.Enqueue(new MatchElement());
-
-            if (!inputEnumerator.MoveNext())
-                yield break;
-
-            var index = 0;
-            foreach (var value in inputSequence)
+            do
             {
-                while (currentQueue.Count > 0)
-                {
-                    var currentMatch = currentQueue.Dequeue();
+                tryWithoutNext = startMatch.HasNext;
+                var hadSuccessfulMatch = false;
 
-                    foreach (var nextMatch in MatchNextInternal(currentMatch, value))
-                    {
-                        if (nextMatch.IsDone)
-                            yield return nextMatch.GetMatch();
-                        else
-                            nextQueue.Enqueue(nextMatch);
-                    }
+                var match = MatchNextInternal(startMatch).FirstOrDefault();
+                if (match != null)
+                {
+                    hadSuccessfulMatch = true;
+                    yield return match.GetMatch();
                 }
 
-                (nextQueue, currentQueue) = (currentQueue, nextQueue);
+                if (restartFromEveryValue || !hadSuccessfulMatch)
+                    startMatch = startMatch.Next();
+                else
+                    startMatch = match!;
 
-                if (currentQueue.Count == 0 && fromStartOnly)
-                    yield break;
-
-                currentQueue.Enqueue(new MatchElement(index));
-                ++index;
+                startMatch.IsDone = true;
             }
+            while (startMatch.HasNext || tryWithoutNext);
 
-            while (currentQueue.Count > 0)
-            {
-                var endMatch = currentQueue.Dequeue();
+            //var nextQueue = new Queue<MatchElement>();
+            //var currentQueue = new Queue<MatchElement>();
+            //currentQueue.Enqueue(new MatchElement());
 
-                if (!MatchEndInternal(endMatch))
-                    continue;
+            //var inputEnumerator = inputSequence.GetEnumerator();
+            //if (!inputEnumerator.MoveNext())
+            //    yield break;
 
-                endMatch.IsDone = true;
-                yield return endMatch.GetMatch();
-            }
+            //var index = 0;
+            //foreach (var value in inputSequence)
+            //{
+            //    while (currentQueue.Count > 0)
+            //    {
+            //        var currentMatch = currentQueue.Dequeue();
+
+            //        foreach (var nextMatch in MatchNextInternal(currentMatch, value))
+            //        {
+            //            if (nextMatch.IsDone)
+            //                yield return nextMatch.GetMatch();
+            //            else
+            //                nextQueue.Enqueue(nextMatch);
+            //        }
+            //    }
+
+            //    (nextQueue, currentQueue) = (currentQueue, nextQueue);
+
+            //    if (currentQueue.Count == 0 && fromStartOnly)
+            //        yield break;
+
+            //    currentQueue.Enqueue(new MatchElement(index));
+            //    ++index;
+            //}
+
+            //while (currentQueue.Count > 0)
+            //{
+            //    var endMatch = currentQueue.Dequeue();
+
+            //    if (!MatchEndInternal(endMatch))
+            //        continue;
+
+            //    endMatch.IsDone = true;
+            //    yield return endMatch.GetMatch();
+            //}
         }
 
         public abstract override string ToString();
 
-        protected static IEnumerable<MatchElement> MatchNext(Generex<T> instance, MatchElement currentMatch, T value)
-            => instance.MatchNextInternal(currentMatch, value);
+        protected static IEnumerable<MatchElement> MatchNext(Generex<T> instance, MatchElement currentMatch)
+            => instance.MatchNextInternal(currentMatch);
 
-        protected abstract IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value);
+        protected abstract IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch);
 
         protected virtual bool MatchEndInternal(MatchElement currentMatch) => false;
 

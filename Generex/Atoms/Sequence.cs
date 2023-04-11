@@ -53,46 +53,27 @@ namespace Generex.Atoms
             return progress >= Length;
         }
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
+            => MatchSequence(currentMatch);
+
+        private IEnumerable<MatchElement> MatchSequence(MatchElement currentMatch, int progress = 0)
         {
-            var progress = currentMatch.GetLatestState(this, 0);
+            var newProgress = progress + 1;
 
-            if (progress >= Length)
-                throw new InvalidOperationException("Sequence can't be at progress >= Length!");
-
-            foreach (var nextMatch in MatchNext(atoms[progress], currentMatch, value))
+            if (newProgress >= Length)
             {
-                // Nothing to do when nested atom isn't done
-                if (!nextMatch.IsDone)
-                {
+                foreach (var nextMatch in MatchNext(atoms[progress], currentMatch))
                     yield return nextMatch;
-                    continue;
-                }
 
-                var newProgress = progress + 1;
-                if (newProgress >= Length)
-                {
-                    // Reset state when done, so this atom can be used again
-                    nextMatch.SetState(this, 0);
-                    yield return nextMatch;
-                    continue;
-                }
+                yield break;
+            }
 
-                // Sequence not done - advance progress
+            foreach (var nextMatch in MatchNext(atoms[progress], currentMatch))
+            {
                 nextMatch.IsDone = false;
-                nextMatch.SetState(this, newProgress);
 
-                if (nextMatch.Index > currentMatch.Index)
-                {
-                    yield return nextMatch;
-                    continue;
-                }
-
-                // Have to recurse to pass the value to the next atom in the sequence,
-                // if nextMatch is zero-width and this sequence isn't done.
-                // If this sequence is done, it's the parent's problem or the match is actually complete.
-                foreach (var nextNextMatch in MatchNextInternal(nextMatch, value))
-                    yield return nextNextMatch;
+                foreach (var futureMatch in MatchSequence(nextMatch, newProgress))
+                    yield return futureMatch;
             }
         }
     }

@@ -51,35 +51,9 @@ namespace Generex.Atoms
             return atoms.Any(atom => MatchEnd(atom, currentMatch));
         }
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
         {
-            // Check if option matches if one was picked
-            if (currentMatch.TryGetLatestState(this, out int option) && option >= 0)
-            {
-                foreach (var nextMatch in MatchNext(atoms[option], currentMatch, value))
-                {
-                    // Reset state when done so this can be used again
-                    if (nextMatch.IsDone)
-                        nextMatch.SetState(this, -1);
-
-                    yield return nextMatch;
-                }
-
-                yield break;
-            }
-
-            // Attempt all options otherwise
-            for (var i = 0; i < Length; ++i)
-            {
-                foreach (var nextMatch in MatchNext(atoms[i], currentMatch, value))
-                {
-                    // Only set state when not done so this can be used again
-                    if (!nextMatch.IsDone)
-                        nextMatch.SetState(this, i);
-
-                    yield return nextMatch;
-                }
-            }
+            return Atoms.SelectMany(atom => MatchNext(atom, currentMatch.Clone()));
         }
     }
 }

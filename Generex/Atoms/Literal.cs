@@ -22,10 +22,10 @@ namespace Generex.Atoms
             return Value?.ToString() ?? "null";
         }
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
         {
-            if (EqualityComparer.Equals(Value, value))
-                yield return currentMatch.DoneWithNext(value);
+            if (currentMatch.HasNext && EqualityComparer.Equals(Value, currentMatch.NextValue))
+                yield return currentMatch.DoneWithNext();
         }
     }
 }

@@ -15,29 +15,48 @@ namespace Generex
         {
             private readonly Lazy<Dictionary<CaptureReference<T>, T[]>> captureState = new();
             private readonly Lazy<Dictionary<Generex<T>, object>> matchState = new();
+            private readonly PeekAheadEnumerator<T> peekAheadEnumerator;
             public bool Capturing { get; set; } = true;
+            public bool HasNext { get; }
             public int Index { get; set; }
             public bool IsDone { get; set; }
 
             public bool IsStart => Previous == null;
+            public T NextValue { get; }
             public MatchElement? Previous { get; }
 
-            public T? Value { get; }
-
-            public MatchElement(int index = -1)
+            public MatchElement(MatchElement template, int index)
             {
+                peekAheadEnumerator = template.peekAheadEnumerator.Snapshot();
+                NextValue = template.NextValue;
+                Capturing = template.Capturing;
+                Previous = template.Previous;
+                HasNext = template.HasNext;
+                IsDone = template.IsDone;
                 Index = index;
             }
 
-            public MatchElement(MatchElement previous, T value) : this(previous.Index + 1)
+            public MatchElement(IEnumerable<T> inputSequence)
             {
+                peekAheadEnumerator = new PeekAheadEnumerator<T>(inputSequence);
+                HasNext = peekAheadEnumerator.MoveNextAndResetPeek();
+                NextValue = peekAheadEnumerator.Current;
+                Index = -1;
+            }
+
+            public MatchElement(MatchElement previous)
+            {
+                peekAheadEnumerator = previous.peekAheadEnumerator.Snapshot();
+                HasNext = peekAheadEnumerator.MoveNext();
+                NextValue = peekAheadEnumerator.Current;
+                Capturing = previous.Capturing;
                 Previous = previous;
-                Value = value;
+                Index = previous.Index + 1;
             }
 
             public MatchElement Clone()
             {
-                var clone = new MatchElement(Previous!, Value!);
+                var clone = new MatchElement(this, Index);
 
                 if (matchState.IsValueCreated)
                     foreach (var state in matchState.Value)
@@ -50,7 +69,7 @@ namespace Generex
                 return clone;
             }
 
-            public MatchElement DoneWithNext(T value) => new(this, value) { IsDone = true };
+            public MatchElement DoneWithNext() => new(this) { IsDone = true };
 
             public TState? GetLatestState<TState>(Generex<T> atom, TState? defaultState = default)
             {
@@ -63,34 +82,30 @@ namespace Generex
             public Match<T> GetMatch()
             {
                 var matchSequence = GetMatchSequence().ToArray();
-                var start = IsStart ? Index : matchSequence[0].Index;
-                var end = matchSequence[^1].Index;
+                var start = matchSequence[0].Index + 1;
+                var end = matchSequence[^1].Index + 1;
 
-                return new Match<T>(matchSequence.Select(element => element.Value!), matchSequence.Where(element => element.Capturing).Select(element => element.Value!), start, end);
+                return new Match<T>(matchSequence.Select(element => element.NextValue!), matchSequence.Where(element => element.Capturing).Select(element => element.NextValue!), start, end);
             }
 
             public IEnumerable<MatchElement> GetMatchSequence()
             {
-                var matchStack = new Stack<MatchElement>();
-                var current = this;
-
-                while (!current!.IsStart)
-                {
-                    matchStack.Push(current);
-                    current = current.Previous;
-                }
-
-                return matchStack.ToArray();
+                return GetParentSequence()
+                    .Skip(1)
+                    .Reverse();
             }
 
             public IEnumerable<MatchElement> GetParentSequence()
             {
                 var current = this;
-                while (!current!.IsStart)
+                do
                 {
                     yield return current;
                     current = current.Previous;
                 }
+                while (!current!.IsStart && !current.IsDone);
+
+                yield return current;
             }
 
             public TState? GetState<TState>(Generex<T> atom, TState? defaultState = default)
@@ -101,7 +116,7 @@ namespace Generex
                 return defaultState;
             }
 
-            public MatchElement Next(T value) => new(this, value);
+            public MatchElement Next() => new(this);
 
             public void SetCapture(CaptureReference<T> captureReference, T[] capture)
                 => captureState.Value[captureReference] = capture;
@@ -121,7 +136,7 @@ namespace Generex
             public bool TryGetLatestCapture(CaptureReference<T> captureReference, out T[] capture)
             {
                 foreach (var matchElement in GetParentSequence())
-                    if (TryGetCapture(captureReference, out capture))
+                    if (matchElement.TryGetCapture(captureReference, out capture))
                         return true;
 
                 capture = Array.Empty<T>();

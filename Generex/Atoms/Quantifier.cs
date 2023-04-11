@@ -51,50 +51,37 @@ namespace Generex.Atoms
             return progress == 0 && Minimum == 0;
         }
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
         {
-            var progress = currentMatch.GetLatestState(this, 0);
+            var originalMatch = currentMatch.Clone();
 
-            if (progress >= Maximum)
-                throw new InvalidOperationException("Quantifier can't be at progress >= Max!");
+            foreach (var quantityMatch in MatchQuantity(currentMatch))
+                yield return quantityMatch;
 
-            if (progress == 0 && Minimum == 0)
+            if (Minimum == 0)
             {
-                var newMatch = currentMatch.Clone();
-                newMatch.SetState(this, 0);
-                newMatch.IsDone = true;
-
-                yield return newMatch;
+                originalMatch.IsDone = true;
+                yield return originalMatch;
             }
+        }
 
-            foreach (var nextMatch in MatchNext(Atom, currentMatch, value))
+        private IEnumerable<MatchElement> MatchQuantity(MatchElement currentMatch, int progress = 1, bool tryWithoutNext = true)
+        {
+            foreach (var nextMatch in MatchNext(Atom, currentMatch))
             {
-                // Advance progress and return match(es) when inner is done
-                if (nextMatch.IsDone)
+                nextMatch.IsDone = false;
+
+                // Only recurse when it's not at the max number yet
+                if (progress < Maximum && (tryWithoutNext || nextMatch.HasNext))
+                    foreach (var futureMatch in MatchQuantity(nextMatch, progress + 1, nextMatch.HasNext))
+                        yield return futureMatch;
+
+                // Greedy order: shorter matches at the bottom
+                if (progress >= Minimum)
                 {
-                    var newProgress = progress + 1;
-
-                    // Return incomplete match whenever progress isn't at the max yet
-                    // This has to be done first, because otherwise the state may be changed and cloned wrongly
-                    if (newProgress < Maximum)
-                    {
-                        var nextMatchClone = nextMatch.Clone();
-                        nextMatchClone.SetState(this, newProgress);
-                        nextMatchClone.IsDone = false;
-
-                        yield return nextMatchClone;
-                    }
-
-                    // Return (additional) complete match whenever progress fits the quantifier
-                    if (newProgress >= Minimum && newProgress <= Maximum)
-                    {
-                        // Reset state so this can be used again
-                        nextMatch.SetState(this, 0);
-                        yield return nextMatch;
-                    }
-                }
-                else
+                    nextMatch.IsDone = true;
                     yield return nextMatch;
+                }
             }
         }
     }

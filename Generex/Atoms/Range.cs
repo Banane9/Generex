@@ -47,12 +47,18 @@ namespace Generex.Atoms
             return $"[{string.Join(SequenceSeparator, ranges.Select(range => range.ToString()))}]";
         }
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch, T value)
+        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
         {
+            if (!currentMatch.HasNext)
+                yield break;
+
             foreach (var range in ranges)
             {
-                if (range.Contains(value))
-                    yield return currentMatch.DoneWithNext(value);
+                if (range.Contains(currentMatch.NextValue))
+                {
+                    yield return currentMatch.DoneWithNext();
+                    yield break;
+                }
             }
         }
     }

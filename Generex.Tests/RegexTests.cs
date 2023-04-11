@@ -24,7 +24,7 @@ namespace Generex.Tests
         {
             var hexNumberMatcher = new Sequence<char>(new NonCapturingGroup<char>(new[] { '0', 'x' }), new Quantifier<char>(new Range<char>(new[] { new LiteralRange<char>('a', 'f'), new LiteralRange<char>('A', 'F'), new LiteralRange<char>('0', '9') }), 1, int.MaxValue));
 
-            var result = hexNumberMatcher.MatchAll(input).LastOrDefault();
+            var result = hexNumberMatcher.MatchAll(input).FirstOrDefault();
 
             Assert.That(result, Is.Not.Null);
             Assert.That(int.TryParse(new string(result.ToArray()), NumberStyles.AllowHexSpecifier, null, out var value), Is.True);
@@ -47,7 +47,7 @@ namespace Generex.Tests
                 .FollowedBy.Range.From('0').To('9').And.From('a').To('f').And.From('A').To('F').Repeat.AtLeastOnce
                 .Finish();
 
-            var result = hexNumberMatcher.MatchAll(input).LastOrDefault();
+            var result = hexNumberMatcher.MatchAll(input).FirstOrDefault();
 
             Assert.That(result, Is.Not.Null);
             Assert.That(int.TryParse(new string(result.ToArray()), NumberStyles.AllowHexSpecifier, null, out var value), Is.True);
