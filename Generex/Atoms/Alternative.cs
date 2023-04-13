@@ -33,27 +33,20 @@ namespace Generex.Atoms
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Atoms).GetEnumerator();
 
-        public override string ToString()
+        public override string ToString(bool grouped)
         {
-            if (Length == 1)
-                return atoms[0].ToString();
+            if (Length == 0)
+                return atoms[0].ToString(grouped);
 
-            return $"({string.Join("|", atoms.Select(atom => atom.ToString()))})";
+            var alternatives = string.Join("|", atoms.Select(atom => atom.ToString(atom is Sequence<T>)));
+
+            if (grouped)
+                return $"({alternatives})";
+            else
+                return alternatives;
         }
 
-        protected override bool MatchEndInternal(MatchElement currentMatch)
-        {
-            // Check if option matches if one was picked
-            if (currentMatch.TryGetLatestState(this, out int option) && option >= 0)
-                return MatchEnd(atoms[option], currentMatch);
-
-            // Any option matching is enough otherwise
-            return atoms.Any(atom => MatchEnd(atom, currentMatch));
-        }
-
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
-        {
-            return Atoms.SelectMany(atom => MatchNext(atom, currentMatch.Clone()));
-        }
+        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
+            => Atoms.SelectMany(atom => MatchNext(atom, currentMatch.Clone()));
     }
 }

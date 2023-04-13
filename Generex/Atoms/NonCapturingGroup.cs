@@ -4,21 +4,17 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class NonCapturingGroup<T> : Generex<T>
+    public class NonCapturingGroup<T> : UnaryModifier<T>
     {
-        public Generex<T> Atom { get; }
+        public NonCapturingGroup(Generex<T> atom) : base(atom)
+        { }
 
-        public NonCapturingGroup(Generex<T> atom)
-        {
-            Atom = atom;
-        }
-
-        public override string ToString()
+        public override string ToString(bool grouped)
         {
             return $"(?:{Atom})";
         }
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
+        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
         {
             var matchClone = currentMatch.Clone();
             matchClone.Capturing = false;

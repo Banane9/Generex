@@ -39,15 +39,10 @@ namespace Generex.Atoms
             return ranges.GetEnumerator();
         }
 
-        public override string ToString()
-        {
-            if (Length == 1)
-                return $"[{ranges[0]}]";
+        public override string ToString(bool grouped)
+            => $"[{string.Join(SequenceSeparator, ranges.Select(range => range.ToString()))}]";
 
-            return $"[{string.Join(SequenceSeparator, ranges.Select(range => range.ToString()))}]";
-        }
-
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
+        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
         {
             if (!currentMatch.HasNext)
                 yield break;

@@ -4,14 +4,12 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class Quantifier<T> : Generex<T>
+    public class Quantifier<T> : UnaryModifier<T>
     {
-        public Generex<T> Atom { get; }
-
         public int Maximum { get; }
         public int Minimum { get; }
 
-        public Quantifier(Generex<T> atom, int minimum, int maximum)
+        public Quantifier(Generex<T> atom, int minimum, int maximum) : base(atom)
         {
             if (minimum < 0)
                 throw new ArgumentOutOfRangeException(nameof(minimum), "Minimum must be at least 0.");
@@ -19,7 +17,6 @@ namespace Generex.Atoms
             if (maximum < 1 || maximum < minimum)
                 throw new ArgumentOutOfRangeException(nameof(maximum), "Maximum must be at least 1 and >= minium.");
 
-            Atom = atom;
             Minimum = minimum;
             Maximum = maximum;
         }
@@ -27,31 +24,23 @@ namespace Generex.Atoms
         public Quantifier(Generex<T> atom, int exactly) : this(atom, exactly, exactly)
         { }
 
-        public override string ToString()
+        public override string ToString(bool grouped)
         {
             if (Minimum == Maximum)
-                return $"{Atom}{{{Minimum}}}";
+                return $"{Atom.ToString(true)}{{{Minimum}}}";
 
             if (Maximum == int.MaxValue)
                 if (Minimum == 0)
-                    return $"{Atom}*";
+                    return $"{Atom.ToString(true)}*";
                 else if (Minimum == 1)
-                    return $"{Atom}+";
+                    return $"{Atom.ToString(true)}+";
                 else
-                    return $"{Atom}{{{Minimum},}}";
+                    return $"{Atom.ToString(true)}{{{Minimum},}}";
 
-            return $"{Atom}{{{Minimum},{Maximum}}}";
+            return $"{Atom.ToString(true)}{{{Minimum},{Maximum}}}";
         }
 
-        protected override bool MatchEndInternal(MatchElement currentMatch)
-        {
-            // Only approve zero-width matches at the end.
-            // Others were already returned in the last MatchNextInternal.
-            var progress = currentMatch.GetLatestState(this, 0);
-            return progress == 0 && Minimum == 0;
-        }
-
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
+        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
         {
             var originalMatch = currentMatch.Clone();
 
@@ -65,7 +54,7 @@ namespace Generex.Atoms
             }
         }
 
-        private IEnumerable<MatchElement> MatchQuantity(MatchElement currentMatch, int progress = 1, bool tryWithoutNext = true)
+        private IEnumerable<MatchElement<T>> MatchQuantity(MatchElement<T> currentMatch, int progress = 1, bool tryWithoutNext = true)
         {
             foreach (var nextMatch in MatchNext(Atom, currentMatch))
             {

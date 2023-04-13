@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Generex.Atoms
+namespace Generex
 {
     public class Match<T> : IEnumerable<T>
     {

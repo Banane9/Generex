@@ -24,9 +24,9 @@ namespace Generex
         public override string ToString()
         {
             if (Comparer.Compare(Minimum, Maximum) == 0)
-                return (Minimum ?? Maximum)?.ToString() ?? "null";
+                return Generex<T>.EscapeLiteral((Minimum ?? Maximum)?.ToString()) ?? "null";
 
-            return $"{Minimum}-{Maximum}";
+            return Generex<T>.EscapeLiteral($"{Minimum?.ToString() ?? "null"}-{Maximum?.ToString() ?? "null"}");
         }
 
         private sealed class WildcardComparer : IComparer<T>

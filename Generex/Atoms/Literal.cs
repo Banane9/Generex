@@ -17,12 +17,18 @@ namespace Generex.Atoms
             EqualityComparer = equalityComparer ?? EqualityComparer<T>.Default;
         }
 
-        public override string ToString()
+        public override string ToString(bool grouped)
         {
-            return Value?.ToString() ?? "null";
+            if (Value is char character && char.IsWhiteSpace(character))
+                return $"({character})";
+
+            if (Value is string text && string.IsNullOrWhiteSpace(text))
+                return $"({text})";
+
+            return EscapeLiteral(Value?.ToString()) ?? "null";
         }
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
+        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
         {
             if (currentMatch.HasNext && EqualityComparer.Equals(Value, currentMatch.NextValue))
                 yield return currentMatch.DoneWithNext();

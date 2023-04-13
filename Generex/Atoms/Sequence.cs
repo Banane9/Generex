@@ -32,31 +32,23 @@ namespace Generex.Atoms
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Atoms).GetEnumerator();
 
-        public override string ToString()
+        public override string ToString(bool grouped)
         {
             if (Length == 1)
-                return atoms[0].ToString();
+                return atoms[0].ToString(grouped);
 
-            return $"({string.Join(SequenceSeparator, atoms.Select(atom => atom.ToString()))})";
+            var sequence = string.Join(SequenceSeparator, atoms.Select(atom => atom.ToString(true)));
+
+            if (grouped)
+                return $"({sequence})";
+            else
+                return sequence;
         }
 
-        protected override bool MatchEndInternal(MatchElement currentMatch)
-        {
-            var progress = currentMatch.GetLatestState(this, 0);
-
-            if (progress >= Length)
-                throw new InvalidOperationException("Sequence can't be at progress >= Length!");
-
-            // Check if all remaining elements in the sequence accept an end match
-            while (MatchEnd(atoms[progress], currentMatch) && ++progress < Length) ;
-
-            return progress >= Length;
-        }
-
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
+        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
             => MatchSequence(currentMatch);
 
-        private IEnumerable<MatchElement> MatchSequence(MatchElement currentMatch, int progress = 0)
+        private IEnumerable<MatchElement<T>> MatchSequence(MatchElement<T> currentMatch, int progress = 0)
         {
             var newProgress = progress + 1;
 

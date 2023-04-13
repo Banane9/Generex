@@ -88,7 +88,7 @@ namespace Generex.Fluent
             if (captureReference == null)
                 return new Atoms.NonCapturingGroup<T>(FinishInternal(atom));
 
-            return new Atoms.CapturingGroup<T>(captureReference, FinishInternal(atom));
+            return new Atoms.CapturingGroup<T>(FinishInternal(atom), captureReference);
         }
     }
 }

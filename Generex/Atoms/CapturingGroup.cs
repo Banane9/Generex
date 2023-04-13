@@ -5,23 +5,21 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class CapturingGroup<T> : Generex<T>
+    public class CapturingGroup<T> : UnaryModifier<T>
     {
-        public Generex<T> Atom { get; }
         public CaptureReference<T> CaptureReference { get; }
 
-        public CapturingGroup(CaptureReference<T> captureReference, Generex<T> atom)
+        public CapturingGroup(Generex<T> atom, CaptureReference<T> captureReference) : base(atom)
         {
             CaptureReference = captureReference;
-            Atom = atom;
         }
 
-        public override string ToString()
+        public override string ToString(bool grouped)
         {
             return $"(?'{CaptureReference}'{Atom})";
         }
 
-        protected override IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch)
+        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
         {
             foreach (var nextMatch in MatchNext(Atom, currentMatch))
             {

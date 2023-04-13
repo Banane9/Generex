@@ -1,13 +1,25 @@
 ﻿using Generex.Atoms;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
 namespace Generex
 {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the input sequence.</typeparam>
     public abstract partial class Generex<T>
     {
+        protected static string EscapedSequenceSeparator { get; } = "\\" + SequenceSeparator;
+        protected static string SequenceSeparator { get; } = typeof(T) == typeof(char) ? "" : "⋅";
+
+        [return: NotNullIfNotNull(nameof(literal))]
+        public static string? EscapeLiteral(string? literal)
+            => literal?.Replace(SequenceSeparator, EscapedSequenceSeparator);
+
         public static implicit operator Generex<T>(T value) => new Literal<T>(value);
 
         public static implicit operator Generex<T>(Generex<T>[] atoms) => new Sequence<T>((IEnumerable<Generex<T>>)atoms);
@@ -18,14 +30,9 @@ namespace Generex
 
         public static Generex<T> operator +(Generex<T> leftAtom, Generex<T> rightAtom) => new Sequence<T>(leftAtom, rightAtom);
 
-        protected static string SequenceSeparator { get; } = typeof(T) == typeof(char) ? "" : "⋅";
-
-        public IEnumerable<Match<T>> MatchSequential(IEnumerable<T> inputSequence, bool fromStartOnly = false)
-            => MatchAll(inputSequence, false, fromStartOnly);
-
         public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, bool restartFromEveryValue = true, bool fromStartOnly = false)
         {
-            var startMatch = new MatchElement(inputSequence);
+            var startMatch = new MatchElement<T>(inputSequence);
             bool tryWithoutNext;
 
             do
@@ -94,16 +101,16 @@ namespace Generex
             //}
         }
 
-        public abstract override string ToString();
+        public IEnumerable<Match<T>> MatchSequential(IEnumerable<T> inputSequence, bool fromStartOnly = false)
+                    => MatchAll(inputSequence, false, fromStartOnly);
 
-        protected static IEnumerable<MatchElement> MatchNext(Generex<T> instance, MatchElement currentMatch)
+        public override string ToString() => ToString(false);
+
+        public abstract string ToString(bool grouped);
+
+        protected static IEnumerable<MatchElement<T>> MatchNext(Generex<T> instance, MatchElement<T> currentMatch)
             => instance.MatchNextInternal(currentMatch);
 
-        protected abstract IEnumerable<MatchElement> MatchNextInternal(MatchElement currentMatch);
-
-        protected virtual bool MatchEndInternal(MatchElement currentMatch) => false;
-
-        protected static bool MatchEnd(Generex<T> instance, MatchElement currentMatch)
-            => instance.MatchEndInternal(currentMatch);
+        protected abstract IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch);
     }
 }
