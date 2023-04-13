@@ -19,18 +19,18 @@ namespace Generex.Atoms
         public override string ToString()
             => $"\\k'{CaptureReference}'";
 
-        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
             var progress = -1;
             if (!currentMatch.TryGetLatestCapture(CaptureReference, out var capture))
                 yield break;
 
-            while (++progress < capture.Length && currentMatch.HasNext && EqualityComparer.Equals(capture[progress], currentMatch.NextValue))
+            while (++progress < capture.Length && currentMatch.IsInputEnd && EqualityComparer.Equals(capture[progress], currentMatch.NextValue))
                 currentMatch = currentMatch.Next();
 
             if (progress >= capture.Length)
             {
-                currentMatch.IsDone = true;
+                currentMatch.IsMatchEnd = true;
                 yield return currentMatch;
             }
         }

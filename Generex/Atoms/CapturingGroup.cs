@@ -19,9 +19,9 @@ namespace Generex.Atoms
             return $"(?'{CaptureReference}'{Atom})";
         }
 
-        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            foreach (var nextMatch in MatchNext(Atom, currentMatch))
+            foreach (var nextMatch in ContinueMatch(Atom, currentMatch))
             {
                 nextMatch.SetCapture(CaptureReference,
                     nextMatch.GetParentSequence()

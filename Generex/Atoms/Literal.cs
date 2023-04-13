@@ -28,9 +28,9 @@ namespace Generex.Atoms
             return EscapeLiteral(Value?.ToString()) ?? "null";
         }
 
-        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            if (currentMatch.HasNext && EqualityComparer.Equals(Value, currentMatch.NextValue))
+            if (currentMatch.IsInputEnd && EqualityComparer.Equals(Value, currentMatch.NextValue))
                 yield return currentMatch.DoneWithNext();
         }
     }

@@ -32,9 +32,9 @@ namespace Generex.Atoms
         public override string ToString()
             => $"[{string.Join(SequenceSeparator, ranges.Select(range => range.ToString()))}]";
 
-        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            if (!currentMatch.HasNext)
+            if (!currentMatch.IsInputEnd)
                 yield break;
 
             foreach (var range in ranges)

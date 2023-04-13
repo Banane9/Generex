@@ -6,37 +6,24 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class Alternative<T> : Generex<T>
+    public class Alternative<T> : Chain<T>
     {
-        private readonly Generex<T>[] atoms;
-
-        public IEnumerable<Generex<T>> Atoms
-        {
-            get
-            {
-                foreach (var atom in atoms)
-                    yield return atom;
-            }
-        }
-
-        public int Length => atoms.Length;
-
-        public Alternative(Generex<T> atom, params Generex<T>[] furtherAtoms) : this(atom.Yield().Concat(furtherAtoms))
+        public Alternative(Generex<T> atom, params Generex<T>[] furtherAtoms)
+            : base(atom, furtherAtoms)
         { }
 
         public Alternative(IEnumerable<Generex<T>> atoms)
-        {
-            this.atoms = atoms.ToArray();
-        }
+            : base(atoms)
+        { }
 
         public override string ToString() => ToString(false);
 
         public override string ToString(bool grouped)
         {
             if (Length == 0)
-                return atoms[0].ToString(grouped);
+                return Atoms.First().ToString(grouped);
 
-            var alternatives = string.Join("|", atoms.Select(atom => atom.ToString(atom is Sequence<T>)));
+            var alternatives = string.Join("|", Atoms.Select(atom => atom.ToString()));
 
             if (grouped)
                 return $"({alternatives})";
@@ -44,7 +31,7 @@ namespace Generex.Atoms
                 return alternatives;
         }
 
-        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
-            => Atoms.SelectMany(atom => MatchNext(atom, currentMatch.Clone()));
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
+            => Atoms.SelectMany(atom => ContinueMatch(atom, currentMatch.Clone()));
     }
 }

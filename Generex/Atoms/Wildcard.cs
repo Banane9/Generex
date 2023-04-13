@@ -8,7 +8,7 @@ namespace Generex.Atoms
     {
         public override string ToString() => ".";
 
-        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
             yield return currentMatch.DoneWithNext();
         }

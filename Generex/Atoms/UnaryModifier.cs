@@ -15,7 +15,7 @@ namespace Generex.Atoms
         /// </summary>
         public Generex<T> Atom { get; }
 
-        public UnaryModifier(Generex<T> atom)
+        protected UnaryModifier(Generex<T> atom)
         {
             Atom = atom;
         }

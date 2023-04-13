@@ -40,7 +40,7 @@ namespace Generex.Atoms
             return $"{Atom.ToString(true)}{{{Minimum},{Maximum}}}";
         }
 
-        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
             var originalMatch = currentMatch.Clone();
 
@@ -49,26 +49,26 @@ namespace Generex.Atoms
 
             if (Minimum == 0)
             {
-                originalMatch.IsDone = true;
+                originalMatch.IsMatchEnd = true;
                 yield return originalMatch;
             }
         }
 
-        private IEnumerable<MatchElement<T>> MatchQuantity(MatchElement<T> currentMatch, int progress = 1, bool tryWithoutNext = true)
+        private IEnumerable<MatchState<T>> MatchQuantity(MatchState<T> currentMatch, int progress = 1, bool tryWithoutNext = true)
         {
-            foreach (var nextMatch in MatchNext(Atom, currentMatch))
+            foreach (var nextMatch in ContinueMatch(Atom, currentMatch))
             {
-                nextMatch.IsDone = false;
+                nextMatch.IsMatchEnd = false;
 
                 // Only recurse when it's not at the max number yet
-                if (progress < Maximum && (tryWithoutNext || nextMatch.HasNext))
-                    foreach (var futureMatch in MatchQuantity(nextMatch, progress + 1, nextMatch.HasNext))
+                if (progress < Maximum && (tryWithoutNext || nextMatch.IsInputEnd))
+                    foreach (var futureMatch in MatchQuantity(nextMatch, progress + 1, nextMatch.IsInputEnd))
                         yield return futureMatch;
 
                 // Greedy order: shorter matches at the bottom
                 if (progress >= Minimum)
                 {
-                    nextMatch.IsDone = true;
+                    nextMatch.IsMatchEnd = true;
                     yield return nextMatch;
                 }
             }

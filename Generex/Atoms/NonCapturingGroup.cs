@@ -14,12 +14,12 @@ namespace Generex.Atoms
             return $"(?:{Atom})";
         }
 
-        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
             var matchClone = currentMatch.Clone();
             matchClone.Capturing = false;
 
-            foreach (var nextMatch in MatchNext(Atom, matchClone))
+            foreach (var nextMatch in ContinueMatch(Atom, matchClone))
             {
                 nextMatch.Capturing = true;
                 yield return nextMatch;

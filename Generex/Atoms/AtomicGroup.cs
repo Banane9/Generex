@@ -17,9 +17,9 @@ namespace Generex.Atoms
         public override string ToString()
             => $"(?>{Atom})";
 
-        protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            if (MatchNext(Atom, currentMatch).FirstOrDefault() is MatchElement<T> matchChoice)
+            if (ContinueMatch(Atom, currentMatch).FirstOrDefault() is MatchState<T> matchChoice)
                 yield return matchChoice;
 
             yield break;

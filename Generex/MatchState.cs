@@ -6,78 +6,78 @@ using System.Text;
 
 namespace Generex
 {
-    public class MatchElement<T>
+    public sealed partial class MatchState<T>
     {
-        private readonly Lazy<Dictionary<CaptureReference<T>, T[]>> captureState = new();
-        private readonly PeekAheadEnumerator<T> peekAheadEnumerator;
+        private readonly Dictionary<CaptureReference<T>, T[]> captureState = new();
+        private readonly PeekAheadEnumerator peekAheadEnumerator;
         public bool Capturing { get; set; } = true;
-        public bool HasNext { get; }
-        public int Index { get; set; }
-        public bool IsDone { get; set; }
-
-        public bool IsStart => Previous == null;
+        public int Index { get; }
+        public bool IsInputEnd { get; }
+        public bool IsInputStart => Index == 0;
+        public bool IsMatchEnd { get; set; }
+        public bool IsMatchStart => Previous == null;
         public T NextValue { get; }
-        public MatchElement<T>? Previous { get; }
 
-        public MatchElement(MatchElement<T> template, int index)
+        public MatchState<T>? Previous { get; }
+
+        public MatchState(IEnumerable<T> inputSequence)
+        {
+            peekAheadEnumerator = new PeekAheadEnumerator(inputSequence);
+            IsInputEnd = peekAheadEnumerator.MoveNextAndResetPeek();
+            NextValue = peekAheadEnumerator.Current;
+            Index = 0;
+        }
+
+        private MatchState(MatchState<T> template, int index)
         {
             peekAheadEnumerator = template.peekAheadEnumerator.Snapshot();
             NextValue = template.NextValue;
             Capturing = template.Capturing;
             Previous = template.Previous;
-            HasNext = template.HasNext;
-            IsDone = template.IsDone;
+            IsInputEnd = template.IsInputEnd;
+            IsMatchEnd = template.IsMatchEnd;
             Index = index;
         }
 
-        public MatchElement(IEnumerable<T> inputSequence)
-        {
-            peekAheadEnumerator = new PeekAheadEnumerator<T>(inputSequence);
-            HasNext = peekAheadEnumerator.MoveNextAndResetPeek();
-            NextValue = peekAheadEnumerator.Current;
-            Index = -1;
-        }
-
-        public MatchElement(MatchElement<T> previous)
+        private MatchState(MatchState<T> previous)
         {
             peekAheadEnumerator = previous.peekAheadEnumerator.Snapshot();
-            HasNext = peekAheadEnumerator.MoveNext();
+            IsInputEnd = peekAheadEnumerator.MoveNext();
             NextValue = peekAheadEnumerator.Current;
             Capturing = previous.Capturing;
             Previous = previous;
             Index = previous.Index + 1;
         }
 
-        public MatchElement<T> Clone()
+        public MatchState<T> Clone()
         {
-            var clone = new MatchElement<T>(this, Index);
+            var clone = new MatchState<T>(this, Index);
 
-            if (captureState.IsValueCreated)
-                foreach (var state in captureState.Value)
-                    clone.SetCapture(state.Key, state.Value);
+            foreach (var state in captureState)
+                clone.SetCapture(state.Key, state.Value);
 
             return clone;
         }
 
-        public MatchElement<T> DoneWithNext() => new(this) { IsDone = true };
+        public MatchState<T> DoneWithNext() => new(this) { IsMatchEnd = true };
 
         public Match<T> GetMatch()
         {
             var matchSequence = GetMatchSequence().ToArray();
-            var start = matchSequence[0].Index + 1;
-            var end = matchSequence[^1].Index + 1;
+            var start = matchSequence[0].Index;
+            var end = matchSequence[^1].Index;
 
             return new Match<T>(matchSequence.Select(element => element.NextValue!), matchSequence.Where(element => element.Capturing).Select(element => element.NextValue!), start, end);
         }
 
-        public IEnumerable<MatchElement<T>> GetMatchSequence()
+        public IEnumerable<MatchState<T>> GetMatchSequence()
         {
             return GetParentSequence()
                 .Skip(1)
                 .Reverse();
         }
 
-        public IEnumerable<MatchElement<T>> GetParentSequence()
+        public IEnumerable<MatchState<T>> GetParentSequence()
         {
             var current = this;
             do
@@ -85,19 +85,19 @@ namespace Generex
                 yield return current;
                 current = current.Previous;
             }
-            while (!current!.IsStart && !current.IsDone);
+            while (!current!.IsMatchStart && !current.IsMatchEnd);
 
             yield return current;
         }
 
-        public MatchElement<T> Next() => new(this);
+        public MatchState<T> Next() => new(this);
 
         public void SetCapture(CaptureReference<T> captureReference, T[] capture)
-            => captureState.Value[captureReference] = capture;
+            => captureState[captureReference] = capture;
 
         public bool TryGetCapture(CaptureReference<T> captureReference, out T[] capture)
         {
-            if (captureState.IsValueCreated && captureState.Value.TryGetValue(captureReference, out capture))
+            if (captureState.TryGetValue(captureReference, out capture))
                 return true;
 
             capture = Array.Empty<T>();
