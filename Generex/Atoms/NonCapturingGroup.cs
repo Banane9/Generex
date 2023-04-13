@@ -4,11 +4,16 @@ using System.Text;
 
 namespace Generex.Atoms
 {
+    /// <summary>
+    /// Represents a pattern who's sub-pattern's matched sequence won't be part of the resulting <see cref="Match{T}"/>.
+    /// </summary>
+    /// <inheritdoc/>
     public class NonCapturingGroup<T> : UnaryModifier<T>
     {
         public NonCapturingGroup(Generex<T> atom) : base(atom)
         { }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             return $"(?:{Atom})";

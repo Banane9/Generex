@@ -4,6 +4,10 @@ using System.Text;
 
 namespace Generex.Atoms
 {
+    /// <summary>
+    /// Represents a pattern that matches a back-reference to the latest capture of another group, that is, a repetition of the sub-sequence.
+    /// </summary>
+    /// <inheritdoc/>
     public class CapturedGroup<T> : Generex<T>
     {
         public CaptureReference<T> CaptureReference { get; }
@@ -16,6 +20,7 @@ namespace Generex.Atoms
             EqualityComparer = equalityComparer ?? EqualityComparer<T>.Default;
         }
 
+        /// <inheritdoc/>
         public override string ToString()
             => $"\\k'{CaptureReference}'";
 

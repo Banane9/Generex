@@ -5,6 +5,10 @@ using System.Linq;
 
 namespace Generex.Atoms
 {
+    /// <summary>
+    /// Represents a sequence of sub-patterns, all of which need to match one after the other.
+    /// </summary>
+    /// <inheritdoc/>
     public class Sequence<T> : Chain<T>
     {
         public Sequence(Generex<T> atom, params Generex<T>[] furtherAtoms)
@@ -14,6 +18,7 @@ namespace Generex.Atoms
         public Sequence(IEnumerable<Generex<T>> atoms) : base(atoms)
         { }
 
+        /// <inheritdoc/>
         public override string ToString(bool grouped)
         {
             if (Length == 1)

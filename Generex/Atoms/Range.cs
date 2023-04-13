@@ -5,12 +5,22 @@ using System.Text;
 
 namespace Generex.Atoms
 {
+    /// <summary>
+    /// Represents multiple literals or ranges of literals, at least one of which a value has to fall into to match.
+    /// </summary>
+    /// <inheritdoc/>
     public class Range<T> : Generex<T>
     {
         private readonly LiteralRange<T>[] ranges;
 
+        /// <summary>
+        /// Gets the number of ranges.
+        /// </summary>
         public int Length => ranges.Length;
 
+        /// <summary>
+        /// Gets the ranges in the order of their appearance.
+        /// </summary>
         public IEnumerable<LiteralRange<T>> Ranges
         {
             get
@@ -29,6 +39,7 @@ namespace Generex.Atoms
             : this(range.Yield().Concat(furtherRanges))
         { }
 
+        /// <inheritdoc/>
         public override string ToString()
             => $"[{string.Join(SequenceSeparator, ranges.Select(range => range.ToString()))}]";
 

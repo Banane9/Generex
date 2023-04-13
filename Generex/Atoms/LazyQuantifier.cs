@@ -4,6 +4,12 @@ using System.Text;
 
 namespace Generex.Atoms
 {
+    /// <remarks>
+    /// Lazily consumes values from the input sequence which match its sub-pattern.<br/>
+    /// This means it will prioritize matching as short a sequence as possible,
+    /// only consuming more values when no match could be found otherwise.
+    /// </remarks>
+    /// <inheritdoc/>
     public class LazyQuantifier<T> : Quantifier<T>
     {
         public LazyQuantifier(Generex<T> atom, int exactly) : base(atom, exactly)
@@ -12,6 +18,7 @@ namespace Generex.Atoms
         public LazyQuantifier(Generex<T> atom, int minimum, int maximum) : base(atom, minimum, maximum)
         { }
 
+        /// <inheritdoc/>
         public override string ToString() => Minimum == Maximum ? base.ToString() : $"{base.ToString()}?";
 
         protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)

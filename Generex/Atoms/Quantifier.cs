@@ -4,9 +4,20 @@ using System.Text;
 
 namespace Generex.Atoms
 {
+    /// <summary>
+    /// Represents a quantifier for a sub-pattern, specifying how often it has to appear to match.
+    /// </summary>
+    /// <inheritdoc/>
     public abstract class Quantifier<T> : UnaryModifier<T>
     {
+        /// <summary>
+        /// Gets the maximum number of times the sub-pattern can be matched.
+        /// </summary>
         public int Maximum { get; }
+
+        /// <summary>
+        /// Gets the minimum number of times the sub-pattern must be matched.
+        /// </summary>
         public int Minimum { get; }
 
         protected Quantifier(Generex<T> atom, int minimum, int maximum) : base(atom)
@@ -24,6 +35,7 @@ namespace Generex.Atoms
         protected Quantifier(Generex<T> atom, int exactly) : this(atom, exactly, exactly)
         { }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             if (Minimum == Maximum)

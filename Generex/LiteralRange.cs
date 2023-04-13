@@ -18,6 +18,9 @@ namespace Generex
             Comparer = comparer ?? Comparer<T>.Default;
         }
 
+        public LiteralRange(T exactly, IComparer<T>? comparer = null) : this(exactly, exactly, comparer)
+        { }
+
         public bool Contains(T value)
             => Comparer.Compare(Minimum, value) <= 0 && Comparer.Compare(Maximum, value) >= 0;
 

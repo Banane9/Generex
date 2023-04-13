@@ -6,14 +6,15 @@ using System.Text;
 namespace Generex.Atoms
 {
     /// <summary>
-    /// Ensures that the pattern inside this can only be matched all-or-nothing,
-    /// preventing any backtracking into it.
+    /// Represents a pattern who's sub-pattern can only be matched all-or-nothing, preventing any backtracking into it.
     /// </summary>
+    /// <inheritdoc/>
     public class AtomicGroup<T> : UnaryModifier<T>
     {
         public AtomicGroup(Generex<T> atom) : base(atom)
         { }
 
+        /// <inheritdoc/>
         public override string ToString()
             // Could also represent it with a + behind quantifiers, but .NET doesn't support that,
             // so ToString it only in the atomic group notation which is supported.

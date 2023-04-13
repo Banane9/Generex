@@ -4,6 +4,12 @@ using System.Text;
 
 namespace Generex.Atoms
 {
+    /// <remarks>
+    /// Greedily consumes values from the input sequence which match its sub-pattern.<br/>
+    /// This means it will prioritize matching as long a sequence as possible,
+    /// only returning values when no match could be found otherwise.
+    /// </remarks>
+    /// <inheritdoc/>
     public class GreedyQuantifier<T> : Quantifier<T>
     {
         public GreedyQuantifier(Generex<T> atom, int exactly) : base(atom, exactly)

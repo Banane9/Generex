@@ -6,6 +6,10 @@ using System.Text;
 
 namespace Generex.Atoms
 {
+    /// <summary>
+    /// Represents a literal value which has to be matched.
+    /// </summary>
+    /// <inheritdoc/>
     public class Literal<T> : Generex<T>
     {
         public IEqualityComparer<T> EqualityComparer { get; }
@@ -17,6 +21,7 @@ namespace Generex.Atoms
             EqualityComparer = equalityComparer ?? EqualityComparer<T>.Default;
         }
 
+        /// <inheritdoc/>
         public override string ToString()
         {
             if (Value is char character && char.IsWhiteSpace(character))
