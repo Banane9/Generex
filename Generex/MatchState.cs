@@ -41,11 +41,11 @@ namespace Generex
         private MatchState(MatchState<T> previous, bool newMatch)
         {
             peekAheadEnumerator = previous.peekAheadEnumerator.Snapshot();
-            IsInputEnd = !peekAheadEnumerator.MoveNext();
+            IsInputEnd = newMatch ? (!peekAheadEnumerator.MoveToCurrentPeekPosition() || previous.IsInputEnd) : !peekAheadEnumerator.MoveNext();
             NextValue = peekAheadEnumerator.Current;
             Capturing = previous.Capturing || newMatch;
             Previous = newMatch ? null : previous;
-            Index = previous.Index + 1;
+            Index = newMatch ? previous.Index : previous.Index + 1;
         }
 
         public MatchState<T> Clone()
@@ -111,6 +111,6 @@ namespace Generex
             return false;
         }
 
-        internal MatchState<T> NextStart() => new(this, true);
+        internal MatchState<T> AsStart() => new(this, true);
     }
 }

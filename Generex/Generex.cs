@@ -51,9 +51,9 @@ namespace Generex
                 }
 
                 if (restartFromEveryValue || !hadSuccessfulMatch)
-                    startMatch = startMatch.NextStart();
+                    startMatch = startMatch.Next().AsStart();
                 else
-                    startMatch = match!;
+                    startMatch = match!.AsStart();
             }
             while (!fromStartOnly && !wasEnd);
         }

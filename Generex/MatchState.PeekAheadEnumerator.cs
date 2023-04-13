@@ -39,61 +39,71 @@ namespace Generex
 
             public bool MoveNext()
             {
-                if (currentIndex == CurrentMaxPeakIndex)
+                lock (peekedElements)
                 {
-                    ++currentIndex;
-
-                    if (enumerator.MoveNext())
+                    if (currentIndex == CurrentMaxPeakIndex)
                     {
-                        peekedElements.Add(enumerator.Current);
-                        return true;
+                        ++currentIndex;
+
+                        if (enumerator.MoveNext())
+                        {
+                            peekedElements.Add(enumerator.Current);
+                            return true;
+                        }
+
+                        peekedElements.Add(default!);
+                        return false;
                     }
 
-                    peekedElements.Add(default!);
-                    return false;
+                    // When currentIndex before the end of peekedElements
+                    ++currentIndex;
+                    return true;
                 }
-
-                // When currentIndex before the end of peekedElements
-                ++currentIndex;
-                return true;
             }
 
             public bool MoveNextAndResetPeek()
             {
-                ResetPeek();
-
-                if (CurrentMaxPeakIndex == 0)
+                lock (peekedElements)
                 {
-                    if (enumerator.MoveNext())
+                    ResetPeek();
+
+                    if (CurrentMaxPeakIndex == 0)
                     {
-                        peekedElements[0] = enumerator.Current;
-                        return true;
+                        if (enumerator.MoveNext())
+                        {
+                            peekedElements[0] = enumerator.Current;
+                            return true;
+                        }
+
+                        peekedElements[0] = default!;
+                        return false;
                     }
 
-                    peekedElements[0] = default!;
-                    return false;
+                    // When peekedElements.Count > 1
+                    peekedElements.RemoveAt(0);
+                    return true;
                 }
-
-                // When peekedElements.Count > 1
-                peekedElements.RemoveAt(0);
-                return true;
             }
 
-            public int MoveToPeekedEnd(int offset = 0)
+            public bool MoveToCurrentPeekPosition()
             {
-                ResetPeek();
-                var removed = CurrentMaxPeakIndex - offset;
-                peekedElements.RemoveRange(0, CurrentMaxPeakIndex - offset);
-
-                return removed;
+                lock (peekedElements)
+                {
+                    peekedElements.RemoveRange(0, currentIndex);
+                    ResetPeek();
+                    return true;
+                }
             }
 
             public void Reset()
             {
-                ResetPeek();
-                enumerator.Reset();
-                peekedElements.Clear();
-                peekedElements.Add(default!);
+                lock (peekedElements)
+                {
+                    ResetPeek();
+                    enumerator.Reset();
+                    peekedElements.Clear();
+                    peekedElements.Add(default!);
+                }
             }
 
             public void ResetPeek() => currentIndex = 0;
