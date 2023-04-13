@@ -30,8 +30,8 @@ namespace Generex.Atoms
 
         protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            if (currentMatch.IsInputEnd && EqualityComparer.Equals(Value, currentMatch.NextValue))
-                yield return currentMatch.DoneWithNext();
+            if (!currentMatch.IsInputEnd && EqualityComparer.Equals(Value, currentMatch.NextValue))
+                yield return currentMatch.Next();
         }
     }
 }

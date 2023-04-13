@@ -48,29 +48,21 @@ namespace Generex.Atoms
                 yield return quantityMatch;
 
             if (Minimum == 0)
-            {
-                originalMatch.IsMatchEnd = true;
                 yield return originalMatch;
-            }
         }
 
         private IEnumerable<MatchState<T>> MatchQuantity(MatchState<T> currentMatch, int progress = 1, bool tryWithoutNext = true)
         {
             foreach (var nextMatch in ContinueMatch(Atom, currentMatch))
             {
-                nextMatch.IsMatchEnd = false;
-
                 // Only recurse when it's not at the max number yet
-                if (progress < Maximum && (tryWithoutNext || nextMatch.IsInputEnd))
-                    foreach (var futureMatch in MatchQuantity(nextMatch, progress + 1, nextMatch.IsInputEnd))
+                if (progress < Maximum && (tryWithoutNext || !nextMatch.IsInputEnd))
+                    foreach (var futureMatch in MatchQuantity(nextMatch, progress + 1, !nextMatch.IsInputEnd))
                         yield return futureMatch;
 
-                // Greedy order: shorter matches at the bottom
+                // Greedy order: shorter matches at the end
                 if (progress >= Minimum)
-                {
-                    nextMatch.IsMatchEnd = true;
                     yield return nextMatch;
-                }
             }
         }
     }

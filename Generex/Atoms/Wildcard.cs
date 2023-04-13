@@ -10,7 +10,7 @@ namespace Generex.Atoms
 
         protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            yield return currentMatch.DoneWithNext();
+            yield return currentMatch.Next();
         }
     }
 }

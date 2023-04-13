@@ -36,11 +36,11 @@ namespace Generex
         public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, bool restartFromEveryValue = true, bool fromStartOnly = false)
         {
             var startMatch = new MatchState<T>(inputSequence);
-            bool tryWithoutNext;
+            bool wasEnd;
 
             do
             {
-                tryWithoutNext = startMatch.IsInputEnd;
+                wasEnd = startMatch.IsInputEnd;
                 var hadSuccessfulMatch = false;
 
                 var match = ContinueMatchInternal(startMatch).FirstOrDefault();
@@ -51,13 +51,11 @@ namespace Generex
                 }
 
                 if (restartFromEveryValue || !hadSuccessfulMatch)
-                    startMatch = startMatch.Next();
+                    startMatch = startMatch.NextStart();
                 else
                     startMatch = match!;
-
-                startMatch.IsMatchEnd = true;
             }
-            while (!fromStartOnly && (startMatch.IsInputEnd || tryWithoutNext));
+            while (!fromStartOnly && !wasEnd);
         }
 
         public IEnumerable<Match<T>> MatchSequential(IEnumerable<T> inputSequence, bool fromStartOnly = false)

@@ -12,11 +12,8 @@ namespace Generex.Atoms
             : base(atom, furtherAtoms)
         { }
 
-        public Alternative(IEnumerable<Generex<T>> atoms)
-            : base(atoms)
+        public Alternative(IEnumerable<Generex<T>> atoms) : base(atoms)
         { }
-
-        public override string ToString() => ToString(false);
 
         public override string ToString(bool grouped)
         {

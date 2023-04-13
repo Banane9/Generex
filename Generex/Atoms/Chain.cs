@@ -28,5 +28,7 @@ namespace Generex.Atoms
         {
             this.atoms = atoms.ToArray();
         }
+
+        public override string ToString() => ToString(false);
     }
 }

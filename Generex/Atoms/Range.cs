@@ -34,17 +34,8 @@ namespace Generex.Atoms
 
         protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            if (!currentMatch.IsInputEnd)
-                yield break;
-
-            foreach (var range in ranges)
-            {
-                if (range.Contains(currentMatch.NextValue))
-                {
-                    yield return currentMatch.DoneWithNext();
-                    yield break;
-                }
-            }
+            if (!currentMatch.IsInputEnd && ranges.Any(range => range.Contains(currentMatch.NextValue)))
+                yield return currentMatch.Next();
         }
     }
 }

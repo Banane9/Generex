@@ -14,8 +14,6 @@ namespace Generex.Atoms
         public Sequence(IEnumerable<Generex<T>> atoms) : base(atoms)
         { }
 
-        public override string ToString() => ToString(false);
-
         public override string ToString(bool grouped)
         {
             if (Length == 1)
@@ -30,27 +28,6 @@ namespace Generex.Atoms
         }
 
         protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
-            => MatchSequence(currentMatch);
-
-        private IEnumerable<MatchState<T>> MatchSequence(MatchState<T> currentMatch, int progress = 0)
-        {
-            var newProgress = progress + 1;
-
-            if (newProgress >= Length)
-            {
-                foreach (var nextMatch in ContinueMatch(Atoms.Skip(progress).First(), currentMatch))
-                    yield return nextMatch;
-
-                yield break;
-            }
-
-            foreach (var nextMatch in ContinueMatch(Atoms.Skip(progress).First(), currentMatch))
-            {
-                nextMatch.IsMatchEnd = false;
-
-                foreach (var futureMatch in MatchSequence(nextMatch, newProgress))
-                    yield return futureMatch;
-            }
-        }
+            => Atoms.Aggregate(currentMatch.Yield(), (currentMatches, atom) => currentMatches.SelectMany(match => ContinueMatch(atom, match)));
     }
 }

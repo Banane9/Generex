@@ -13,8 +13,7 @@ namespace Generex
         public bool Capturing { get; set; } = true;
         public int Index { get; }
         public bool IsInputEnd { get; }
-        public bool IsInputStart => Index == 0;
-        public bool IsMatchEnd { get; set; }
+        public bool IsInputStart { get; } = false;
         public bool IsMatchStart => Previous == null;
         public T NextValue { get; }
 
@@ -23,43 +22,41 @@ namespace Generex
         public MatchState(IEnumerable<T> inputSequence)
         {
             peekAheadEnumerator = new PeekAheadEnumerator(inputSequence);
-            IsInputEnd = peekAheadEnumerator.MoveNextAndResetPeek();
+            IsInputEnd = !peekAheadEnumerator.MoveNextAndResetPeek();
             NextValue = peekAheadEnumerator.Current;
+            IsInputStart = true;
             Index = 0;
         }
 
-        private MatchState(MatchState<T> template, int index)
+        private MatchState(MatchState<T> template)
         {
             peekAheadEnumerator = template.peekAheadEnumerator.Snapshot();
             NextValue = template.NextValue;
             Capturing = template.Capturing;
             Previous = template.Previous;
             IsInputEnd = template.IsInputEnd;
-            IsMatchEnd = template.IsMatchEnd;
-            Index = index;
+            Index = template.Index;
         }
 
-        private MatchState(MatchState<T> previous)
+        private MatchState(MatchState<T> previous, bool newMatch)
         {
             peekAheadEnumerator = previous.peekAheadEnumerator.Snapshot();
-            IsInputEnd = peekAheadEnumerator.MoveNext();
+            IsInputEnd = !peekAheadEnumerator.MoveNext();
             NextValue = peekAheadEnumerator.Current;
-            Capturing = previous.Capturing;
-            Previous = previous;
+            Capturing = previous.Capturing || newMatch;
+            Previous = newMatch ? null : previous;
             Index = previous.Index + 1;
         }
 
         public MatchState<T> Clone()
         {
-            var clone = new MatchState<T>(this, Index);
+            var clone = new MatchState<T>(this);
 
             foreach (var state in captureState)
                 clone.SetCapture(state.Key, state.Value);
 
             return clone;
         }
-
-        public MatchState<T> DoneWithNext() => new(this) { IsMatchEnd = true };
 
         public Match<T> GetMatch()
         {
@@ -85,12 +82,12 @@ namespace Generex
                 yield return current;
                 current = current.Previous;
             }
-            while (!current!.IsMatchStart && !current.IsMatchEnd);
+            while (!current!.IsMatchStart);
 
             yield return current;
         }
 
-        public MatchState<T> Next() => new(this);
+        public MatchState<T> Next() => new(this, false);
 
         public void SetCapture(CaptureReference<T> captureReference, T[] capture)
             => captureState[captureReference] = capture;
@@ -113,5 +110,7 @@ namespace Generex
             capture = Array.Empty<T>();
             return false;
         }
+
+        internal MatchState<T> NextStart() => new(this, true);
     }
 }

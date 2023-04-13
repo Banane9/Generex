@@ -25,14 +25,11 @@ namespace Generex.Atoms
             if (!currentMatch.TryGetLatestCapture(CaptureReference, out var capture))
                 yield break;
 
-            while (++progress < capture.Length && currentMatch.IsInputEnd && EqualityComparer.Equals(capture[progress], currentMatch.NextValue))
+            while (++progress < capture.Length && !currentMatch.IsInputEnd && EqualityComparer.Equals(capture[progress], currentMatch.NextValue))
                 currentMatch = currentMatch.Next();
 
             if (progress >= capture.Length)
-            {
-                currentMatch.IsMatchEnd = true;
                 yield return currentMatch;
-            }
         }
     }
 }
