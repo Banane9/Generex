@@ -4,12 +4,12 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class Quantifier<T> : UnaryModifier<T>
+    public abstract class Quantifier<T> : UnaryModifier<T>
     {
         public int Maximum { get; }
         public int Minimum { get; }
 
-        public Quantifier(Generex<T> atom, int minimum, int maximum) : base(atom)
+        protected Quantifier(Generex<T> atom, int minimum, int maximum) : base(atom)
         {
             if (minimum < 0)
                 throw new ArgumentOutOfRangeException(nameof(minimum), "Minimum must be at least 0.");
@@ -21,7 +21,7 @@ namespace Generex.Atoms
             Maximum = maximum;
         }
 
-        public Quantifier(Generex<T> atom, int exactly) : this(atom, exactly, exactly)
+        protected Quantifier(Generex<T> atom, int exactly) : this(atom, exactly, exactly)
         { }
 
         public override string ToString()
@@ -38,32 +38,6 @@ namespace Generex.Atoms
                     return $"{Atom.ToString(true)}{{{Minimum},}}";
 
             return $"{Atom.ToString(true)}{{{Minimum},{Maximum}}}";
-        }
-
-        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
-        {
-            var originalMatch = currentMatch.Clone();
-
-            foreach (var quantityMatch in MatchQuantity(currentMatch))
-                yield return quantityMatch;
-
-            if (Minimum == 0)
-                yield return originalMatch;
-        }
-
-        private IEnumerable<MatchState<T>> MatchQuantity(MatchState<T> currentMatch, int progress = 1, bool tryWithoutNext = true)
-        {
-            foreach (var nextMatch in ContinueMatch(Atom, currentMatch))
-            {
-                // Only recurse when it's not at the max number yet
-                if (progress < Maximum && (tryWithoutNext || !nextMatch.IsInputEnd))
-                    foreach (var futureMatch in MatchQuantity(nextMatch, progress + 1, !nextMatch.IsInputEnd))
-                        yield return futureMatch;
-
-                // Greedy order: shorter matches at the end
-                if (progress >= Minimum)
-                    yield return nextMatch;
-            }
         }
     }
 }
