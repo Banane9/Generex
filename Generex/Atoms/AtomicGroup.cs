@@ -15,6 +15,9 @@ namespace Generex.Atoms
         { }
 
         public override string ToString()
+            // Could also represent it with a + behind quantifiers, but .NET doesn't support that,
+            // so ToString it only in the atomic group notation which is supported.
+            // Atom is Quantifier<T> ? $"{Atom}+" : $"(?>{Atom})"
             => $"(?>{Atom})";
 
         protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)

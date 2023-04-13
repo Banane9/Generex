@@ -22,7 +22,7 @@ namespace Generex.Tests
         [TestCase("0xFF", ExpectedResult = 255)]
         public int HexNumber(string input)
         {
-            var hexNumberMatcher = new Sequence<char>(new NonCapturingGroup<char>(new[] { '0', 'x' }), new Quantifier<char>(new Range<char>(new[] { new LiteralRange<char>('a', 'f'), new LiteralRange<char>('A', 'F'), new LiteralRange<char>('0', '9') }), 1, int.MaxValue));
+            var hexNumberMatcher = new Sequence<char>(new NonCapturingGroup<char>(new[] { '0', 'x' }), new GreedyQuantifier<char>(new Range<char>(new[] { new LiteralRange<char>('a', 'f'), new LiteralRange<char>('A', 'F'), new LiteralRange<char>('0', '9') }), 1, int.MaxValue));
 
             var result = hexNumberMatcher.MatchAll(input).FirstOrDefault();
 

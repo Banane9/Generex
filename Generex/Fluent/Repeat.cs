@@ -223,6 +223,6 @@ namespace Generex.Fluent
         }
 
         protected override Generex<T> FinishInternal()
-            => new Quantifier<T>(FinishInternal(atom), minimum, maximum);
+            => new GreedyQuantifier<T>(FinishInternal(atom), minimum, maximum);
     }
 }
