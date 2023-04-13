@@ -17,7 +17,7 @@ namespace Generex.Atoms
             EqualityComparer = equalityComparer ?? EqualityComparer<T>.Default;
         }
 
-        public override string ToString(bool grouped)
+        public override string ToString()
         {
             if (Value is char character && char.IsWhiteSpace(character))
                 return $"({character})";

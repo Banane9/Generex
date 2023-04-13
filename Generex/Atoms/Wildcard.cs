@@ -6,7 +6,7 @@ namespace Generex.Atoms
 {
     public sealed class Wildcard<T> : Generex<T>
     {
-        public override string ToString(bool grouped) => ".";
+        public override string ToString() => ".";
 
         protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
         {

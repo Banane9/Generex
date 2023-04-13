@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class Range<T> : Generex<T>, IEnumerable<LiteralRange<T>>
+    public class Range<T> : Generex<T>
     {
         private readonly LiteralRange<T>[] ranges;
 
@@ -29,17 +29,7 @@ namespace Generex.Atoms
             : this(range.Yield().Concat(furtherRanges))
         { }
 
-        public IEnumerator<LiteralRange<T>> GetEnumerator()
-        {
-            return ((IEnumerable<LiteralRange<T>>)ranges).GetEnumerator();
-        }
-
-        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
-        {
-            return ranges.GetEnumerator();
-        }
-
-        public override string ToString(bool grouped)
+        public override string ToString()
             => $"[{string.Join(SequenceSeparator, ranges.Select(range => range.ToString()))}]";
 
         protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)

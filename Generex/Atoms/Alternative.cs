@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Generex.Atoms
 {
-    public class Alternative<T> : Generex<T>, IEnumerable<Generex<T>>
+    public class Alternative<T> : Generex<T>
     {
         private readonly Generex<T>[] atoms;
 
@@ -29,9 +29,7 @@ namespace Generex.Atoms
             this.atoms = atoms.ToArray();
         }
 
-        public IEnumerator<Generex<T>> GetEnumerator() => Atoms.GetEnumerator();
-
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Atoms).GetEnumerator();
+        public override string ToString() => ToString(false);
 
         public override string ToString(bool grouped)
         {

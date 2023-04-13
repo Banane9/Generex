@@ -104,9 +104,9 @@ namespace Generex
         public IEnumerable<Match<T>> MatchSequential(IEnumerable<T> inputSequence, bool fromStartOnly = false)
                     => MatchAll(inputSequence, false, fromStartOnly);
 
-        public override string ToString() => ToString(false);
+        public abstract override string ToString();
 
-        public abstract string ToString(bool grouped);
+        public virtual string ToString(bool grouped) => ToString();
 
         protected static IEnumerable<MatchElement<T>> MatchNext(Generex<T> instance, MatchElement<T> currentMatch)
             => instance.MatchNextInternal(currentMatch);

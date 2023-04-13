@@ -24,7 +24,7 @@ namespace Generex.Atoms
         public Quantifier(Generex<T> atom, int exactly) : this(atom, exactly, exactly)
         { }
 
-        public override string ToString(bool grouped)
+        public override string ToString()
         {
             if (Minimum == Maximum)
                 return $"{Atom.ToString(true)}{{{Minimum}}}";

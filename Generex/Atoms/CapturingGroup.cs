@@ -14,7 +14,7 @@ namespace Generex.Atoms
             CaptureReference = captureReference;
         }
 
-        public override string ToString(bool grouped)
+        public override string ToString()
         {
             return $"(?'{CaptureReference}'{Atom})";
         }

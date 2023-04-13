@@ -14,7 +14,7 @@ namespace Generex.Atoms
         public AtomicGroup(Generex<T> atom) : base(atom)
         { }
 
-        public override string ToString(bool grouped)
+        public override string ToString()
             => $"(?>{Atom})";
 
         protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)

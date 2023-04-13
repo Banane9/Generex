@@ -9,7 +9,7 @@ namespace Generex.Atoms
         public NonCapturingGroup(Generex<T> atom) : base(atom)
         { }
 
-        public override string ToString(bool grouped)
+        public override string ToString()
         {
             return $"(?:{Atom})";
         }

@@ -16,7 +16,7 @@ namespace Generex.Atoms
             EqualityComparer = equalityComparer ?? EqualityComparer<T>.Default;
         }
 
-        public override string ToString(bool grouped)
+        public override string ToString()
             => $"\\k'{CaptureReference}'";
 
         protected override IEnumerable<MatchElement<T>> MatchNextInternal(MatchElement<T> currentMatch)
