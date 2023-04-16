@@ -28,16 +28,6 @@ namespace Generex
             Index = 0;
         }
 
-        private MatchState(MatchState<T> template)
-        {
-            peekAheadEnumerator = template.peekAheadEnumerator.Snapshot();
-            NextValue = template.NextValue;
-            Capturing = template.Capturing;
-            Previous = template.Previous;
-            IsInputEnd = template.IsInputEnd;
-            Index = template.Index;
-        }
-
         private MatchState(MatchState<T> previous, bool newMatch)
         {
             peekAheadEnumerator = previous.peekAheadEnumerator.Snapshot();
@@ -46,16 +36,6 @@ namespace Generex
             Capturing = previous.Capturing || newMatch;
             Previous = newMatch ? null : previous;
             Index = newMatch ? previous.Index : previous.Index + 1;
-        }
-
-        public MatchState<T> Clone()
-        {
-            var clone = new MatchState<T>(this);
-
-            foreach (var state in captureState)
-                clone.SetCapture(state.Key, state.Value);
-
-            return clone;
         }
 
         public Match<T> GetMatch()

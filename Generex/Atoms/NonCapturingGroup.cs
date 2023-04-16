@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Generex.Atoms
@@ -21,12 +22,13 @@ namespace Generex.Atoms
 
         protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            var matchClone = currentMatch.Clone();
-            matchClone.Capturing = false;
-
-            foreach (var nextMatch in ContinueMatch(Atom, matchClone))
+            foreach (var nextMatch in ContinueMatch(Atom, currentMatch))
             {
-                nextMatch.Capturing = true;
+                foreach (var match in nextMatch.GetParentSequence()
+                                        .TakeUntil(match => match != currentMatch)
+                                        .Skip(1))
+                    match.Capturing = false;
+
                 yield return nextMatch;
             }
         }

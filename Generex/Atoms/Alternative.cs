@@ -34,6 +34,6 @@ namespace Generex.Atoms
         }
 
         protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
-            => Atoms.SelectMany(atom => ContinueMatch(atom, currentMatch.Clone()));
+            => Atoms.SelectMany(atom => ContinueMatch(atom, currentMatch));
     }
 }
