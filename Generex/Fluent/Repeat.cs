@@ -217,7 +217,7 @@ namespace Generex.Fluent
 
         public IGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
-            var group = new Group<T>(this, child);
+            var group = new Grouping<T>(this, child);
             atom = group;
 
             return group;

@@ -102,7 +102,7 @@ namespace Generex.Fluent
 
         public IAlternativeGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
-            var group = new Group<T>(this, child);
+            var group = new Grouping<T>(this, child);
             SetParent(child, group);
 
             var index = atoms.LastIndexOf(child);

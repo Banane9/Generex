@@ -115,7 +115,7 @@ namespace Generex.Fluent
         public ISequenceGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var index = atoms.LastIndexOf(child);
-            var group = new Group<T>(this, child);
+            var group = new Grouping<T>(this, child);
             atoms[index] = group;
 
             return group;

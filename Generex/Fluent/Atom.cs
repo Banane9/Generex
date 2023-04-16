@@ -48,7 +48,7 @@ namespace Generex.Fluent
         {
             get
             {
-                var group = new Group<T>(null, this);
+                var group = new Grouping<T>(null, this);
                 parent = group;
 
                 return group;
