@@ -25,7 +25,7 @@ namespace Generex.Atoms
         /// <inheritdoc/>
         public override string ToString()
         {
-            return $"(?'{CaptureReference}'{Atom})";
+            return $"(?<{CaptureReference}>{Atom})";
         }
 
         protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
