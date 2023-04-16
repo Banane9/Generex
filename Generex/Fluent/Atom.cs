@@ -9,7 +9,8 @@ namespace Generex.Fluent
         IAlternativeNext<T> Alternatively { get; }
         IGroup<T> As { get; }
         ISequenceNext<T> FollowedBy { get; }
-        IRepeatStart<T> Repeat { get; }
+        IRepeatStart<T> GreedilyRepeat { get; }
+        IRepeatStart<T> LazilyRepeat { get; }
     }
 
     public interface ICapturedAtom<T> : IFinishableAtom<T>
@@ -62,20 +63,39 @@ namespace Generex.Fluent
         ISequenceGroup<T> ISequenceAtom<T>.As => SequenceParent.WrapInGroup(this);
         public ISequenceNext<T> FollowedBy => SequenceParent;
 
-        public IRepeatStart<T> Repeat
+        public IRepeatStart<T> GreedilyRepeat
         {
             get
             {
-                var repeat = new Repeat<T>(null, this);
+                var repeat = new Repeat<T>(null, this, false);
                 parent = repeat;
 
                 return repeat;
             }
         }
 
-        IAlternativeRepeatStart<T> IAlternativeAtom<T>.Repeat => AlternativeParent.WrapInRepeat(this);
+        ISequenceRepeatStart<T> ISequenceAtom<T>.GreedilyRepeat
+            => SequenceParent.WrapInGreedyRepeat(this);
 
-        ISequenceRepeatStart<T> ISequenceAtom<T>.Repeat => SequenceParent.WrapInRepeat(this);
+        IAlternativeRepeatStart<T> IAlternativeAtom<T>.GreedilyRepeat
+            => AlternativeParent.WrapInGreedyRepeat(this);
+
+        public IRepeatStart<T> LazilyRepeat
+        {
+            get
+            {
+                var repeat = new Repeat<T>(null, this, true);
+                parent = repeat;
+
+                return repeat;
+            }
+        }
+
+        IAlternativeRepeatStart<T> IAlternativeAtom<T>.LazilyRepeat
+            => AlternativeParent.WrapInLazyRepeat(this);
+
+        ISequenceRepeatStart<T> ISequenceAtom<T>.LazilyRepeat
+            => SequenceParent.WrapInLazyRepeat(this);
 
         private IAlternativeParentAtom<T> AlternativeParent
         {
@@ -112,15 +132,18 @@ namespace Generex.Fluent
         protected static Generex<T> FinishInternal(IFinishableAtom<T> atom)
             => ((Atom<T>)atom).FinishInternal();
 
-        protected static void SetParent(IFinishableAtom<T> atom, IParentAtom<T> parent) => ((Atom<T>)atom).parent = parent;
+        protected static void SetParent(IFinishableAtom<T> atom, IParentAtom<T> parent)
+            => ((Atom<T>)atom).parent = parent;
 
         protected abstract Generex<T> FinishInternal();
     }
 
     internal interface IParentAtom<T> : IFinishableAtom<T>
     {
+        IRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child);
+
         IGroup<T> WrapInGroup(IFinishableAtom<T> child);
 
-        IRepeatStart<T> WrapInRepeat(IFinishableAtom<T> child);
+        IRepeatStart<T> WrapInLazyRepeat(IFinishableAtom<T> child);
     }
 }

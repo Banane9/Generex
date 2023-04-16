@@ -100,7 +100,7 @@ namespace Generex.Fluent
         }
 
         ISequenceLiteral<T> ISequenceComparingLiteral<T>.Of(IEnumerable<T> literals)
-                    => ((ISequenceLiteral<T>)this).And(literals);
+            => ((ISequenceLiteral<T>)this).And(literals);
 
         ISequenceLiteral<T> ISequenceComparingLiteral<T>.Of(T literal, params T[] extraLiterals)
             => ((ISequenceLiteral<T>)this).And(literal, extraLiterals);

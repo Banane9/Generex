@@ -67,6 +67,14 @@ namespace Generex.Fluent
         ISequenceUnnamedCapturedAtom<T> ISequenceGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
             => (ISequenceUnnamedCapturedAtom<T>)CapturingGroup(out captureReference);
 
+        public IRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child)
+        {
+            var repeat = new Repeat<T>(this, child, false);
+            atom = repeat;
+
+            return repeat;
+        }
+
         public IGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var group = new Group<T>(this, child);
@@ -75,9 +83,9 @@ namespace Generex.Fluent
             return group;
         }
 
-        public IRepeatStart<T> WrapInRepeat(IFinishableAtom<T> child)
+        public IRepeatStart<T> WrapInLazyRepeat(IFinishableAtom<T> child)
         {
-            var repeat = new Repeat<T>(this, child);
+            var repeat = new Repeat<T>(this, child, true);
             atom = repeat;
 
             return repeat;

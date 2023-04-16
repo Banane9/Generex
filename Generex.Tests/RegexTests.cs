@@ -44,7 +44,7 @@ namespace Generex.Tests
         public int HexNumberFluentBuilder(string input)
         {
             var hexNumberMatcher = Generex.Literal.Of('0', 'x').As.NonCapturingGroup
-                .FollowedBy.Range.From('0').To('9').And.From('a').To('f').And.From('A').To('F').Repeat.AtLeastOnce
+                .FollowedBy.Range.From('0').To('9').And.From('a').To('f').And.From('A').To('F').GreedilyRepeat.AtLeastOnce
                 .Finish();
 
             var result = hexNumberMatcher.MatchAll(input).FirstOrDefault();
@@ -62,7 +62,7 @@ namespace Generex.Tests
         public int[] RepdigitFluentBuilder(string input)
         {
             var repdigitMatcher = Generex.Range.From('0').To('9').As.CapturingGroup(out var digit).Called("digit")
-                .FollowedBy.CapturedGroup.ReferringBackTo(digit).Repeat.AnyNumber
+                .FollowedBy.CapturedGroup.ReferringBackTo(digit).GreedilyRepeat.AnyNumber
                 .Finish();
 
             var results = repdigitMatcher.MatchAll(input);

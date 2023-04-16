@@ -81,10 +81,10 @@ namespace Generex.Fluent
         IAlternativeRepeatStart<T>, IAlternativeRepeatEnd<T>,
         ISequenceRepeatStart<T>, ISequenceRepeatEnd<T>
     {
+        private readonly bool lazy;
         private IFinishableAtom<T> atom;
         private int maximum = -1;
         private int minimum = -1;
-
         ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.AnyNumber => (ISequenceRepeatedAtom<T>)AnyNumber;
         IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.AnyNumber => (IAlternativeRepeatedAtom<T>)AnyNumber;
 
@@ -125,9 +125,10 @@ namespace Generex.Fluent
         IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.AtMostOnce => (IAlternativeRepeatedAtom<T>)AtMostOnce;
         ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.AtMostOnce => (ISequenceRepeatedAtom<T>)AtMostOnce;
 
-        public Repeat(IParentAtom<T>? parent, IFinishableAtom<T> atom) : base(parent)
+        public Repeat(IParentAtom<T>? parent, IFinishableAtom<T> atom, bool lazy) : base(parent)
         {
             this.atom = atom;
+            this.lazy = lazy;
         }
 
         public IRepeatedAtom<T> And(int maximum)
@@ -206,6 +207,14 @@ namespace Generex.Fluent
         ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.MaybeAtMost(int maximum)
             => (ISequenceRepeatedAtom<T>)MaybeAtMost(maximum);
 
+        public IRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child)
+        {
+            var repeat = new Repeat<T>(this, child, false);
+            atom = repeat;
+
+            return repeat;
+        }
+
         public IGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var group = new Group<T>(this, child);
@@ -214,15 +223,16 @@ namespace Generex.Fluent
             return group;
         }
 
-        public IRepeatStart<T> WrapInRepeat(IFinishableAtom<T> child)
+        public IRepeatStart<T> WrapInLazyRepeat(IFinishableAtom<T> child)
         {
-            var repeat = new Repeat<T>(this, child);
+            var repeat = new Repeat<T>(this, child, true);
             atom = repeat;
 
             return repeat;
         }
 
         protected override Generex<T> FinishInternal()
-            => new GreedyQuantifier<T>(FinishInternal(atom), minimum, maximum);
+            => lazy ? new LazyQuantifier<T>(FinishInternal(atom), minimum, maximum)
+                : new GreedyQuantifier<T>(FinishInternal(atom), minimum, maximum);
     }
 }

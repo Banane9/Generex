@@ -9,6 +9,10 @@ namespace Generex
 {
     public static class Generex
     {
+        public static class Anchor<T>
+        {
+        }
+
         public static class CapturedGroup
         {
             public static ICapturedGroupEnd<T> ReferringBackTo<T>(CaptureReference<T> captureReference) => new Fluent.CapturedGroup<T>().ReferringBackTo(captureReference);
@@ -38,6 +42,8 @@ namespace Generex
             public static ILiteral<T> Of<T>(T literal, params T[] extraLiterals) => new Fluent.Literal<T>().Of(literal.Yield().Concat(extraLiterals));
 
             public static IComparingLiteral<T> Using<T>(IEqualityComparer<T> equalityComparer) => new Fluent.Literal<T>().Using(equalityComparer);
+
+            public static IAtom<T> Wildcard<T>() => new Fluent.Wildcard<T>();
         }
 
         public static class Range

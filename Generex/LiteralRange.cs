@@ -6,7 +6,6 @@ namespace Generex
 {
     public class LiteralRange<T>
     {
-        public static LiteralRange<T> Wildcard { get; } = new(default!, default!, new WildcardComparer());
         public IComparer<T> Comparer { get; }
         public T Maximum { get; }
         public T Minimum { get; }
@@ -30,11 +29,6 @@ namespace Generex
                 return Generex<T>.EscapeLiteral((Minimum ?? Maximum)?.ToString()) ?? "null";
 
             return Generex<T>.EscapeLiteral($"{Minimum?.ToString() ?? "null"}-{Maximum?.ToString() ?? "null"}");
-        }
-
-        private sealed class WildcardComparer : IComparer<T>
-        {
-            public int Compare(T x, T y) => 0;
         }
     }
 }
