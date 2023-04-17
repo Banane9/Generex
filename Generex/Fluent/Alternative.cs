@@ -5,35 +5,100 @@ using System.Text;
 
 namespace Generex.Fluent
 {
+    /// <summary>
+    /// The options for a general atom, which is part of a list of alternatives.
+    /// </summary>
+    /// <inheritdoc/>
     public interface IAlternativeAtom<T> : IFinishableAtom<T>
     {
+        /// <summary>
+        /// Add another atom to the list of alternatives.
+        /// </summary>
         IAlternativeNext<T> Alternatively { get; }
+
+        /// <summary>
+        /// Construct a group wrapper for the current atom.
+        /// </summary>
         IAlternativeGroup<T> As { get; }
+
+        /// <summary>
+        /// Construct a greedy quantifier for the current atom.
+        /// </summary>
         IAlternativeRepeatStart<T> GreedilyRepeat { get; }
+
+        /// <summary>
+        /// Construct a lazy quantifier for the current atom.
+        /// </summary>
         IAlternativeRepeatStart<T> LazilyRepeat { get; }
     }
 
+    /// <summary>
+    /// The options for a named capture group, which is part of a list of alternatives.
+    /// </summary>
+    /// <inheritdoc/>
     public interface IAlternativeCapturedAtom<T> : IFinishableAtom<T>
     {
+        /// <summary>
+        /// Add another atom to the list of alternatives.
+        /// </summary>
         IAlternativeNext<T> Alternatively { get; }
     }
 
+    /// <summary>
+    /// The options for the next atom in a list of alternatives.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface IAlternativeNext<T>
     {
+        /// <summary>
+        /// Construct a back-reference to the latest capture of another capturing group.
+        /// </summary>
         public IAlternativeCapturedGroupStart<T> CapturedGroup { get; }
+
+        /// <summary>
+        /// Construct a sequence of literals.
+        /// </summary>
         public IAlternativeLiteralStart<T> Literal { get; }
+
+        /// <summary>
+        /// Construct a range of literals.
+        /// </summary>
         public IAlternativeRangeStart<T> Range { get; }
+
+        /// <summary>
+        /// Add a wildcard to the list of alternatives.
+        /// </summary>
         public IAlternativeAtom<T> Wildcard { get; }
     }
 
+    /// <summary>
+    /// The options for a quantified atom, which is part of a list of alternatives.
+    /// </summary>
+    /// <inheritdoc/>
     public interface IAlternativeRepeatedAtom<T> : IFinishableAtom<T>
     {
+        /// <summary>
+        /// Add another atom to the list of alternatives.
+        /// </summary>
         IAlternativeNext<T> Alternatively { get; }
+
+        /// <summary>
+        /// Construct a group wrapper for the current atom.
+        /// </summary>
         IAlternativeGroup<T> As { get; }
     }
 
+    /// <summary>
+    /// The options for a not yet explicitly named capture group, which is part of a list of alternatives.
+    /// </summary>
+    /// <inheritdoc/>
     public interface IAlternativeUnnamedCapturedAtom<T> : IAlternativeCapturedAtom<T>
     {
+        /// <summary>
+        /// Adds a name to the capture group.
+        /// </summary>
+        /// <param name="name">The name to associate with the group.</param>
+        /// <returns>The named capture group.</returns>
         IAlternativeCapturedAtom<T> Called(string name);
     }
 
