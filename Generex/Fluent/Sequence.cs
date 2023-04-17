@@ -40,7 +40,7 @@ namespace Generex.Fluent
     public interface ISequenceCapturedAtom<T> : IFinishableAtom<T>
     {
         /// <summary>
-        /// Add the next atom to the sequence.
+        /// Adds the next atom to the sequence.
         /// </summary>
         ISequenceNext<T> FollowedBy { get; }
     }
@@ -52,22 +52,22 @@ namespace Generex.Fluent
     public interface ISequenceNext<T>
     {
         /// <summary>
-        /// Construct a back-reference to the latest capture of another capturing group.
+        /// Constructs a back-reference to the latest capture of another capturing group.
         /// </summary>
         ISequenceCapturedGroupStart<T> CapturedGroup { get; }
 
         /// <summary>
-        /// Construct a sequence of literals.
+        /// Constructs a sequence of literals.
         /// </summary>
         ISequenceLiteralStart<T> Literal { get; }
 
         /// <summary>
-        /// Construct a range of literals.
+        /// Constructs a range of literals.
         /// </summary>
         ISequenceRangeStart<T> Range { get; }
 
         /// <summary>
-        /// Add a wildcard to the sequence.
+        /// Adds a wildcard to the sequence.
         /// </summary>
         ISequenceAtom<T> Wildcard { get; }
     }
@@ -79,12 +79,12 @@ namespace Generex.Fluent
     public interface ISequenceRepeatedAtom<T> : IFinishableAtom<T>
     {
         /// <summary>
-        /// Construct a group wrapper for the current atom.
+        /// Constructs a group wrapper for the current atom.
         /// </summary>
         ISequenceGroup<T> As { get; }
 
         /// <summary>
-        /// Add the next atom to the sequence.
+        /// Adds the next atom to the sequence.
         /// </summary>
         ISequenceNext<T> FollowedBy { get; }
     }
@@ -96,7 +96,7 @@ namespace Generex.Fluent
     public interface ISequenceUnnamedCapturedAtom<T> : ISequenceCapturedAtom<T>
     {
         /// <summary>
-        /// Adds a name to the capture group.
+        /// Addss a name to the capture group.
         /// </summary>
         /// <param name="name">The name to associate with the group.</param>
         /// <returns>The named capture group.</returns>
