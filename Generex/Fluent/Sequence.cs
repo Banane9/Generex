@@ -5,35 +5,101 @@ using System.Text;
 
 namespace Generex.Fluent
 {
+    /// <summary>
+    /// The options for a general atom, which is part of a sequence.
+    /// </summary>
+    /// <inheritdoc/>
     public interface ISequenceAtom<T> : IFinishableAtom<T>
     {
+        /// <summary>
+        /// Construct a group wrapper for the current atom.
+        /// </summary>
         ISequenceGroup<T> As { get; }
+
+        /// <summary>
+        /// Add the next atom to the sequence.
+        /// </summary>
         ISequenceNext<T> FollowedBy { get; }
+
+        /// <summary>
+        /// Construct a greedy quantifier for the current atom.
+        /// </summary>
+
         ISequenceRepeatStart<T> GreedilyRepeat { get; }
+
+        /// <summary>
+        /// Construct a lazy quantifier for the current atom.
+        /// </summary>
         ISequenceRepeatStart<T> LazilyRepeat { get; }
     }
 
+    /// <summary>
+    /// The options for a named capture group, which is part of a sequence.
+    /// </summary>
+    /// <inheritdoc/>
     public interface ISequenceCapturedAtom<T> : IFinishableAtom<T>
     {
+        /// <summary>
+        /// Add the next atom to the sequence.
+        /// </summary>
         ISequenceNext<T> FollowedBy { get; }
     }
 
+    /// <summary>
+    /// The options for the next atom in a sequence.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface ISequenceNext<T>
     {
+        /// <summary>
+        /// Construct a back-reference to the latest capture of another capturing group.
+        /// </summary>
         ISequenceCapturedGroupStart<T> CapturedGroup { get; }
+
+        /// <summary>
+        /// Construct a sequence of literals.
+        /// </summary>
         ISequenceLiteralStart<T> Literal { get; }
+
+        /// <summary>
+        /// Construct a range of literals.
+        /// </summary>
         ISequenceRangeStart<T> Range { get; }
+
+        /// <summary>
+        /// Add a wildcard to the sequence.
+        /// </summary>
         ISequenceAtom<T> Wildcard { get; }
     }
 
+    /// <summary>
+    /// The options for a quantified atom, which is part of a sequence.
+    /// </summary>
+    /// <inheritdoc/>
     public interface ISequenceRepeatedAtom<T> : IFinishableAtom<T>
     {
+        /// <summary>
+        /// Construct a group wrapper for the current atom.
+        /// </summary>
         ISequenceGroup<T> As { get; }
+
+        /// <summary>
+        /// Add the next atom to the sequence.
+        /// </summary>
         ISequenceNext<T> FollowedBy { get; }
     }
 
+    /// <summary>
+    /// The options for a not yet explicitly named capture group, which is part of a sequence.
+    /// </summary>
+    /// <inheritdoc/>
     public interface ISequenceUnnamedCapturedAtom<T> : ISequenceCapturedAtom<T>
     {
+        /// <summary>
+        /// Adds a name to the capture group.
+        /// </summary>
+        /// <param name="name">The name to associate with the group.</param>
+        /// <returns>The named capture group.</returns>
         ISequenceCapturedAtom<T> Called(string name);
     }
 
