@@ -4,33 +4,91 @@ using System.Text;
 
 namespace Generex.Fluent
 {
+    /// <summary>
+    /// The options for a ready-to-use back-reference to another capturing group,
+    /// which is part of a list of alternatives.
+    /// </summary>
+    /// <inheritdoc/>
     public interface IAlternativeCapturedGroupEnd<T> : IAlternativeAtom<T>
     {
+        /// <summary>
+        /// Sets an explicit <see cref="IEqualityComparer{T}"/> for the back-reference.
+        /// </summary>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer{T}"/> to use.</param>
+        /// <returns>The fully configured back-reference.</returns>
         IAlternativeAtom<T> Using(IEqualityComparer<T> equalityComparer);
     }
 
+    /// <summary>
+    /// The options for an unfinished back-reference to another capturing group,
+    /// which is part of a list of alternatives.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface IAlternativeCapturedGroupStart<T>
     {
+        /// <summary>
+        /// Sets which capturing group this refers back to.
+        /// </summary>
+        /// <param name="captureReference">The capturing group's <see cref="CaptureReference{T}"/>.</param>
+        /// <returns>The ready-to-use back-reference to another capturing group.</returns>
         IAlternativeCapturedGroupEnd<T> ReferringBackTo(CaptureReference<T> captureReference);
     }
 
+    /// <summary>
+    /// The options for a ready-to-use back-reference to another capturing group,
+    /// which is not yet part of a sequence or list of alternatives.
+    /// </summary>
+    /// <inheritdoc/>
     public interface ICapturedGroupEnd<T> : IAtom<T>
     {
+        /// <summary>
+        /// Sets an explicit <see cref="IEqualityComparer{T}"/> for the back-reference.
+        /// </summary>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer{T}"/> to use.</param>
+        /// <returns>The fully configured back-reference.</returns>
         IAtom<T> Using(IEqualityComparer<T> equalityComparer);
     }
 
+    /// <summary>
+    /// The options for an unfinished back-reference to another capturing group,
+    /// which is not yet part of a sequence or list of alternatives.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface ICapturedGroupStart<T>
     {
+        /// <summary>
+        /// Sets which capturing group this refers back to.
+        /// </summary>
+        /// <param name="captureReference">The capturing group's <see cref="CaptureReference{T}"/>.</param>
+        /// <returns>The ready-to-use back-reference to another capturing group.</returns>
         ICapturedGroupEnd<T> ReferringBackTo(CaptureReference<T> captureReference);
     }
 
+    /// <summary>
+    /// The options for a ready-to-use back-reference to another capturing group, which is part of a sequence.
+    /// </summary>
+    /// <inheritdoc/>
     public interface ISequenceCapturedGroupEnd<T> : ISequenceAtom<T>
     {
+        /// <summary>
+        /// Sets an explicit <see cref="IEqualityComparer{T}"/> for the back-reference.
+        /// </summary>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer{T}"/> to use.</param>
+        /// <returns>The fully configured back-reference.</returns>
         ISequenceAtom<T> Using(IEqualityComparer<T> equalityComparer);
     }
 
+    /// <summary>
+    /// The options for an unfinished back-reference to another capturing group, which is part of a sequence.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface ISequenceCapturedGroupStart<T>
     {
+        /// <summary>
+        /// Sets which capturing group this refers back to.
+        /// </summary>
+        /// <param name="captureReference">The capturing group's <see cref="CaptureReference{T}"/>.</param>
+        /// <returns>The ready-to-use back-reference to another capturing group.</returns>
         ISequenceCapturedGroupEnd<T> ReferringBackTo(CaptureReference<T> captureReference);
     }
 
