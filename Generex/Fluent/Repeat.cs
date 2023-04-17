@@ -5,75 +5,217 @@ using System.Text;
 
 namespace Generex.Fluent
 {
+    /// <summary>
+    /// The options for a quantifier, which is missing its maximum and part of a list of alternatives.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface IAlternativeRepeatEnd<T>
     {
+        /// <summary>
+        /// Sets the maximum number of matches allowed by the quantifier.
+        /// </summary>
+        /// <param name="maximum">The maximum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         IAlternativeRepeatedAtom<T> And(int maximum);
     }
 
+    /// <summary>
+    /// The options for an unconfigured quantifier, which is part of a list of alternatives.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface IAlternativeRepeatStart<T>
     {
+        /// <summary>
+        /// Configures the quantifier to allow zero to infinite matches.
+        /// </summary>
         public IAlternativeRepeatedAtom<T> AnyNumber { get; }
 
+        /// <summary>
+        /// Configures the quantifier to allow one to infinite matches.
+        /// </summary>
         public IAlternativeRepeatedAtom<T> AtLeastOnce { get; }
 
+        /// <summary>
+        /// Configures the quantifier to allow zero to one match(es).
+        /// </summary>
         public IAlternativeRepeatedAtom<T> AtMostOnce { get; }
 
+        /// <summary>
+        /// Configures the quantifier to allow <paramref name="minimum"/> to infinite matches.
+        /// </summary>
+        /// <param name="minimum">The minimum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         public IAlternativeRepeatedAtom<T> AtLeast(int minimum);
 
+        /// <summary>
+        /// Configures the quantifier to allow one to <paramref name="maximum"/> matches.
+        /// </summary>
+        /// <param name="maximum">The maximum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         public IAlternativeRepeatedAtom<T> AtMost(int maximum);
 
+        /// <summary>
+        /// Configures the quantifier to allow at least <paramref name="minimum"/> matches.
+        /// </summary>
+        /// <param name="minimum">The minimum number of matches to allow.</param>
+        /// <returns>The quantifier missing its maximum.</returns>
         public IAlternativeRepeatEnd<T> Between(int minimum);
 
-        public IAlternativeRepeatedAtom<T> Exactly(int times);
+        /// <summary>
+        /// Configures the quantifier to allow <paramref name="exactly"/> matches.
+        /// </summary>
+        /// <param name="exactly">The number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
+        public IAlternativeRepeatedAtom<T> Exactly(int exactly);
 
+        /// <summary>
+        /// Configures the quantifier to allow zero to <paramref name="maximum"/> matches.
+        /// </summary>
+        /// <param name="maximum">The maximum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         public IAlternativeRepeatedAtom<T> MaybeAtMost(int maximum);
     }
 
+    /// <summary>
+    /// The options for a quantifier, which is missing its maximum and
+    /// not yet part of a sequence or list of alternatives.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface IRepeatEnd<T>
     {
+        /// <summary>
+        /// Sets the maximum number of matches allowed by the quantifier.
+        /// </summary>
+        /// <param name="maximum">The maximum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         IRepeatedAtom<T> And(int maximum);
     }
 
+    /// <summary>
+    /// The options for an unconfigured quantifier, which is not yet part of a sequence or list of alternatives.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface IRepeatStart<T>
     {
+        /// <summary>
+        /// Configures the quantifier to allow zero to infinite matches.
+        /// </summary>
         public IRepeatedAtom<T> AnyNumber { get; }
 
+        /// <summary>
+        /// Configures the quantifier to allow one to infinite matches.
+        /// </summary>
         public IRepeatedAtom<T> AtLeastOnce { get; }
 
+        /// <summary>
+        /// Configures the quantifier to allow zero to one match(es).
+        /// </summary>
         public IRepeatedAtom<T> AtMostOnce { get; }
 
+        /// <summary>
+        /// Configures the quantifier to allow <paramref name="minimum"/> to infinite matches.
+        /// </summary>
+        /// <param name="minimum">The minimum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         public IRepeatedAtom<T> AtLeast(int minimum);
 
+        /// <summary>
+        /// Configures the quantifier to allow one to <paramref name="maximum"/> matches.
+        /// </summary>
+        /// <param name="maximum">The maximum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         public IRepeatedAtom<T> AtMost(int maximum);
 
+        /// <summary>
+        /// Configures the quantifier to allow at least <paramref name="minimum"/> matches.
+        /// </summary>
+        /// <param name="minimum">The minimum number of matches to allow.</param>
+        /// <returns>The quantifier missing its maximum.</returns>
         public IRepeatEnd<T> Between(int minimum);
 
-        public IRepeatedAtom<T> Exactly(int times);
+        /// <summary>
+        /// Configures the quantifier to allow <paramref name="exactly"/> matches.
+        /// </summary>
+        /// <param name="exactly">The number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
+        public IRepeatedAtom<T> Exactly(int exactly);
 
+        /// <summary>
+        /// Configures the quantifier to allow zero to <paramref name="maximum"/> matches.
+        /// </summary>
+        /// <param name="maximum">The maximum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         public IRepeatedAtom<T> MaybeAtMost(int maximum);
     }
 
+    /// <summary>
+    /// The options for a quantifier, which is missing its maximum and part of a sequence.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface ISequenceRepeatEnd<T>
     {
+        /// <summary>
+        /// Sets the maximum number of matches allowed by the quantifier.
+        /// </summary>
+        /// <param name="maximum">The maximum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         ISequenceRepeatedAtom<T> And(int maximum);
     }
 
+    /// <summary>
+    /// The options for an unconfigured quantifier, which is part of a sequence.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface ISequenceRepeatStart<T>
     {
+        /// <summary>
+        /// Configures the quantifier to allow zero to infinite matches.
+        /// </summary>
         public ISequenceRepeatedAtom<T> AnyNumber { get; }
 
+        /// <summary>
+        /// Configures the quantifier to allow one to infinite matches.
+        /// </summary>
         public ISequenceRepeatedAtom<T> AtLeastOnce { get; }
 
+        /// <summary>
+        /// Configures the quantifier to allow zero to one match(es).
+        /// </summary>
         public ISequenceRepeatedAtom<T> AtMostOnce { get; }
 
+        /// <summary>
+        /// Configures the quantifier to allow <paramref name="minimum"/> to infinite matches.
+        /// </summary>
+        /// <param name="minimum">The minimum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         public ISequenceRepeatedAtom<T> AtLeast(int minimum);
 
+        /// <summary>
+        /// Configures the quantifier to allow one to <paramref name="maximum"/> matches.
+        /// </summary>
+        /// <param name="maximum">The maximum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         public ISequenceRepeatedAtom<T> AtMost(int maximum);
 
+        /// <summary>
+        /// Configures the quantifier to allow at least <paramref name="minimum"/> matches.
+        /// </summary>
+        /// <param name="minimum">The minimum number of matches to allow.</param>
+        /// <returns>The quantifier missing its maximum.</returns>
         public ISequenceRepeatEnd<T> Between(int minimum);
 
-        public ISequenceRepeatedAtom<T> Exactly(int times);
+        /// <summary>
+        /// Configures the quantifier to allow <paramref name="exactly"/> matches.
+        /// </summary>
+        /// <param name="exactly">The number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
+        public ISequenceRepeatedAtom<T> Exactly(int exactly);
 
+        /// <summary>
+        /// Configures the quantifier to allow zero to <paramref name="maximum"/> matches.
+        /// </summary>
+        /// <param name="maximum">The maximum number of matches to allow.</param>
+        /// <returns>The fully configured quantifier.</returns>
         public ISequenceRepeatedAtom<T> MaybeAtMost(int maximum);
     }
 
