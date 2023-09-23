@@ -33,7 +33,7 @@ namespace Generex.Atoms
             return EscapeLiteral(Value?.ToString()) ?? "null";
         }
 
-        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
         {
             if (!currentMatch.IsInputEnd && EqualityComparer.Equals(Value, currentMatch.NextValue))
                 yield return currentMatch.Next();

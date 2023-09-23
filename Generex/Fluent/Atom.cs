@@ -82,34 +82,6 @@ namespace Generex.Fluent
     }
 
     /// <summary>
-    /// The options for a quantified atom,
-    /// which is not yet part of a sequence or list of alternatives.
-    /// </summary>
-    /// <inheritdoc/>
-    public interface IRepeatedAtom<T> : IFinishableAtom<T>
-    {
-        /// <summary>
-        /// Start a list of requirements with this atom and add another to it.
-        /// </summary>
-        IAdditionNext<T> Additionally { get; }
-
-        /// <summary>
-        /// Start a list of alternatives with this atom and add another to it.
-        /// </summary>
-        IAlternativeNext<T> Alternatively { get; }
-
-        /// <summary>
-        /// Construct a group wrapper for the current atom.
-        /// </summary>
-        IGroup<T> As { get; }
-
-        /// <summary>
-        /// Start a sequence with this atom and add the next one to it.
-        /// </summary>
-        ISequenceNext<T> FollowedBy { get; }
-    }
-
-    /// <summary>
     /// The options for a not yet explicitly named capture group,
     /// which is not yet part of a sequence or list of alternatives.
     /// </summary>
@@ -124,10 +96,10 @@ namespace Generex.Fluent
         ICapturedAtom<T> Called(string name);
     }
 
-    internal abstract class Atom<T> : IAtom<T>, ICapturedAtom<T>, IRepeatedAtom<T>,
-        IAlternativeAtom<T>, IAlternativeCapturedAtom<T>, IAlternativeRepeatedAtom<T>,
-        IAdditionAtom<T>, IAdditionCapturedAtom<T>, IAdditionRepeatedAtom<T>,
-        ISequenceAtom<T>, ISequenceCapturedAtom<T>, ISequenceRepeatedAtom<T>
+    internal abstract class Atom<T> : IAtom<T>, ICapturedAtom<T>,
+        IAlternativeAtom<T>, IAlternativeCapturedAtom<T>,
+        IAdditionAtom<T>, IAdditionCapturedAtom<T>,
+        ISequenceAtom<T>, ISequenceCapturedAtom<T>
     {
         private IParentAtom<T>? parent;
 
@@ -145,14 +117,9 @@ namespace Generex.Fluent
             }
         }
 
-        IAlternativeGroup<T> IAlternativeRepeatedAtom<T>.As => alternativeParent.WrapInGroup(this);
-
-        ISequenceGroup<T> ISequenceRepeatedAtom<T>.As => sequenceParent.WrapInGroup(this);
-
         IAlternativeGroup<T> IAlternativeAtom<T>.As => alternativeParent.WrapInGroup(this);
         ISequenceGroup<T> ISequenceAtom<T>.As => sequenceParent.WrapInGroup(this);
         IAdditionGroup<T> IAdditionAtom<T>.As => additionParent.WrapInGroup(this);
-        IAdditionGroup<T> IAdditionRepeatedAtom<T>.As => additionParent.WrapInGroup(this);
         public ISequenceNext<T> FollowedBy => sequenceParent;
 
         public IRepeatStart<T> GreedilyRepeat

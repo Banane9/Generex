@@ -73,23 +73,6 @@ namespace Generex.Fluent
     }
 
     /// <summary>
-    /// The options for a quantified atom, which is part of a list of alternatives.
-    /// </summary>
-    /// <inheritdoc/>
-    public interface IAlternativeRepeatedAtom<T> : IFinishableAtom<T>
-    {
-        /// <summary>
-        /// Add another atom to the list of alternatives.
-        /// </summary>
-        IAlternativeNext<T> Alternatively { get; }
-
-        /// <summary>
-        /// Construct a group wrapper for the current atom.
-        /// </summary>
-        IAlternativeGroup<T> As { get; }
-    }
-
-    /// <summary>
     /// The options for a not yet explicitly named capture group, which is part of a list of alternatives.
     /// </summary>
     /// <inheritdoc/>

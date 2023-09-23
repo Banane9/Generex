@@ -73,23 +73,6 @@ namespace Generex.Fluent
     }
 
     /// <summary>
-    /// The options for a quantified atom, which is part of a sequence.
-    /// </summary>
-    /// <inheritdoc/>
-    public interface ISequenceRepeatedAtom<T> : IFinishableAtom<T>
-    {
-        /// <summary>
-        /// Constructs a group wrapper for the current atom.
-        /// </summary>
-        ISequenceGroup<T> As { get; }
-
-        /// <summary>
-        /// Adds the next atom to the sequence.
-        /// </summary>
-        ISequenceNext<T> FollowedBy { get; }
-    }
-
-    /// <summary>
     /// The options for a not yet explicitly named capture group, which is part of a sequence.
     /// </summary>
     /// <inheritdoc/>

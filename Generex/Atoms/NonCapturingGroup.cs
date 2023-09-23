@@ -20,9 +20,9 @@ namespace Generex.Atoms
             return $"(?:{Atom})";
         }
 
-        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
         {
-            foreach (var nextMatch in ContinueMatch(Atom, currentMatch))
+            foreach (var nextMatch in continueMatch(Atom, currentMatch))
             {
                 foreach (var match in nextMatch.GetParentSequence()
                                         .TakeUntil(match => match != currentMatch)

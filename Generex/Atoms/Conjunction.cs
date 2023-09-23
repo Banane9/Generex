@@ -22,7 +22,7 @@ namespace Generex.Atoms
         /// <inheritdoc/>
         public override string ToString(bool grouped)
         {
-            if (Length == 0)
+            if (Length == 1)
                 return Atoms.First().ToString(grouped);
 
             var conjuncts = string.Join("&", Atoms.Select(atom => atom.ToString()));
@@ -33,15 +33,15 @@ namespace Generex.Atoms
                 return conjuncts;
         }
 
-        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
         {
             if (Length == 0)
                 return currentMatch.AllNext();
 
             if (Length == 1)
-                return ContinueMatch(Atoms.First(), currentMatch);
+                return continueMatch(Atoms.First(), currentMatch);
 
-            var results = Atoms.Select(atom => ContinueMatch(atom, currentMatch)).ToArray();
+            var results = Atoms.Select(atom => continueMatch(atom, currentMatch)).ToArray();
 
             var i = -1;
             var result = new List<MatchState<T>>(results[0]);

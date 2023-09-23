@@ -41,9 +41,9 @@ namespace Generex.Atoms
 
         /// <inheritdoc/>
         public override string ToString()
-            => $"[{string.Join(SequenceSeparator, ranges.Select(range => range.ToString()))}]";
+            => $"[{string.Join(sequenceSeparator, ranges.Select(range => range.ToString()))}]";
 
-        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
         {
             if (!currentMatch.IsInputEnd && ranges.Any(range => range.Contains(currentMatch.NextValue)))
                 yield return currentMatch.Next();

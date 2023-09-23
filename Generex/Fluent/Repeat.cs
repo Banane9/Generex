@@ -16,7 +16,7 @@ namespace Generex.Fluent
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        IAdditionRepeatedAtom<T> And(int maximum);
+        IAdditionAtom<T> And(int maximum);
     }
 
     /// <summary>
@@ -28,31 +28,31 @@ namespace Generex.Fluent
         /// <summary>
         /// Configures the quantifier to allow zero to infinite matches.
         /// </summary>
-        public IAdditionRepeatedAtom<T> AnyNumber { get; }
+        public IAdditionAtom<T> AnyNumber { get; }
 
         /// <summary>
         /// Configures the quantifier to allow one to infinite matches.
         /// </summary>
-        public IAdditionRepeatedAtom<T> AtLeastOnce { get; }
+        public IAdditionAtom<T> AtLeastOnce { get; }
 
         /// <summary>
         /// Configures the quantifier to allow zero to one match(es).
         /// </summary>
-        public IAdditionRepeatedAtom<T> AtMostOnce { get; }
+        public IAdditionAtom<T> AtMostOnce { get; }
 
         /// <summary>
         /// Configures the quantifier to allow <paramref name="minimum"/> to infinite matches.
         /// </summary>
         /// <param name="minimum">The minimum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IAdditionRepeatedAtom<T> AtLeast(int minimum);
+        public IAdditionAtom<T> AtLeast(int minimum);
 
         /// <summary>
         /// Configures the quantifier to allow one to <paramref name="maximum"/> matches.
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IAdditionRepeatedAtom<T> AtMost(int maximum);
+        public IAdditionAtom<T> AtMost(int maximum);
 
         /// <summary>
         /// Configures the quantifier to allow at least <paramref name="minimum"/> matches.
@@ -66,14 +66,14 @@ namespace Generex.Fluent
         /// </summary>
         /// <param name="exactly">The number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IAdditionRepeatedAtom<T> Exactly(int exactly);
+        public IAdditionAtom<T> Exactly(int exactly);
 
         /// <summary>
         /// Configures the quantifier to allow zero to <paramref name="maximum"/> matches.
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IAdditionRepeatedAtom<T> MaybeAtMost(int maximum);
+        public IAdditionAtom<T> MaybeAtMost(int maximum);
     }
 
     /// <summary>
@@ -87,7 +87,7 @@ namespace Generex.Fluent
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        IAlternativeRepeatedAtom<T> And(int maximum);
+        IAlternativeAtom<T> And(int maximum);
     }
 
     /// <summary>
@@ -99,31 +99,31 @@ namespace Generex.Fluent
         /// <summary>
         /// Configures the quantifier to allow zero to infinite matches.
         /// </summary>
-        public IAlternativeRepeatedAtom<T> AnyNumber { get; }
+        public IAlternativeAtom<T> AnyNumber { get; }
 
         /// <summary>
         /// Configures the quantifier to allow one to infinite matches.
         /// </summary>
-        public IAlternativeRepeatedAtom<T> AtLeastOnce { get; }
+        public IAlternativeAtom<T> AtLeastOnce { get; }
 
         /// <summary>
         /// Configures the quantifier to allow zero to one match(es).
         /// </summary>
-        public IAlternativeRepeatedAtom<T> AtMostOnce { get; }
+        public IAlternativeAtom<T> AtMostOnce { get; }
 
         /// <summary>
         /// Configures the quantifier to allow <paramref name="minimum"/> to infinite matches.
         /// </summary>
         /// <param name="minimum">The minimum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IAlternativeRepeatedAtom<T> AtLeast(int minimum);
+        public IAlternativeAtom<T> AtLeast(int minimum);
 
         /// <summary>
         /// Configures the quantifier to allow one to <paramref name="maximum"/> matches.
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IAlternativeRepeatedAtom<T> AtMost(int maximum);
+        public IAlternativeAtom<T> AtMost(int maximum);
 
         /// <summary>
         /// Configures the quantifier to allow at least <paramref name="minimum"/> matches.
@@ -137,14 +137,14 @@ namespace Generex.Fluent
         /// </summary>
         /// <param name="exactly">The number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IAlternativeRepeatedAtom<T> Exactly(int exactly);
+        public IAlternativeAtom<T> Exactly(int exactly);
 
         /// <summary>
         /// Configures the quantifier to allow zero to <paramref name="maximum"/> matches.
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IAlternativeRepeatedAtom<T> MaybeAtMost(int maximum);
+        public IAlternativeAtom<T> MaybeAtMost(int maximum);
     }
 
     /// <summary>
@@ -159,7 +159,7 @@ namespace Generex.Fluent
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        IRepeatedAtom<T> And(int maximum);
+        IAtom<T> And(int maximum);
     }
 
     /// <summary>
@@ -171,31 +171,31 @@ namespace Generex.Fluent
         /// <summary>
         /// Configures the quantifier to allow zero to infinite matches.
         /// </summary>
-        public IRepeatedAtom<T> AnyNumber { get; }
+        public IAtom<T> AnyNumber { get; }
 
         /// <summary>
         /// Configures the quantifier to allow one to infinite matches.
         /// </summary>
-        public IRepeatedAtom<T> AtLeastOnce { get; }
+        public IAtom<T> AtLeastOnce { get; }
 
         /// <summary>
         /// Configures the quantifier to allow zero to one match(es).
         /// </summary>
-        public IRepeatedAtom<T> AtMostOnce { get; }
+        public IAtom<T> AtMostOnce { get; }
 
         /// <summary>
         /// Configures the quantifier to allow <paramref name="minimum"/> to infinite matches.
         /// </summary>
         /// <param name="minimum">The minimum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IRepeatedAtom<T> AtLeast(int minimum);
+        public IAtom<T> AtLeast(int minimum);
 
         /// <summary>
         /// Configures the quantifier to allow one to <paramref name="maximum"/> matches.
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IRepeatedAtom<T> AtMost(int maximum);
+        public IAtom<T> AtMost(int maximum);
 
         /// <summary>
         /// Configures the quantifier to allow at least <paramref name="minimum"/> matches.
@@ -209,14 +209,14 @@ namespace Generex.Fluent
         /// </summary>
         /// <param name="exactly">The number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IRepeatedAtom<T> Exactly(int exactly);
+        public IAtom<T> Exactly(int exactly);
 
         /// <summary>
         /// Configures the quantifier to allow zero to <paramref name="maximum"/> matches.
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public IRepeatedAtom<T> MaybeAtMost(int maximum);
+        public IAtom<T> MaybeAtMost(int maximum);
     }
 
     /// <summary>
@@ -230,7 +230,7 @@ namespace Generex.Fluent
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        ISequenceRepeatedAtom<T> And(int maximum);
+        ISequenceAtom<T> And(int maximum);
     }
 
     /// <summary>
@@ -242,31 +242,31 @@ namespace Generex.Fluent
         /// <summary>
         /// Configures the quantifier to allow zero to infinite matches.
         /// </summary>
-        public ISequenceRepeatedAtom<T> AnyNumber { get; }
+        public ISequenceAtom<T> AnyNumber { get; }
 
         /// <summary>
         /// Configures the quantifier to allow one to infinite matches.
         /// </summary>
-        public ISequenceRepeatedAtom<T> AtLeastOnce { get; }
+        public ISequenceAtom<T> AtLeastOnce { get; }
 
         /// <summary>
         /// Configures the quantifier to allow zero to one match(es).
         /// </summary>
-        public ISequenceRepeatedAtom<T> AtMostOnce { get; }
+        public ISequenceAtom<T> AtMostOnce { get; }
 
         /// <summary>
         /// Configures the quantifier to allow <paramref name="minimum"/> to infinite matches.
         /// </summary>
         /// <param name="minimum">The minimum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public ISequenceRepeatedAtom<T> AtLeast(int minimum);
+        public ISequenceAtom<T> AtLeast(int minimum);
 
         /// <summary>
         /// Configures the quantifier to allow one to <paramref name="maximum"/> matches.
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public ISequenceRepeatedAtom<T> AtMost(int maximum);
+        public ISequenceAtom<T> AtMost(int maximum);
 
         /// <summary>
         /// Configures the quantifier to allow at least <paramref name="minimum"/> matches.
@@ -280,14 +280,14 @@ namespace Generex.Fluent
         /// </summary>
         /// <param name="exactly">The number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public ISequenceRepeatedAtom<T> Exactly(int exactly);
+        public ISequenceAtom<T> Exactly(int exactly);
 
         /// <summary>
         /// Configures the quantifier to allow zero to <paramref name="maximum"/> matches.
         /// </summary>
         /// <param name="maximum">The maximum number of matches to allow.</param>
         /// <returns>The fully configured quantifier.</returns>
-        public ISequenceRepeatedAtom<T> MaybeAtMost(int maximum);
+        public ISequenceAtom<T> MaybeAtMost(int maximum);
     }
 
     internal class Repeat<T> : Atom<T>, IParentAtom<T>,
@@ -300,11 +300,11 @@ namespace Generex.Fluent
         private IFinishableAtom<T> atom;
         private int maximum = -1;
         private int minimum = -1;
-        ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.AnyNumber => (ISequenceRepeatedAtom<T>)AnyNumber;
-        IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.AnyNumber => (IAlternativeRepeatedAtom<T>)AnyNumber;
-        IAdditionRepeatedAtom<T> IAdditionRepeatStart<T>.AnyNumber => (IAdditionRepeatedAtom<T>)AnyNumber;
+        ISequenceAtom<T> ISequenceRepeatStart<T>.AnyNumber => (ISequenceAtom<T>)AnyNumber;
+        IAlternativeAtom<T> IAlternativeRepeatStart<T>.AnyNumber => (IAlternativeAtom<T>)AnyNumber;
+        IAdditionAtom<T> IAdditionRepeatStart<T>.AnyNumber => (IAdditionAtom<T>)AnyNumber;
 
-        public IRepeatedAtom<T> AnyNumber
+        public IAtom<T> AnyNumber
         {
             get
             {
@@ -314,7 +314,7 @@ namespace Generex.Fluent
             }
         }
 
-        public IRepeatedAtom<T> AtLeastOnce
+        public IAtom<T> AtLeastOnce
         {
             get
             {
@@ -324,12 +324,12 @@ namespace Generex.Fluent
             }
         }
 
-        IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.AtLeastOnce => (IAlternativeRepeatedAtom<T>)AtLeastOnce;
-        IAdditionRepeatedAtom<T> IAdditionRepeatStart<T>.AtLeastOnce => (IAdditionRepeatedAtom<T>)AtLeastOnce;
+        IAlternativeAtom<T> IAlternativeRepeatStart<T>.AtLeastOnce => (IAlternativeAtom<T>)AtLeastOnce;
+        IAdditionAtom<T> IAdditionRepeatStart<T>.AtLeastOnce => (IAdditionAtom<T>)AtLeastOnce;
 
-        ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.AtLeastOnce => (ISequenceRepeatedAtom<T>)AtLeastOnce;
+        ISequenceAtom<T> ISequenceRepeatStart<T>.AtLeastOnce => (ISequenceAtom<T>)AtLeastOnce;
 
-        public IRepeatedAtom<T> AtMostOnce
+        public IAtom<T> AtMostOnce
         {
             get
             {
@@ -339,9 +339,9 @@ namespace Generex.Fluent
             }
         }
 
-        IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.AtMostOnce => (IAlternativeRepeatedAtom<T>)AtMostOnce;
-        IAdditionRepeatedAtom<T> IAdditionRepeatStart<T>.AtMostOnce => (IAdditionRepeatedAtom<T>)AtMostOnce;
-        ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.AtMostOnce => (ISequenceRepeatedAtom<T>)AtMostOnce;
+        IAlternativeAtom<T> IAlternativeRepeatStart<T>.AtMostOnce => (IAlternativeAtom<T>)AtMostOnce;
+        IAdditionAtom<T> IAdditionRepeatStart<T>.AtMostOnce => (IAdditionAtom<T>)AtMostOnce;
+        ISequenceAtom<T> ISequenceRepeatStart<T>.AtMostOnce => (ISequenceAtom<T>)AtMostOnce;
 
         public Repeat(IParentAtom<T>? parent, IFinishableAtom<T> atom, bool lazy) : base(parent)
         {
@@ -349,52 +349,52 @@ namespace Generex.Fluent
             this.lazy = lazy;
         }
 
-        public IRepeatedAtom<T> And(int maximum)
+        public IAtom<T> And(int maximum)
         {
             this.maximum = maximum;
             return this;
         }
 
-        IAdditionRepeatedAtom<T> IAdditionRepeatEnd<T>.And(int maximum)
-            => (IAdditionRepeatedAtom<T>)And(maximum);
+        IAdditionAtom<T> IAdditionRepeatEnd<T>.And(int maximum)
+            => (IAdditionAtom<T>)And(maximum);
 
-        IAlternativeRepeatedAtom<T> IAlternativeRepeatEnd<T>.And(int maximum)
-            => (IAlternativeRepeatedAtom<T>)And(maximum);
+        IAlternativeAtom<T> IAlternativeRepeatEnd<T>.And(int maximum)
+            => (IAlternativeAtom<T>)And(maximum);
 
-        ISequenceRepeatedAtom<T> ISequenceRepeatEnd<T>.And(int maximum)
-            => (ISequenceRepeatedAtom<T>)And(maximum);
+        ISequenceAtom<T> ISequenceRepeatEnd<T>.And(int maximum)
+            => (ISequenceAtom<T>)And(maximum);
 
-        public IRepeatedAtom<T> AtLeast(int minimum)
+        public IAtom<T> AtLeast(int minimum)
         {
             this.minimum = minimum;
             maximum = int.MaxValue;
             return this;
         }
 
-        IAdditionRepeatedAtom<T> IAdditionRepeatStart<T>.AtLeast(int minimum)
-            => (IAdditionRepeatedAtom<T>)AtLeast(minimum);
+        IAdditionAtom<T> IAdditionRepeatStart<T>.AtLeast(int minimum)
+            => (IAdditionAtom<T>)AtLeast(minimum);
 
-        IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.AtLeast(int minimum)
-            => (IAlternativeRepeatedAtom<T>)AtLeast(minimum);
+        IAlternativeAtom<T> IAlternativeRepeatStart<T>.AtLeast(int minimum)
+            => (IAlternativeAtom<T>)AtLeast(minimum);
 
-        ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.AtLeast(int minimum)
-            => (ISequenceRepeatedAtom<T>)AtLeast(minimum);
+        ISequenceAtom<T> ISequenceRepeatStart<T>.AtLeast(int minimum)
+            => (ISequenceAtom<T>)AtLeast(minimum);
 
-        public IRepeatedAtom<T> AtMost(int maximum)
+        public IAtom<T> AtMost(int maximum)
         {
             minimum = 1;
             this.maximum = maximum;
             return this;
         }
 
-        IAdditionRepeatedAtom<T> IAdditionRepeatStart<T>.AtMost(int maximum)
-            => (IAdditionRepeatedAtom<T>)AtMost(maximum);
+        IAdditionAtom<T> IAdditionRepeatStart<T>.AtMost(int maximum)
+            => (IAdditionAtom<T>)AtMost(maximum);
 
-        IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.AtMost(int maximum)
-            => (IAlternativeRepeatedAtom<T>)AtMost(maximum);
+        IAlternativeAtom<T> IAlternativeRepeatStart<T>.AtMost(int maximum)
+            => (IAlternativeAtom<T>)AtMost(maximum);
 
-        ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.AtMost(int maximum)
-            => (ISequenceRepeatedAtom<T>)AtMost(maximum);
+        ISequenceAtom<T> ISequenceRepeatStart<T>.AtMost(int maximum)
+            => (ISequenceAtom<T>)AtMost(maximum);
 
         public IRepeatEnd<T> Between(int minimum)
         {
@@ -411,37 +411,37 @@ namespace Generex.Fluent
         ISequenceRepeatEnd<T> ISequenceRepeatStart<T>.Between(int minimum)
             => (ISequenceRepeatEnd<T>)Between(minimum);
 
-        public IRepeatedAtom<T> Exactly(int times)
+        public IAtom<T> Exactly(int times)
         {
             minimum = times;
             maximum = times;
             return this;
         }
 
-        IAdditionRepeatedAtom<T> IAdditionRepeatStart<T>.Exactly(int times)
-            => (IAdditionRepeatedAtom<T>)Exactly(times);
+        IAdditionAtom<T> IAdditionRepeatStart<T>.Exactly(int times)
+            => (IAdditionAtom<T>)Exactly(times);
 
-        IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.Exactly(int times)
-            => (IAlternativeRepeatedAtom<T>)Exactly(times);
+        IAlternativeAtom<T> IAlternativeRepeatStart<T>.Exactly(int times)
+            => (IAlternativeAtom<T>)Exactly(times);
 
-        ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.Exactly(int times)
-            => (ISequenceRepeatedAtom<T>)Exactly(times);
+        ISequenceAtom<T> ISequenceRepeatStart<T>.Exactly(int times)
+            => (ISequenceAtom<T>)Exactly(times);
 
-        public IRepeatedAtom<T> MaybeAtMost(int maximum)
+        public IAtom<T> MaybeAtMost(int maximum)
         {
             minimum = 0;
             this.maximum = maximum;
             return this;
         }
 
-        IAdditionRepeatedAtom<T> IAdditionRepeatStart<T>.MaybeAtMost(int maximum)
-            => (IAdditionRepeatedAtom<T>)MaybeAtMost(maximum);
+        IAdditionAtom<T> IAdditionRepeatStart<T>.MaybeAtMost(int maximum)
+            => (IAdditionAtom<T>)MaybeAtMost(maximum);
 
-        IAlternativeRepeatedAtom<T> IAlternativeRepeatStart<T>.MaybeAtMost(int maximum)
-            => (IAlternativeRepeatedAtom<T>)MaybeAtMost(maximum);
+        IAlternativeAtom<T> IAlternativeRepeatStart<T>.MaybeAtMost(int maximum)
+            => (IAlternativeAtom<T>)MaybeAtMost(maximum);
 
-        ISequenceRepeatedAtom<T> ISequenceRepeatStart<T>.MaybeAtMost(int maximum)
-            => (ISequenceRepeatedAtom<T>)MaybeAtMost(maximum);
+        ISequenceAtom<T> ISequenceRepeatStart<T>.MaybeAtMost(int maximum)
+            => (ISequenceAtom<T>)MaybeAtMost(maximum);
 
         public IRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child)
         {

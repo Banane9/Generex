@@ -39,8 +39,8 @@ namespace Generex
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public abstract partial class Generex<T>
     {
-        protected static string EscapedSequenceSeparator { get; } = "\\" + SequenceSeparator;
-        protected static string SequenceSeparator { get; } = typeof(T) == typeof(char) ? "" : "⋅";
+        protected static string escapedSequenceSeparator { get; } = "\\" + sequenceSeparator;
+        protected static string sequenceSeparator { get; } = typeof(T) == typeof(char) ? "" : "⋅";
 
         /// <summary>
         /// Replaces any occurences of the sequence separator character by an escaped version.<br/>
@@ -50,7 +50,7 @@ namespace Generex
         /// <returns></returns>
         [return: NotNullIfNotNull(nameof(literal))]
         public static string? EscapeLiteral(string? literal)
-            => literal?.Replace(SequenceSeparator, EscapedSequenceSeparator);
+            => literal?.Replace(sequenceSeparator, escapedSequenceSeparator);
 
         public static implicit operator Generex<T>(T value) => new Literal<T>(value);
 
@@ -86,7 +86,7 @@ namespace Generex
                 wasEnd = startMatch.IsInputEnd;
                 var hadSuccessfulMatch = false;
 
-                var matches = ContinueMatchInternal(startMatch);
+                var matches = continueMatchInternal(startMatch);
 
                 if (returnEveryMatch)
                 {
@@ -108,10 +108,8 @@ namespace Generex
                         yield return match.GetMatch();
                     }
 
-                    if (restartFromEveryValue || !hadSuccessfulMatch)
-                        startMatch = startMatch.Next().AsStart();
-                    else
-                        startMatch = match!.AsStart();
+                    startMatch = restartFromEveryValue || !hadSuccessfulMatch ?
+                        startMatch.Next().AsStart() : match!.AsStart();
                 }
             }
             while (!fromStartOnly && !wasEnd);
@@ -136,9 +134,9 @@ namespace Generex
         /// <returns>A string that represents the current pattern.</returns>
         public virtual string ToString(bool grouped) => ToString();
 
-        protected static IEnumerable<MatchState<T>> ContinueMatch(Generex<T> instance, MatchState<T> currentMatch)
-            => instance.ContinueMatchInternal(currentMatch);
+        protected static IEnumerable<MatchState<T>> continueMatch(Generex<T> instance, MatchState<T> currentMatch)
+            => instance.continueMatchInternal(currentMatch);
 
-        protected abstract IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch);
+        protected abstract IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch);
     }
 }

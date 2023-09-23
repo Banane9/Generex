@@ -21,9 +21,9 @@ namespace Generex.Atoms
             // Atom is Quantifier<T> ? $"{Atom}+" : $"(?>{Atom})"
             => $"(?>{Atom})";
 
-        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
         {
-            if (ContinueMatch(Atom, currentMatch).FirstOrDefault() is MatchState<T> matchChoice)
+            if (continueMatch(Atom, currentMatch).FirstOrDefault() is MatchState<T> matchChoice)
                 yield return matchChoice;
 
             yield break;

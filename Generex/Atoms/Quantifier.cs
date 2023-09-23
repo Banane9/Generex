@@ -35,6 +35,14 @@ namespace Generex.Atoms
         protected Quantifier(Generex<T> atom, int exactly) : this(atom, exactly, exactly)
         { }
 
+        public override string ToString(bool grouped)
+        {
+            if (grouped)
+                return $"({ToString()})";
+            else
+                return ToString();
+        }
+
         /// <inheritdoc/>
         public override string ToString()
         {

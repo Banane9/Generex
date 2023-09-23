@@ -24,7 +24,7 @@ namespace Generex.Atoms
         public override string ToString()
             => $"\\k<{CaptureReference}>";
 
-        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
         {
             var progress = -1;
             if (!currentMatch.TryGetLatestCapture(CaptureReference, out var capture))
