@@ -21,5 +21,17 @@ namespace Generex.Tests
 
             return results.Select(result => result.Length).ToArray();
         }
+
+        [TestCase(10, ExpectedResult = new int[] { 0, 10 })]
+        [TestCase(20, ExpectedResult = new int[] { 0, 10, 20 })]
+        public int[] CommonMultiplesOf2And5FluentBuilder(int n)
+        {
+            var commonMultiplesMatcher = Generex.Literal.Wildcard<int>().LazilyRepeat.Exactly(2).LazilyRepeat.AnyNumber.
+                Additionally.Wildcard.LazilyRepeat.Exactly(5).LazilyRepeat.AnyNumber.Finish();
+
+            var results = commonMultiplesMatcher.MatchAll(Enumerable.Repeat(0, n), fromStartOnly: true);
+
+            return results.Select(result => result.Length).ToArray();
+        }
     }
 }
