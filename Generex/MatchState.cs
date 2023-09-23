@@ -127,9 +127,9 @@ namespace Generex
 
             // Sequences should be identical, so only need to check one.
             // Don't need to include start one, as it should not have capture state.
-            while (!currentTarget.IsMatchStart)
+            while (!currentTarget!.IsMatchStart)
             {
-                foreach (var sourceCapture in currentSource.captureState)
+                foreach (var sourceCapture in currentSource!.captureState)
                 {
                     if (currentTarget.captureState.TryGetValue(sourceCapture.Key, out var targetCaptureSequence))
                     {

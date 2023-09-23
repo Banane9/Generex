@@ -7,6 +7,65 @@ namespace Generex.Fluent
 {
     /// <summary>
     /// The options for the start of a sequence of literals, which just had an explicit
+    /// <see cref="IEqualityComparer{T}"/> set and is part of a list of requirements.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
+    public interface IAdditionComparingLiteral<T>
+    {
+        /// <summary>
+        /// Starts the sequence of literals with the given one.
+        /// </summary>
+        /// <param name="literals">The starting sequence of literals.</param>
+        /// <returns>The ready-to-use sequence of literals.</returns>
+        IAdditionLiteral<T> Of(IEnumerable<T> literals);
+
+        /// <summary>
+        /// Starts the sequence of literals with the given ones.
+        /// </summary>
+        /// <param name="literal">The first literal for the sequence.</param>
+        /// <param name="furtherLiterals">Any further literals for the sequence.</param>
+        /// <returns>The ready-to-use sequence of literals.</returns>
+        IAdditionLiteral<T> Of(T literal, params T[] furtherLiterals);
+    }
+
+    /// <summary>
+    /// The options for a ready-to-use sequence of literals, which is part of a list of requirements.
+    /// </summary>
+    /// <inheritdoc/>
+    public interface IAdditionLiteral<T> : IAdditionAtom<T>
+    {
+        /// <summary>
+        /// Continues the sequence of literals with the given ones.
+        /// </summary>
+        /// <param name="literal">The first literal to continue the sequence.</param>
+        /// <param name="furtherLiterals">Any further literals to continue the sequence.</param>
+        /// <returns>The ready-to-use sequence of literals.</returns>
+        IAdditionLiteral<T> And(T literal, params T[] furtherLiterals);
+
+        /// <summary>
+        /// Continues the sequence of literals with the given one.
+        /// </summary>
+        /// <param name="literals">The sequence of literals to continue with.</param>
+        /// <returns>The ready-to-use sequence of literals.</returns>
+        IAdditionLiteral<T> And(IEnumerable<T> literals);
+    }
+
+    /// <summary>
+    /// The options for the start of a sequence of literals, which is part of a list of requirements.
+    /// </summary>
+    /// <inheritdoc/>
+    public interface IAdditionLiteralStart<T> : IAdditionComparingLiteral<T>
+    {
+        /// <summary>
+        /// Sets an explicit <see cref="IEqualityComparer{T}"/> for the sequence of literals.
+        /// </summary>
+        /// <param name="equalityComparer">The <see cref="IEqualityComparer{T}"/> to use.</param>
+        /// <returns>The not-yet-started sequence with the set <paramref name="equalityComparer"/>.</returns>
+        IAdditionComparingLiteral<T> Using(IEqualityComparer<T> equalityComparer);
+    }
+
+    /// <summary>
+    /// The options for the start of a sequence of literals, which just had an explicit
     /// <see cref="IEqualityComparer{T}"/> set and is part of a list of alternatives.
     /// </summary>
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
@@ -66,7 +125,7 @@ namespace Generex.Fluent
 
     /// <summary>
     /// The options for the start of a sequence of literals, which just had an explicit
-    /// <see cref="IEqualityComparer{T}"/> set and is not yet part of a sequence or list of alternatives.
+    /// <see cref="IEqualityComparer{T}"/> set and is not yet part of a sequence or list.
     /// </summary>
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public interface IComparingLiteral<T>
@@ -88,7 +147,7 @@ namespace Generex.Fluent
     }
 
     /// <summary>
-    /// The options for a ready-to-use sequence of literals, which is not yet part of a sequence or list of alternatives.
+    /// The options for a ready-to-use sequence of literals, which is not yet part of a sequence or list.
     /// </summary>
     /// <inheritdoc/>
     public interface ILiteral<T> : IAtom<T>
@@ -110,7 +169,7 @@ namespace Generex.Fluent
     }
 
     /// <summary>
-    /// The options for the start of a sequence of literals, which is not yet part of a sequence or list of alternatives.
+    /// The options for the start of a sequence of literals, which is not yet part of a sequence or list.
     /// </summary>
     /// <inheritdoc/>
     public interface ILiteralStart<T> : IComparingLiteral<T>
@@ -184,6 +243,7 @@ namespace Generex.Fluent
 
     internal class Literal<T> : Atom<T>, ILiteral<T>, ILiteralStart<T>,
         IAlternativeLiteral<T>, IAlternativeLiteralStart<T>,
+        IAdditionLiteral<T>, IAdditionLiteralStart<T>,
         ISequenceLiteral<T>, ISequenceLiteralStart<T>
     {
         private readonly List<T> literals = new();
@@ -193,72 +253,81 @@ namespace Generex.Fluent
         { }
 
         ISequenceLiteral<T> ISequenceLiteral<T>.And(T literal, params T[] furtherLiterals)
-            => ((ISequenceLiteral<T>)this).And(literal.Yield().Concat(furtherLiterals));
+            => and(literal.Yield().Concat(furtherLiterals));
 
         ISequenceLiteral<T> ISequenceLiteral<T>.And(IEnumerable<T> literals)
-        {
-            this.literals.AddRange(literals);
-            return this;
-        }
+            => and(literals);
 
-        IAlternativeLiteral<T> IAlternativeLiteral<T>.And(T literal, params T[] furtherLiterals) =>
-            ((IAlternativeLiteral<T>)this).And(literal.Yield().Concat(furtherLiterals));
+        IAdditionLiteral<T> IAdditionLiteral<T>.And(T literal, params T[] furtherLiterals)
+            => and(literal.Yield().Concat(furtherLiterals));
+
+        IAdditionLiteral<T> IAdditionLiteral<T>.And(IEnumerable<T> literals)
+            => and(literals);
+
+        IAlternativeLiteral<T> IAlternativeLiteral<T>.And(T literal, params T[] furtherLiterals)
+            => and(literal.Yield().Concat(furtherLiterals));
 
         IAlternativeLiteral<T> IAlternativeLiteral<T>.And(IEnumerable<T> literals)
-        {
-            this.literals.AddRange(literals);
-            return this;
-        }
+            => and(literals);
 
         public ILiteral<T> And(T literal, params T[] furtherLiterals)
-            => And(literal.Yield().Concat(furtherLiterals));
+            => and(literal.Yield().Concat(furtherLiterals));
 
-        public ILiteral<T> And(IEnumerable<T> literals)
-        {
-            this.literals.AddRange(literals);
-            return this;
-        }
+        public ILiteral<T> And(IEnumerable<T> literals) => and(literals);
 
         ISequenceLiteral<T> ISequenceComparingLiteral<T>.Of(IEnumerable<T> literals)
-            => ((ISequenceLiteral<T>)this).And(literals);
+            => and(literals);
 
-        ISequenceLiteral<T> ISequenceComparingLiteral<T>.Of(T literal, params T[] extraLiterals)
-            => ((ISequenceLiteral<T>)this).And(literal, extraLiterals);
+        ISequenceLiteral<T> ISequenceComparingLiteral<T>.Of(T literal, params T[] furtherLiterals)
+            => and(literal.Yield().Concat(furtherLiterals));
 
-        public ILiteral<T> Of(IEnumerable<T> literals) => And(literals);
+        public ILiteral<T> Of(IEnumerable<T> literals) => and(literals);
 
-        public ILiteral<T> Of(T literal, params T[] furtherLiterals) => And(literal, furtherLiterals);
+        public ILiteral<T> Of(T literal, params T[] furtherLiterals)
+            => and(literal.Yield().Concat(furtherLiterals));
+
+        IAdditionLiteral<T> IAdditionComparingLiteral<T>.Of(IEnumerable<T> literals)
+            => and(literals);
+
+        IAdditionLiteral<T> IAdditionComparingLiteral<T>.Of(T literal, params T[] furtherLiterals)
+            => and(literal.Yield().Concat(furtherLiterals));
 
         IAlternativeLiteral<T> IAlternativeComparingLiteral<T>.Of(IEnumerable<T> literals)
-            => ((IAlternativeLiteral<T>)this).And(literals);
+            => and(literals);
 
         IAlternativeLiteral<T> IAlternativeComparingLiteral<T>.Of(T literal, params T[] furtherLiterals)
-            => ((IAlternativeLiteral<T>)this).And(literal, furtherLiterals);
+            => and(literal.Yield().Concat(furtherLiterals));
 
         public IComparingLiteral<T> Using(IEqualityComparer<T> equalityComparer)
-        {
-            this.equalityComparer = equalityComparer;
-            return this;
-        }
+            => @using(equalityComparer);
+
+        IAdditionComparingLiteral<T> IAdditionLiteralStart<T>.Using(IEqualityComparer<T> equalityComparer)
+            => @using(equalityComparer);
 
         IAlternativeComparingLiteral<T> IAlternativeLiteralStart<T>.Using(IEqualityComparer<T> equalityComparer)
-        {
-            this.equalityComparer = equalityComparer;
-            return this;
-        }
+            => @using(equalityComparer);
 
         ISequenceComparingLiteral<T> ISequenceLiteralStart<T>.Using(IEqualityComparer<T> equalityComparer)
-        {
-            this.equalityComparer = equalityComparer;
-            return this;
-        }
+            => @using(equalityComparer);
 
-        protected override Generex<T> FinishInternal()
+        protected override Generex<T> finishInternal()
         {
             if (literals.Count == 1)
                 return new Atoms.Literal<T>(literals[0], equalityComparer);
 
             return new Atoms.Sequence<T>(literals.Select(literal => new Atoms.Literal<T>(literal, equalityComparer)));
+        }
+
+        private Literal<T> @using(IEqualityComparer<T> equalityComparer)
+        {
+            this.equalityComparer = equalityComparer;
+            return this;
+        }
+
+        private Literal<T> and(IEnumerable<T> literals)
+        {
+            this.literals.AddRange(literals);
+            return this;
         }
     }
 }

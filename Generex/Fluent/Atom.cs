@@ -12,6 +12,11 @@ namespace Generex.Fluent
     public interface IAtom<T> : IFinishableAtom<T>
     {
         /// <summary>
+        /// Start a list of requirements with this atom and add another to it.
+        /// </summary>
+        IAdditionNext<T> Additionally { get; }
+
+        /// <summary>
         /// Start a list of alternatives with this atom and add another to it.
         /// </summary>
         IAlternativeNext<T> Alternatively { get; }
@@ -44,6 +49,11 @@ namespace Generex.Fluent
     /// <inheritdoc/>
     public interface ICapturedAtom<T> : IFinishableAtom<T>
     {
+        /// <summary>
+        /// Start a list of requirements with this atom and add another to it.
+        /// </summary>
+        IAdditionNext<T> Additionally { get; }
+
         /// <summary>
         /// Start a list of alternatives with this atom and add another to it.
         /// </summary>
@@ -79,6 +89,11 @@ namespace Generex.Fluent
     public interface IRepeatedAtom<T> : IFinishableAtom<T>
     {
         /// <summary>
+        /// Start a list of requirements with this atom and add another to it.
+        /// </summary>
+        IAdditionNext<T> Additionally { get; }
+
+        /// <summary>
         /// Start a list of alternatives with this atom and add another to it.
         /// </summary>
         IAlternativeNext<T> Alternatively { get; }
@@ -111,11 +126,13 @@ namespace Generex.Fluent
 
     internal abstract class Atom<T> : IAtom<T>, ICapturedAtom<T>, IRepeatedAtom<T>,
         IAlternativeAtom<T>, IAlternativeCapturedAtom<T>, IAlternativeRepeatedAtom<T>,
+        IAdditionAtom<T>, IAdditionCapturedAtom<T>, IAdditionRepeatedAtom<T>,
         ISequenceAtom<T>, ISequenceCapturedAtom<T>, ISequenceRepeatedAtom<T>
     {
         private IParentAtom<T>? parent;
 
-        public IAlternativeNext<T> Alternatively => AlternativeParent;
+        public IAdditionNext<T> Additionally => additionParent;
+        public IAlternativeNext<T> Alternatively => alternativeParent;
 
         public IGroup<T> As
         {
@@ -128,13 +145,15 @@ namespace Generex.Fluent
             }
         }
 
-        IAlternativeGroup<T> IAlternativeRepeatedAtom<T>.As => AlternativeParent.WrapInGroup(this);
+        IAlternativeGroup<T> IAlternativeRepeatedAtom<T>.As => alternativeParent.WrapInGroup(this);
 
-        ISequenceGroup<T> ISequenceRepeatedAtom<T>.As => SequenceParent.WrapInGroup(this);
+        ISequenceGroup<T> ISequenceRepeatedAtom<T>.As => sequenceParent.WrapInGroup(this);
 
-        IAlternativeGroup<T> IAlternativeAtom<T>.As => AlternativeParent.WrapInGroup(this);
-        ISequenceGroup<T> ISequenceAtom<T>.As => SequenceParent.WrapInGroup(this);
-        public ISequenceNext<T> FollowedBy => SequenceParent;
+        IAlternativeGroup<T> IAlternativeAtom<T>.As => alternativeParent.WrapInGroup(this);
+        ISequenceGroup<T> ISequenceAtom<T>.As => sequenceParent.WrapInGroup(this);
+        IAdditionGroup<T> IAdditionAtom<T>.As => additionParent.WrapInGroup(this);
+        IAdditionGroup<T> IAdditionRepeatedAtom<T>.As => additionParent.WrapInGroup(this);
+        public ISequenceNext<T> FollowedBy => sequenceParent;
 
         public IRepeatStart<T> GreedilyRepeat
         {
@@ -148,10 +167,13 @@ namespace Generex.Fluent
         }
 
         ISequenceRepeatStart<T> ISequenceAtom<T>.GreedilyRepeat
-            => SequenceParent.WrapInGreedyRepeat(this);
+            => sequenceParent.WrapInGreedyRepeat(this);
 
         IAlternativeRepeatStart<T> IAlternativeAtom<T>.GreedilyRepeat
-            => AlternativeParent.WrapInGreedyRepeat(this);
+            => alternativeParent.WrapInGreedyRepeat(this);
+
+        IAdditionRepeatStart<T> IAdditionAtom<T>.GreedilyRepeat
+            => additionParent.WrapInGreedyRepeat(this);
 
         public IRepeatStart<T> LazilyRepeat
         {
@@ -165,12 +187,23 @@ namespace Generex.Fluent
         }
 
         IAlternativeRepeatStart<T> IAlternativeAtom<T>.LazilyRepeat
-            => AlternativeParent.WrapInLazyRepeat(this);
+            => alternativeParent.WrapInLazyRepeat(this);
 
         ISequenceRepeatStart<T> ISequenceAtom<T>.LazilyRepeat
-            => SequenceParent.WrapInLazyRepeat(this);
+            => sequenceParent.WrapInLazyRepeat(this);
 
-        private IAlternativeParentAtom<T> AlternativeParent
+        IAdditionRepeatStart<T> IAdditionAtom<T>.LazilyRepeat => additionParent.WrapInLazyRepeat(this);
+
+        private IAdditionParentAtom<T> additionParent
+        {
+            get
+            {
+                parent ??= new Addition<T>(this);
+                return (IAdditionParentAtom<T>)parent;
+            }
+        }
+
+        private IAlternativeParentAtom<T> alternativeParent
         {
             get
             {
@@ -179,7 +212,7 @@ namespace Generex.Fluent
             }
         }
 
-        private ISequenceParentAtom<T> SequenceParent
+        private ISequenceParentAtom<T> sequenceParent
         {
             get
             {
@@ -199,16 +232,16 @@ namespace Generex.Fluent
             while (current.parent != null)
                 current = (Atom<T>)current.parent;
 
-            return current.FinishInternal();
+            return current.finishInternal();
         }
 
-        protected static Generex<T> FinishInternal(IFinishableAtom<T> atom)
-            => ((Atom<T>)atom).FinishInternal();
+        protected static Generex<T> finishInternal(IFinishableAtom<T> atom)
+            => ((Atom<T>)atom).finishInternal();
 
-        protected static void SetParent(IFinishableAtom<T> atom, IParentAtom<T> parent)
+        protected static void setParent(IFinishableAtom<T> atom, IParentAtom<T> parent)
             => ((Atom<T>)atom).parent = parent;
 
-        protected abstract Generex<T> FinishInternal();
+        protected abstract Generex<T> finishInternal();
     }
 
     internal interface IParentAtom<T> : IFinishableAtom<T>

@@ -5,6 +5,68 @@ using System.Text;
 namespace Generex.Fluent
 {
     /// <summary>
+    /// The options for an atomic group, which is part of a list of requirements.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
+    public interface IAdditionAtomicGroup<T>
+    {
+        /// <summary>
+        /// Finishes constructing a plain atomic group, which prevents backtracking into it.
+        /// </summary>
+        IAdditionAtom<T> Group { get; }
+
+        /// <summary>
+        /// Finishes constructing a non-capturing atomic group, which excludes its contents from the final match.
+        /// </summary>
+        IAdditionAtom<T> NonCapturingGroup { get; }
+
+        /// <summary>
+        /// Constructs a not yet explicitly named atomic capture group, creating a new <see cref="CaptureReference{T}"/>.
+        /// </summary>
+        /// <param name="captureReference">Outputs the capture group's reference.</param>
+        /// <returns>The not yet explicitly named atomic capture group.</returns>
+        IAdditionUnnamedCapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference);
+
+        /// <summary>
+        /// Constructs an atomic capture group with an existing <see cref="CaptureReference{T}"/>.
+        /// </summary>
+        /// <param name="captureReference">The reference to use.</param>
+        /// <returns>The fully configured atomic capture group.</returns>
+        IAdditionCapturedAtom<T> CapturingGroup(CaptureReference<T> captureReference);
+    }
+
+    /// <summary>
+    /// The options for a group, which is part of a list of requirements.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
+    public interface IAdditionGroup<T>
+    {
+        /// <summary>
+        /// Constructs an atomic group, which prevents backtracking into it.
+        /// </summary>
+        IAdditionAtomicGroup<T> Atomic { get; }
+
+        /// <summary>
+        /// Constructs a non-capturing group, which excludes its contents from the final match.
+        /// </summary>
+        IAdditionAtom<T> NonCapturingGroup { get; }
+
+        /// <summary>
+        /// Constructs a not yet explicitly named capture group, creating a new <see cref="CaptureReference{T}"/>.
+        /// </summary>
+        /// <param name="captureReference">Outputs the capture group's reference.</param>
+        /// <returns>The not yet explicitly named capture group.</returns>
+        IAdditionUnnamedCapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference);
+
+        /// <summary>
+        /// Constructs a capture group with an existing <see cref="CaptureReference{T}"/>.
+        /// </summary>
+        /// <param name="captureReference">The reference to use.</param>
+        /// <returns>The fully configured capture group.</returns>
+        IAdditionCapturedAtom<T> CapturingGroup(CaptureReference<T> captureReference);
+    }
+
+    /// <summary>
     /// The options for an atomic group, which is part of a list of alternatives.
     /// </summary>
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
@@ -193,6 +255,7 @@ namespace Generex.Fluent
 
     internal class Grouping<T> : Atom<T>, IParentAtom<T>, IAtomicGroup<T>, IGroup<T>, IUnnamedCapturedAtom<T>,
         IAlternativeAtomicGroup<T>, IAlternativeGroup<T>, IAlternativeUnnamedCapturedAtom<T>,
+        IAdditionAtomicGroup<T>, IAdditionGroup<T>, IAdditionUnnamedCapturedAtom<T>,
         ISequenceAtomicGroup<T>, ISequenceGroup<T>, ISequenceUnnamedCapturedAtom<T>
     {
         private IFinishableAtom<T> atom;
@@ -200,7 +263,25 @@ namespace Generex.Fluent
         private CaptureReference<T>? captureReference;
         private bool nonCapturing;
 
-        public IAtomicGroup<T> Atomic
+        public IAtomicGroup<T> Atomic => atomicGroup;
+        IAdditionAtomicGroup<T> IAdditionGroup<T>.Atomic => atomicGroup;
+        IAlternativeAtomicGroup<T> IAlternativeGroup<T>.Atomic => atomicGroup;
+        ISequenceAtomicGroup<T> ISequenceGroup<T>.Atomic => atomicGroup;
+
+        public IAtom<T> Group => this;
+        IAdditionAtom<T> IAdditionAtomicGroup<T>.Group => this;
+        IAlternativeAtom<T> IAlternativeAtomicGroup<T>.Group => this;
+        ISequenceAtom<T> ISequenceAtomicGroup<T>.Group => this;
+
+        public IAtom<T> NonCapturingGroup => nonCapturingGroup;
+        IAdditionAtom<T> IAdditionAtomicGroup<T>.NonCapturingGroup => nonCapturingGroup;
+        IAlternativeAtom<T> IAlternativeAtomicGroup<T>.NonCapturingGroup => nonCapturingGroup;
+        ISequenceAtom<T> ISequenceAtomicGroup<T>.NonCapturingGroup => nonCapturingGroup;
+        IAdditionAtom<T> IAdditionGroup<T>.NonCapturingGroup => nonCapturingGroup;
+        ISequenceAtom<T> ISequenceGroup<T>.NonCapturingGroup => nonCapturingGroup;
+        IAlternativeAtom<T> IAlternativeGroup<T>.NonCapturingGroup => nonCapturingGroup;
+
+        private Grouping<T> atomicGroup
         {
             get
             {
@@ -209,14 +290,7 @@ namespace Generex.Fluent
             }
         }
 
-        IAlternativeAtomicGroup<T> IAlternativeGroup<T>.Atomic => (IAlternativeAtomicGroup<T>)Atomic;
-        ISequenceAtomicGroup<T> ISequenceGroup<T>.Atomic => (ISequenceAtomicGroup<T>)Atomic;
-        public IAtom<T> Group => this;
-        IAlternativeAtom<T> IAlternativeAtomicGroup<T>.Group => this;
-
-        ISequenceAtom<T> ISequenceAtomicGroup<T>.Group => this;
-
-        public IAtom<T> NonCapturingGroup
+        private Grouping<T> nonCapturingGroup
         {
             get
             {
@@ -225,66 +299,63 @@ namespace Generex.Fluent
             }
         }
 
-        IAlternativeAtom<T> IAlternativeAtomicGroup<T>.NonCapturingGroup => (IAlternativeAtom<T>)NonCapturingGroup;
-        ISequenceAtom<T> ISequenceAtomicGroup<T>.NonCapturingGroup => (ISequenceAtom<T>)NonCapturingGroup;
-
-        IAlternativeAtom<T> IAlternativeGroup<T>.NonCapturingGroup => (IAlternativeAtom<T>)NonCapturingGroup;
-        ISequenceAtom<T> ISequenceGroup<T>.NonCapturingGroup => (ISequenceAtom<T>)NonCapturingGroup;
-
         public Grouping(IParentAtom<T>? parent, IFinishableAtom<T> atom) : base(parent)
         {
             this.atom = atom;
         }
 
-        public ICapturedAtom<T> Called(string name)
-        {
-            captureReference!.Name = name;
-            return this;
-        }
+        public ICapturedAtom<T> Called(string name) => called(name);
+
+        IAdditionCapturedAtom<T> IAdditionUnnamedCapturedAtom<T>.Called(string name)
+            => called(name);
 
         IAlternativeCapturedAtom<T> IAlternativeUnnamedCapturedAtom<T>.Called(string name)
-            => (IAlternativeCapturedAtom<T>)Called(name);
+            => called(name);
 
         ISequenceCapturedAtom<T> ISequenceUnnamedCapturedAtom<T>.Called(string name)
-            => (ISequenceCapturedAtom<T>)Called(name);
+            => called(name);
 
         public IUnnamedCapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference)
-        {
-            captureReference = new CaptureReference<T>();
-            this.captureReference = captureReference;
-
-            return this;
-        }
-
-        IAlternativeUnnamedCapturedAtom<T> IAlternativeGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
-            => (IAlternativeUnnamedCapturedAtom<T>)CapturingGroup(out captureReference);
+            => capturingGroup(out captureReference);
 
         ISequenceUnnamedCapturedAtom<T> ISequenceAtomicGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
-            => (ISequenceUnnamedCapturedAtom<T>)CapturingGroup(out captureReference);
+            => capturingGroup(out captureReference);
+
+        IAdditionUnnamedCapturedAtom<T> IAdditionAtomicGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
+            => capturingGroup(out captureReference);
+
+        IAdditionUnnamedCapturedAtom<T> IAdditionGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
+            => capturingGroup(out captureReference);
 
         IAlternativeUnnamedCapturedAtom<T> IAlternativeAtomicGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
-            => (IAlternativeUnnamedCapturedAtom<T>)CapturingGroup(out captureReference);
+            => capturingGroup(out captureReference);
+
+        IAlternativeUnnamedCapturedAtom<T> IAlternativeGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
+            => capturingGroup(out captureReference);
 
         ISequenceUnnamedCapturedAtom<T> ISequenceGroup<T>.CapturingGroup(out CaptureReference<T> captureReference)
-            => (ISequenceUnnamedCapturedAtom<T>)CapturingGroup(out captureReference);
+            => capturingGroup(out captureReference);
 
         public ICapturedAtom<T> CapturingGroup(CaptureReference<T> captureReference)
-        {
-            this.captureReference = captureReference;
-            return this;
-        }
+            => capturingGroup(captureReference);
+
+        IAdditionCapturedAtom<T> IAdditionAtomicGroup<T>.CapturingGroup(CaptureReference<T> captureReference)
+            => capturingGroup(captureReference);
+
+        IAdditionCapturedAtom<T> IAdditionGroup<T>.CapturingGroup(CaptureReference<T> captureReference)
+            => capturingGroup(captureReference);
 
         IAlternativeCapturedAtom<T> IAlternativeAtomicGroup<T>.CapturingGroup(CaptureReference<T> captureReference)
-            => (IAlternativeCapturedAtom<T>)CapturingGroup(captureReference);
+            => capturingGroup(captureReference);
 
         IAlternativeCapturedAtom<T> IAlternativeGroup<T>.CapturingGroup(CaptureReference<T> captureReference)
-            => (IAlternativeCapturedAtom<T>)CapturingGroup(captureReference);
+            => capturingGroup(captureReference);
 
         ISequenceCapturedAtom<T> ISequenceAtomicGroup<T>.CapturingGroup(CaptureReference<T> captureReference)
-            => (ISequenceCapturedAtom<T>)CapturingGroup(captureReference);
+            => capturingGroup(captureReference);
 
         ISequenceCapturedAtom<T> ISequenceGroup<T>.CapturingGroup(CaptureReference<T> captureReference)
-            => (ISequenceCapturedAtom<T>)CapturingGroup(captureReference);
+            => capturingGroup(captureReference);
 
         public IRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child)
         {
@@ -310,9 +381,9 @@ namespace Generex.Fluent
             return repeat;
         }
 
-        protected override Generex<T> FinishInternal()
+        protected override Generex<T> finishInternal()
         {
-            var nested = FinishInternal(atom);
+            var nested = finishInternal(atom);
 
             if (atomic)
                 nested = new Atoms.AtomicGroup<T>(nested);
@@ -324,6 +395,26 @@ namespace Generex.Fluent
                 return new Atoms.CapturingGroup<T>(nested, captureReference);
 
             return nested;
+        }
+
+        private Grouping<T> called(string name)
+        {
+            captureReference!.Name = name;
+            return this;
+        }
+
+        private Grouping<T> capturingGroup(out CaptureReference<T> captureReference)
+        {
+            captureReference = new CaptureReference<T>();
+            this.captureReference = captureReference;
+
+            return this;
+        }
+
+        private Grouping<T> capturingGroup(CaptureReference<T> captureReference)
+        {
+            this.captureReference = captureReference;
+            return this;
         }
     }
 }

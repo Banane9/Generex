@@ -202,12 +202,12 @@ namespace Generex.Fluent
         IRepeatStart<T> IParentAtom<T>.WrapInLazyRepeat(IFinishableAtom<T> child)
             => (IRepeatStart<T>)WrapInLazyRepeat(child);
 
-        protected override Generex<T> FinishInternal()
+        protected override Generex<T> finishInternal()
         {
             if (atoms.Count == 1)
-                return FinishInternal(atoms[0]);
+                return finishInternal(atoms[0]);
 
-            return new Atoms.Sequence<T>(atoms.Select(FinishInternal));
+            return new Atoms.Sequence<T>(atoms.Select(finishInternal));
         }
     }
 }

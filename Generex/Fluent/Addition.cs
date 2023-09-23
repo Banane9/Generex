@@ -7,107 +7,107 @@ using System.Text;
 namespace Generex.Fluent
 {
     /// <summary>
-    /// The options for a general atom, which is part of a list of alternatives.
+    /// The options for a general atom, which is part of a list of requirements.
     /// </summary>
     /// <inheritdoc/>
-    public interface IAlternativeAtom<T> : IFinishableAtom<T>
+    public interface IAdditionAtom<T> : IFinishableAtom<T>
     {
         /// <summary>
-        /// Add another atom to the list of alternatives.
+        /// Add another atom to the list of requirements.
         /// </summary>
-        IAlternativeNext<T> Alternatively { get; }
+        IAdditionNext<T> Additionally { get; }
 
         /// <summary>
         /// Construct a group wrapper for the current atom.
         /// </summary>
-        IAlternativeGroup<T> As { get; }
+        IAdditionGroup<T> As { get; }
 
         /// <summary>
         /// Construct a greedy quantifier for the current atom.
         /// </summary>
-        IAlternativeRepeatStart<T> GreedilyRepeat { get; }
+        IAdditionRepeatStart<T> GreedilyRepeat { get; }
 
         /// <summary>
         /// Construct a lazy quantifier for the current atom.
         /// </summary>
-        IAlternativeRepeatStart<T> LazilyRepeat { get; }
+        IAdditionRepeatStart<T> LazilyRepeat { get; }
     }
 
     /// <summary>
-    /// The options for a named capture group, which is part of a list of alternatives.
+    /// The options for a named capture group, which is part of a list of requirements.
     /// </summary>
     /// <inheritdoc/>
-    public interface IAlternativeCapturedAtom<T> : IFinishableAtom<T>
+    public interface IAdditionCapturedAtom<T> : IFinishableAtom<T>
     {
         /// <summary>
-        /// Add another atom to the list of alternatives.
+        /// Add another atom to the list of requirements.
         /// </summary>
-        IAlternativeNext<T> Alternatively { get; }
+        IAdditionNext<T> Additionally { get; }
     }
 
     /// <summary>
-    /// The options for the next atom in a list of alternatives.
+    /// The options for the next atom in a list of requirements.
     /// </summary>
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
-    public interface IAlternativeNext<T>
+    public interface IAdditionNext<T>
     {
         /// <summary>
         /// Construct a back-reference to the latest capture of another capturing group.
         /// </summary>
-        public IAlternativeCapturedGroupStart<T> CapturedGroup { get; }
+        public IAdditionCapturedGroupStart<T> CapturedGroup { get; }
 
         /// <summary>
         /// Construct a sequence of literals.
         /// </summary>
-        public IAlternativeLiteralStart<T> Literal { get; }
+        public IAdditionLiteralStart<T> Literal { get; }
 
         /// <summary>
         /// Construct a range of literals.
         /// </summary>
-        public IAlternativeRangeStart<T> Range { get; }
+        public IAdditionRangeStart<T> Range { get; }
 
         /// <summary>
-        /// Add a wildcard to the list of alternatives.
+        /// Add a wildcard to the list of requirements.
         /// </summary>
-        public IAlternativeAtom<T> Wildcard { get; }
+        public IAdditionAtom<T> Wildcard { get; }
     }
 
     /// <summary>
-    /// The options for a quantified atom, which is part of a list of alternatives.
+    /// The options for a quantified atom, which is part of a list of requirements.
     /// </summary>
     /// <inheritdoc/>
-    public interface IAlternativeRepeatedAtom<T> : IFinishableAtom<T>
+    public interface IAdditionRepeatedAtom<T> : IFinishableAtom<T>
     {
         /// <summary>
-        /// Add another atom to the list of alternatives.
+        /// Add another atom to the list of requirements.
         /// </summary>
-        IAlternativeNext<T> Alternatively { get; }
+        IAdditionNext<T> Additionally { get; }
 
         /// <summary>
         /// Construct a group wrapper for the current atom.
         /// </summary>
-        IAlternativeGroup<T> As { get; }
+        IAdditionGroup<T> As { get; }
     }
 
     /// <summary>
-    /// The options for a not yet explicitly named capture group, which is part of a list of alternatives.
+    /// The options for a not yet explicitly named capture group, which is part of a list of requirements.
     /// </summary>
     /// <inheritdoc/>
-    public interface IAlternativeUnnamedCapturedAtom<T> : IAlternativeCapturedAtom<T>
+    public interface IAdditionUnnamedCapturedAtom<T> : IAdditionCapturedAtom<T>
     {
         /// <summary>
         /// Adds a name to the capture group.
         /// </summary>
         /// <param name="name">The name to associate with the group.</param>
         /// <returns>The named capture group.</returns>
-        IAlternativeCapturedAtom<T> Called(string name);
+        IAdditionCapturedAtom<T> Called(string name);
     }
 
-    internal class Alternative<T> : Atom<T>, IParentAtom<T>, IAlternativeParentAtom<T>
+    internal class Addition<T> : Atom<T>, IParentAtom<T>, IAdditionParentAtom<T>
     {
         private readonly List<IFinishableAtom<T>> atoms = new();
 
-        public IAlternativeCapturedGroupStart<T> CapturedGroup
+        public IAdditionCapturedGroupStart<T> CapturedGroup
         {
             get
             {
@@ -117,7 +117,7 @@ namespace Generex.Fluent
             }
         }
 
-        public IAlternativeLiteralStart<T> Literal
+        public IAdditionLiteralStart<T> Literal
         {
             get
             {
@@ -127,7 +127,7 @@ namespace Generex.Fluent
             }
         }
 
-        public IAlternativeRangeStart<T> Range
+        public IAdditionRangeStart<T> Range
         {
             get
             {
@@ -137,7 +137,7 @@ namespace Generex.Fluent
             }
         }
 
-        public IAlternativeAtom<T> Wildcard
+        public IAdditionAtom<T> Wildcard
         {
             get
             {
@@ -147,12 +147,12 @@ namespace Generex.Fluent
             }
         }
 
-        public Alternative(IFinishableAtom<T> atom) : base(null)
+        public Addition(IFinishableAtom<T> atom) : base(null)
         {
             atoms.Add(atom);
         }
 
-        public IAlternativeRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child)
+        public IAdditionRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child)
         {
             var repeat = new Repeat<T>(this, child, false);
             setParent(child, repeat);
@@ -166,7 +166,7 @@ namespace Generex.Fluent
         IRepeatStart<T> IParentAtom<T>.WrapInGreedyRepeat(IFinishableAtom<T> child)
             => (IRepeatStart<T>)WrapInGreedyRepeat(child);
 
-        public IAlternativeGroup<T> WrapInGroup(IFinishableAtom<T> child)
+        public IAdditionGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var group = new Grouping<T>(this, child);
             setParent(child, group);
@@ -183,7 +183,7 @@ namespace Generex.Fluent
         IRepeatStart<T> IParentAtom<T>.WrapInLazyRepeat(IFinishableAtom<T> child)
             => (IRepeatStart<T>)WrapInLazyRepeat(child);
 
-        public IAlternativeRepeatStart<T> WrapInLazyRepeat(IFinishableAtom<T> child)
+        public IAdditionRepeatStart<T> WrapInLazyRepeat(IFinishableAtom<T> child)
         {
             var repeat = new Repeat<T>(this, child, true);
             setParent(child, repeat);
@@ -199,16 +199,16 @@ namespace Generex.Fluent
             if (atoms.Count == 1)
                 return finishInternal(atoms[0]);
 
-            return new Disjunction<T>(atoms.Select(finishInternal));
+            return new Conjunction<T>(atoms.Select(finishInternal));
         }
     }
 
-    internal interface IAlternativeParentAtom<T> : IAlternativeNext<T>, IFinishableAtom<T>
+    internal interface IAdditionParentAtom<T> : IAdditionNext<T>, IFinishableAtom<T>
     {
-        IAlternativeRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child);
+        IAdditionRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child);
 
-        IAlternativeGroup<T> WrapInGroup(IFinishableAtom<T> child);
+        IAdditionGroup<T> WrapInGroup(IFinishableAtom<T> child);
 
-        IAlternativeRepeatStart<T> WrapInLazyRepeat(IFinishableAtom<T> child);
+        IAdditionRepeatStart<T> WrapInLazyRepeat(IFinishableAtom<T> child);
     }
 }
