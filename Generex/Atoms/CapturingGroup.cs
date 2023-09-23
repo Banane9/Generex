@@ -36,9 +36,7 @@ namespace Generex.Atoms
                     nextMatch.GetParentSequence()
                         .TakeUntil(match => match != currentMatch)
                         .Skip(1)
-                        .Select(match => match.NextValue!)
-                        .Reverse()
-                        .ToArray());
+                        .Reverse());
 
                 yield return nextMatch;
             }

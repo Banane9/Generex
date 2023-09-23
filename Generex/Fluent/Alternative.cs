@@ -198,7 +198,7 @@ namespace Generex.Fluent
             if (atoms.Count == 1)
                 return FinishInternal(atoms[0]);
 
-            return new Atoms.Alternative<T>(atoms.Select(FinishInternal));
+            return new Atoms.Disjunction<T>(atoms.Select(FinishInternal));
         }
     }
 

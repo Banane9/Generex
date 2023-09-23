@@ -9,7 +9,7 @@ namespace Generex.Atoms
     /// Represents a sequence of sub-patterns, all of which need to match one after the other.
     /// </summary>
     /// <inheritdoc/>
-    public class Sequence<T> : Chain<T>
+    public class Sequence<T> : Junction<T>
     {
         public Sequence(Generex<T> atom, params Generex<T>[] furtherAtoms)
             : base(atom, furtherAtoms)

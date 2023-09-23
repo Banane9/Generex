@@ -18,7 +18,7 @@ namespace Generex.Tests
         {
             var result = fiveFivesMatcher.MatchAll(sequence).ToArray();
 
-            Assert.That(result.SelectMany(r => r.MatchedSequence), Has.All.EqualTo(5));
+            Assert.That(result.SelectMany(result => result), Has.All.EqualTo(5));
 
             return result.Length;
         }
@@ -26,8 +26,7 @@ namespace Generex.Tests
         [TestCase(new int[] { 5000, 5, 5, 5, 5, 5, 10, -5, 5, 6, 5, 5, 5, 5, 5, 5 }, ExpectedResult = 1)]
         public int MatchesStartIndex(int[] sequence)
         {
-            var result = fiveFivesMatcher.MatchAll(sequence).FirstOrDefault();
-
+            Assert.That(fiveFivesMatcher.HasMatch(sequence, out var result), Is.True);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Length, Is.EqualTo(5));
             Assert.That(result.StartIndex + 4, Is.EqualTo(result.EndIndex));

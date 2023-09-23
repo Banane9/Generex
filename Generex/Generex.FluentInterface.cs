@@ -20,7 +20,7 @@ namespace Generex
 
         public static class From
         {
-            public static Generex<T> Alternatives<T>(IEnumerable<Generex<T>> atoms) => new Atoms.Alternative<T>(atoms);
+            public static Generex<T> Alternatives<T>(IEnumerable<Generex<T>> atoms) => new Atoms.Disjunction<T>(atoms);
 
             public static Generex<T> Alternatives<T>(Generex<T> atom, params Generex<T>[] furtherAtoms) => Alternatives(atom.Yield().Concat(furtherAtoms));
 

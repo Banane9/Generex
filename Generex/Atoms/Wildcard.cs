@@ -15,7 +15,8 @@ namespace Generex.Atoms
 
         protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            yield return currentMatch.Next();
+            if (!currentMatch.IsInputEnd)
+                yield return currentMatch.Next();
         }
     }
 }

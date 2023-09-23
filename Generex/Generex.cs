@@ -58,15 +58,26 @@ namespace Generex
 
         public static implicit operator Generex<T>(T[] values) => values.Select(v => new Literal<T>(v)).ToArray();
 
-        public static Generex<T> operator |(Generex<T> leftAtom, Generex<T> rightAtom) => new Alternative<T>(leftAtom, rightAtom);
+        public static Generex<T> operator &(Generex<T> leftAtom, Generex<T> rightAtom) => new Conjunction<T>(leftAtom, rightAtom);
 
-        public static Generex<T> operator +(Generex<T> leftAtom, Generex<T> rightAtom) => new Sequence<T>(leftAtom, rightAtom);
+        public static Generex<T> operator *(Generex<T> leftAtom, Generex<T> rightAtom) => new Sequence<T>(leftAtom, rightAtom);
 
-        public Match<T>? Match(IEnumerable<T> inputSequence, bool fromStartOnly = false)
-            => MatchAll(inputSequence, false, fromStartOnly).FirstOrDefault();
+        public static Generex<T> operator |(Generex<T> leftAtom, Generex<T> rightAtom) => new Disjunction<T>(leftAtom, rightAtom); // only when not already alternatives
 
-        public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, bool restartFromEveryValue = true, bool fromStartOnly = false)
+        public bool HasMatch(IEnumerable<T> inputSequence, out Match<T>? match, bool fromStartOnly = false)
         {
+            match = MatchAll(inputSequence, false, true, fromStartOnly).FirstOrDefault();
+            return match != null;
+        }
+
+        public IEnumerable<Match<T>> Match(IEnumerable<T> inputSequence, bool fromStartOnly = false)
+            => MatchAll(inputSequence, false, true, fromStartOnly);
+
+        public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, bool returnEveryMatch = true, bool restartFromEveryValue = true, bool fromStartOnly = false)
+        {
+            if (returnEveryMatch && !restartFromEveryValue)
+                throw new InvalidOperationException($"{nameof(restartFromEveryValue)} must be true when {nameof(returnEveryMatch)} is.");
+
             var startMatch = new MatchState<T>(inputSequence);
             bool wasEnd;
 
@@ -75,23 +86,42 @@ namespace Generex
                 wasEnd = startMatch.IsInputEnd;
                 var hadSuccessfulMatch = false;
 
-                var match = ContinueMatchInternal(startMatch).FirstOrDefault();
-                if (match != null)
-                {
-                    hadSuccessfulMatch = true;
-                    yield return match.GetMatch();
-                }
+                var matches = ContinueMatchInternal(startMatch);
 
-                if (restartFromEveryValue || !hadSuccessfulMatch)
+                if (returnEveryMatch)
+                {
+                    foreach (var match in matches)
+                        yield return match.GetMatch();
+
+                    if (fromStartOnly)
+                        yield break;
+
                     startMatch = startMatch.Next().AsStart();
+                }
                 else
-                    startMatch = match!.AsStart();
+                {
+                    var match = matches.FirstOrDefault();
+
+                    if (match != null)
+                    {
+                        hadSuccessfulMatch = true;
+                        yield return match.GetMatch();
+                    }
+
+                    if (restartFromEveryValue || !hadSuccessfulMatch)
+                        startMatch = startMatch.Next().AsStart();
+                    else
+                        startMatch = match!.AsStart();
+                }
             }
             while (!fromStartOnly && !wasEnd);
         }
 
+        public IEnumerable<Match<T>> MatchAllFromStart(IEnumerable<T> inputSequence, bool returnEveryMatch = true, bool restartFromEveryValue = true)
+            => MatchAll(inputSequence, returnEveryMatch, restartFromEveryValue, true);
+
         public IEnumerable<Match<T>> MatchSequential(IEnumerable<T> inputSequence, bool fromStartOnly = false)
-            => MatchAll(inputSequence, false, fromStartOnly);
+            => MatchAll(inputSequence, false, false, fromStartOnly);
 
         /// <summary>
         /// Returns a string that represents the current pattern.

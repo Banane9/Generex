@@ -11,35 +11,34 @@ namespace Generex.Tests
 {
     public class RegexTests
     {
-        [TestCase("0x01", ExpectedResult = 1)]
-        [TestCase("0xA2", ExpectedResult = 162)]
-        [TestCase("0x3b", ExpectedResult = 59)]
-        [TestCase("0xC4", ExpectedResult = 196)]
-        [TestCase("0x5d", ExpectedResult = 93)]
-        [TestCase("0xe6", ExpectedResult = 230)]
+        [TestCase("0x0001", ExpectedResult = 1)]
+        [TestCase("0x03b", ExpectedResult = 59)]
+        [TestCase("0x05d", ExpectedResult = 93)]
         [TestCase("0x7f", ExpectedResult = 127)]
         [TestCase("0x89", ExpectedResult = 137)]
+        [TestCase("0xA2", ExpectedResult = 162)]
+        [TestCase("0xC4", ExpectedResult = 196)]
+        [TestCase("0xe6", ExpectedResult = 230)]
         [TestCase("0xFF", ExpectedResult = 255)]
         public int HexNumber(string input)
         {
             var hexNumberMatcher = new Sequence<char>(new NonCapturingGroup<char>(new[] { '0', 'x' }), new GreedyQuantifier<char>(new Range<char>(new[] { new LiteralRange<char>('a', 'f'), new LiteralRange<char>('A', 'F'), new LiteralRange<char>('0', '9') }), 1, int.MaxValue));
 
-            var result = hexNumberMatcher.MatchAll(input).FirstOrDefault();
-
+            Assert.That(hexNumberMatcher.HasMatch(input, out var result), Is.True);
             Assert.That(result, Is.Not.Null);
             Assert.That(int.TryParse(new string(result.ToArray()), NumberStyles.AllowHexSpecifier, null, out var value), Is.True);
 
             return value;
         }
 
-        [TestCase("0x01", ExpectedResult = 1)]
-        [TestCase("0xA2", ExpectedResult = 162)]
-        [TestCase("0x3b", ExpectedResult = 59)]
-        [TestCase("0xC4", ExpectedResult = 196)]
-        [TestCase("0x5d", ExpectedResult = 93)]
-        [TestCase("0xe6", ExpectedResult = 230)]
+        [TestCase("0x0001", ExpectedResult = 1)]
+        [TestCase("0x03b", ExpectedResult = 59)]
+        [TestCase("0x05d", ExpectedResult = 93)]
         [TestCase("0x7f", ExpectedResult = 127)]
         [TestCase("0x89", ExpectedResult = 137)]
+        [TestCase("0xA2", ExpectedResult = 162)]
+        [TestCase("0xC4", ExpectedResult = 196)]
+        [TestCase("0xe6", ExpectedResult = 230)]
         [TestCase("0xFF", ExpectedResult = 255)]
         public int HexNumberFluentBuilder(string input)
         {
@@ -47,8 +46,7 @@ namespace Generex.Tests
                 .FollowedBy.Range.From('0').To('9').And.From('a').To('f').And.From('A').To('F').GreedilyRepeat.AtLeastOnce
                 .Finish();
 
-            var result = hexNumberMatcher.MatchAll(input).FirstOrDefault();
-
+            Assert.That(hexNumberMatcher.HasMatch(input, out var result), Is.True);
             Assert.That(result, Is.Not.Null);
             Assert.That(int.TryParse(new string(result.ToArray()), NumberStyles.AllowHexSpecifier, null, out var value), Is.True);
 
@@ -65,7 +63,7 @@ namespace Generex.Tests
                 .FollowedBy.CapturedGroup.ReferringBackTo(digit).GreedilyRepeat.AnyNumber
                 .Finish();
 
-            var results = repdigitMatcher.MatchAll(input);
+            var results = repdigitMatcher.MatchAll(input, returnEveryMatch: false);
 
             var ints = results.Select(result => int.Parse(result.ToArray())).ToArray();
             return ints;

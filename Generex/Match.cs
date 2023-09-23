@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Generex.Atoms;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,52 +7,76 @@ using System.Text;
 
 namespace Generex
 {
-    public class Match<T> : IEnumerable<T>
+    public sealed class Match<T> : MatchedSequence<T>
     {
-        private readonly T[] fullMatchSequence;
-        private readonly T[] matchSequence;
-        public int EndIndex { get; }
+        private readonly Dictionary<CaptureReference<T>, CaptureGroup> capturedGroups;
+        public MatchedSequence<T> FullMatch { get; }
 
-        public IEnumerable<T> FullMatchSequence
+        public IEnumerable<CaptureGroup> Groups
         {
             get
             {
-                foreach (var value in fullMatchSequence)
-                    yield return value;
+                foreach (var group in capturedGroups.Values)
+                    yield return group;
             }
         }
 
-        public int Length => matchSequence.Length;
+        public CaptureGroup this[CaptureReference<T> captureReference] => capturedGroups[captureReference];
 
-        public IEnumerable<T> MatchedSequence
+        internal Match(IEnumerable<MatchState<T>> fullMatchSequence)
+            : base(fullMatchSequence.Where(match => match.Capturing))
         {
-            get
+            FullMatch = new(fullMatchSequence);
+            capturedGroups = CollectCaptureGroups(fullMatchSequence);
+        }
+
+        internal Match(int index) : base(index)
+        {
+            FullMatch = new(index);
+            capturedGroups = new();
+        }
+
+        internal Match(IEnumerable<MatchState<T>> fullMatchSequence, int index) : base(index)
+        {
+            FullMatch = new(fullMatchSequence);
+            capturedGroups = CollectCaptureGroups(fullMatchSequence);
+        }
+
+        private static Dictionary<CaptureReference<T>, CaptureGroup> CollectCaptureGroups(IEnumerable<MatchState<T>> fullMatchSequence)
+        {
+            return fullMatchSequence.SelectMany(match => match.CaptureState)
+                .Aggregate(new Dictionary<CaptureReference<T>, List<MatchedSequence<T>>>(), (state, capture) =>
+                    {
+                        if (!state.TryGetValue(capture.Key, out var matches))
+                        {
+                            matches = new List<MatchedSequence<T>>();
+                            state.Add(capture.Key, matches);
+                        }
+
+                        matches.Add(capture.Value);
+                        return state;
+                    })
+                .ToDictionary(captureGroups => captureGroups.Key, captureGroups => new CaptureGroup(captureGroups.Key, captureGroups.Value));
+        }
+
+        public sealed class CaptureGroup : IEnumerable<MatchedSequence<T>>
+        {
+            private readonly MatchedSequence<T>[] captures;
+
+            public CaptureReference<T> CaptureReference { get; }
+
+            public MatchedSequence<T> Last => captures[^1];
+
+            internal CaptureGroup(CaptureReference<T> captureReference, IEnumerable<MatchedSequence<T>> captures)
             {
-                foreach (var value in matchSequence)
-                    yield return value;
+                CaptureReference = captureReference;
+                this.captures = captures.ToArray();
             }
-        }
 
-        public int StartIndex { get; }
+            public IEnumerator<MatchedSequence<T>> GetEnumerator()
+                => ((IEnumerable<MatchedSequence<T>>)captures).GetEnumerator();
 
-        public T this[int index] => matchSequence[index];
-
-        internal Match(IEnumerable<T> fullMatchSequence, IEnumerable<T> matchSequence, int start, int end)
-        {
-            this.fullMatchSequence = fullMatchSequence.ToArray();
-            this.matchSequence = matchSequence.ToArray();
-            StartIndex = start;
-            EndIndex = end;
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return ((IEnumerable<T>)matchSequence).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return matchSequence.GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => captures.GetEnumerator();
         }
     }
 }

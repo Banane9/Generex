@@ -6,10 +6,10 @@ using System.Text;
 namespace Generex.Atoms
 {
     /// <summary>
-    /// Represents a pattern which has multiple sub-patterns.
+    /// Represents a pattern consisting of multiple sub-patterns.
     /// </summary>
     /// <inheritdoc/>
-    public abstract class Chain<T> : Generex<T>
+    public abstract class Junction<T> : Generex<T>
     {
         private readonly Generex<T>[] atoms;
 
@@ -30,11 +30,11 @@ namespace Generex.Atoms
         /// </summary>
         public int Length => atoms.Length;
 
-        protected Chain(Generex<T> atom, params Generex<T>[] furtherAtoms)
+        protected Junction(Generex<T> atom, params Generex<T>[] furtherAtoms)
             : this(atom.Yield().Concat(furtherAtoms))
         { }
 
-        protected Chain(IEnumerable<Generex<T>> atoms)
+        protected Junction(IEnumerable<Generex<T>> atoms)
         {
             this.atoms = atoms.ToArray();
         }

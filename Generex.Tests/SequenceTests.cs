@@ -15,11 +15,11 @@ namespace Generex.Tests
         [TestCase(new int[] { 5000, 5, 5, 5, 5, 5, 10, -5, 5, 6, 5, 5, 5, 5, 5, 5 }, ExpectedResult = 3)]
         public int MatchesCount(int[] sequence)
         {
-            var result = fiveFivesMatcher.MatchAll(sequence).ToArray();
+            var results = fiveFivesMatcher.MatchAll(sequence).ToArray();
 
-            Assert.That(result.SelectMany(r => r.MatchedSequence), Has.All.EqualTo(5));
+            Assert.That(results.SelectMany(result => result), Has.All.EqualTo(5));
 
-            return result.Length;
+            return results.Length;
         }
 
         [TestCase(new int[] { 5000, 5, 5, 5, 5, 5, 10, -5, 5, 6, 5, 5, 5, 5, 5, 5 }, ExpectedResult = 1)]
