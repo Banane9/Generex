@@ -6,7 +6,8 @@ using System.Text;
 namespace Generex.Atoms
 {
     /// <summary>
-    /// Represents multiple literals or ranges of literals, at least one of which a value has to fall into to match.
+    /// Represents multiple literals or ranges of literals, at least one of which a value has to fall into to match.<br/>
+    /// Alternatively, it can be negated, so that a value has to fall into none of the ranges to match.
     /// </summary>
     /// <inheritdoc/>
     public class Range<T> : Generex<T>
@@ -16,7 +17,13 @@ namespace Generex.Atoms
         /// <summary>
         /// Gets the number of ranges.
         /// </summary>
-        public int Length => ranges.Length;
+        public int Count { get; }
+
+        /// <summary>
+        /// Gets whether the <see cref="LiteralRange{T}">LiteralRanges</see> that are part
+        /// of this range are treated as a blacklist.
+        /// </summary>
+        public bool Negated { get; }
 
         /// <summary>
         /// Gets the ranges in the order of their appearance.
@@ -30,22 +37,31 @@ namespace Generex.Atoms
             }
         }
 
-        public Range(IEnumerable<LiteralRange<T>> ranges)
-        {
-            this.ranges = ranges.ToArray();
-        }
+        public Range(IEnumerable<LiteralRange<T>> ranges) : this(false, ranges)
+        { }
 
         public Range(LiteralRange<T> range, params LiteralRange<T>[] furtherRanges)
-            : this(range.Yield().Concat(furtherRanges))
+            : this(false, range.Yield().Concat(furtherRanges))
         { }
+
+        public Range(bool negated, LiteralRange<T> range, params LiteralRange<T>[] furtherRanges)
+            : this(negated, range.Yield().Concat(furtherRanges))
+        { }
+
+        public Range(bool negated, IEnumerable<LiteralRange<T>> ranges)
+        {
+            this.ranges = ranges.ToArray();
+            Count = this.ranges.Length;
+            Negated = negated;
+        }
 
         /// <inheritdoc/>
         public override string ToString()
-            => $"[{string.Join(sequenceSeparator, ranges.Select(range => range.ToString()))}]";
+            => $"[{(Negated ? "^" : "")}{string.Join(sequenceSeparator, ranges.Select(range => range.ToString()))}]";
 
         protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
         {
-            if (!currentMatch.IsInputEnd && ranges.Any(range => range.Contains(currentMatch.NextValue)))
+            if (!currentMatch.IsInputEnd && (Negated ^ ranges.Any(range => range.Contains(currentMatch.NextValue))))
                 yield return currentMatch.Next();
         }
     }

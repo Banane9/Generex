@@ -52,22 +52,28 @@ namespace Generex.Fluent
     public interface ISequenceNext<T>
     {
         /// <summary>
-        /// Constructs a back-reference to the latest capture of another capturing group.
+        /// Constructs a back-reference to the latest capture of another capturing group,
+        /// which values have to match one by one.
         /// </summary>
         ISequenceCapturedGroupStart<T> CapturedGroup { get; }
 
         /// <summary>
-        /// Constructs a sequence of literals.
+        /// Constructs a sequence of literals, which values have to match one by one.
         /// </summary>
         ISequenceLiteralStart<T> Literal { get; }
 
         /// <summary>
-        /// Constructs a range of literals.
+        /// Construct a negated range of literals, of which a value has to match none.
+        /// </summary>
+        public ISequenceRangeStart<T> NegatedRange { get; }
+
+        /// <summary>
+        /// Constructs a range of literals, of which a value has to match at least one.
         /// </summary>
         ISequenceRangeStart<T> Range { get; }
 
         /// <summary>
-        /// Adds a wildcard to the sequence.
+        /// Adds a wildcard to the sequence, which matches any value.
         /// </summary>
         ISequenceAtom<T> Wildcard { get; }
     }
@@ -119,11 +125,21 @@ namespace Generex.Fluent
             }
         }
 
+        public ISequenceRangeStart<T> NegatedRange
+        {
+            get
+            {
+                var range = new Range<T>(true, this);
+                atoms.Add(range);
+                return range;
+            }
+        }
+
         public ISequenceRangeStart<T> Range
         {
             get
             {
-                var range = new Range<T>(this);
+                var range = new Range<T>(false, this);
                 atoms.Add(range);
                 return range;
             }

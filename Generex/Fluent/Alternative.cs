@@ -52,22 +52,28 @@ namespace Generex.Fluent
     public interface IAlternativeNext<T>
     {
         /// <summary>
-        /// Construct a back-reference to the latest capture of another capturing group.
+        /// Construct a back-reference to the latest capture of another capturing group,
+        /// which values have to match one by one.
         /// </summary>
         public IAlternativeCapturedGroupStart<T> CapturedGroup { get; }
 
         /// <summary>
-        /// Construct a sequence of literals.
+        /// Construct a sequence of literals, which values have to match one by one.
         /// </summary>
         public IAlternativeLiteralStart<T> Literal { get; }
 
         /// <summary>
-        /// Construct a range of literals.
+        /// Construct a negated range of literals, of which a value has to match none.
+        /// </summary>
+        public IAlternativeRangeStart<T> NegatedRange { get; }
+
+        /// <summary>
+        /// Construct a range of literals, of which a value has to match at least one.
         /// </summary>
         public IAlternativeRangeStart<T> Range { get; }
 
         /// <summary>
-        /// Add a wildcard to the list of alternatives.
+        /// Add a wildcard to the list of alternatives, which matches any value.
         /// </summary>
         public IAlternativeAtom<T> Wildcard { get; }
     }
@@ -110,11 +116,21 @@ namespace Generex.Fluent
             }
         }
 
+        public IAlternativeRangeStart<T> NegatedRange
+        {
+            get
+            {
+                var range = new Range<T>(true, this);
+                atoms.Add(range);
+                return range;
+            }
+        }
+
         public IAlternativeRangeStart<T> Range
         {
             get
             {
-                var range = new Range<T>(this);
+                var range = new Range<T>(false, this);
                 atoms.Add(range);
                 return range;
             }

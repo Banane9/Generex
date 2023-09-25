@@ -58,13 +58,22 @@ namespace Generex
             public static IAtom<T> Wildcard<T>() => new Fluent.Wildcard<T>();
         }
 
+        public static class NegatedRange
+        {
+            public static IOpenRange<T> From<T>(T minium) => new Fluent.Range<T>(true).From(minium);
+
+            public static IRange<T> Of<T>(T literal) => new Fluent.Range<T>(true).Of(literal);
+
+            public static IRangeAddition<T> Using<T>(IComparer<T> comparer) => new Fluent.Range<T>(true).Using(comparer);
+        }
+
         public static class Range
         {
-            public static IOpenRange<T> From<T>(T minium) => new Fluent.Range<T>().From(minium);
+            public static IOpenRange<T> From<T>(T minium) => new Fluent.Range<T>(false).From(minium);
 
-            public static IRange<T> Of<T>(T literal) => new Fluent.Range<T>().Of(literal);
+            public static IRange<T> Of<T>(T literal) => new Fluent.Range<T>(false).Of(literal);
 
-            public static IRangeAddition<T> Using<T>(IComparer<T> comparer) => new Fluent.Range<T>().Using(comparer);
+            public static IRangeAddition<T> Using<T>(IComparer<T> comparer) => new Fluent.Range<T>(false).Using(comparer);
         }
 
         public static class Sequence

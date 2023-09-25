@@ -310,18 +310,20 @@ namespace Generex.Fluent
         ISequenceRangeStart<T>, ISequenceRange<T>, ISequenceOpenRange<T>, ISequenceRangeAddition<T>
     {
         private readonly List<T> literals = new();
+        private readonly bool negated;
         private readonly List<LiteralRange<T>> ranges = new();
         private T? capturedMinimum;
         private IComparer<T> comparer = Comparer<T>.Default;
-
         public IRangeAddition<T> And => this;
 
         IAlternativeRangeAddition<T> IAlternativeRange<T>.And => this;
         IAdditionRangeAddition<T> IAdditionRange<T>.And => this;
         ISequenceRangeAddition<T> ISequenceRange<T>.And => this;
 
-        public Range(IParentAtom<T>? parentSequence = null) : base(parentSequence)
-        { }
+        public Range(bool negated, IParentAtom<T>? parentSequence = null) : base(parentSequence)
+        {
+            this.negated = negated;
+        }
 
         public IOpenRange<T> From(T minimum)
         {
@@ -406,6 +408,6 @@ namespace Generex.Fluent
             => (ISequenceRange<T>)With(exactly);
 
         protected override Generex<T> finishInternal()
-            => new Atoms.Range<T>(ranges);
+            => new Atoms.Range<T>(negated, ranges);
     }
 }
