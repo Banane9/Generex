@@ -50,12 +50,14 @@ namespace Generex.Atoms
                 return $"{Atom.ToString(true)}{{{Minimum}}}";
 
             if (Maximum == int.MaxValue)
+            {
                 if (Minimum == 0)
                     return $"{Atom.ToString(true)}*";
                 else if (Minimum == 1)
                     return $"{Atom.ToString(true)}+";
                 else
                     return $"{Atom.ToString(true)}{{{Minimum},}}";
+            }
 
             return $"{Atom.ToString(true)}{{{Minimum},{Maximum}}}";
         }

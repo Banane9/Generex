@@ -40,8 +40,10 @@ namespace Generex.Atoms
 
                 // Only recurse when it's not at the max number yet
                 if (progress < Maximum && (tryWithoutNext || !nextMatch.IsInputEnd))
+                {
                     foreach (var futureMatch in matchQuantity(nextMatch, progress + 1, !nextMatch.IsInputEnd))
                         yield return futureMatch;
+                }
             }
         }
     }

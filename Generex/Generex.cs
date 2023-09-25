@@ -39,8 +39,21 @@ namespace Generex
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public abstract partial class Generex<T>
     {
-        protected static string escapedSequenceSeparator { get; } = "\\" + sequenceSeparator;
-        protected static string sequenceSeparator { get; } = typeof(T) == typeof(char) ? "" : "⋅";
+        protected static readonly bool isChar = typeof(T) == typeof(char);
+
+        protected static HashSet<char> metaCharacters = new()
+        {
+            '(', ')', '[', ']', '{', '}', '|', '&',
+            '.', '\\', '+', '*', '?', '^', '$'
+        };
+
+        protected static string sequenceSeparator { get; } = isChar ? "" : "⋅";
+
+        static Generex()
+        {
+            if (!isChar)
+                metaCharacters.Add('⋅');
+        }
 
         /// <summary>
         /// Replaces any occurences of the sequence separator character by an escaped version.<br/>
@@ -50,7 +63,27 @@ namespace Generex
         /// <returns></returns>
         [return: NotNullIfNotNull(nameof(literal))]
         public static string? EscapeLiteral(string? literal)
-            => literal?.Replace(sequenceSeparator, escapedSequenceSeparator);
+        {
+            if (literal is null)
+                return null;
+
+            var chars = new List<char>(literal);
+            var escapeIndices = new List<int>();
+
+            for (var i = 0; i < chars.Count; ++i)
+            {
+                if (metaCharacters.Contains(chars[i]))
+                    escapeIndices.Add(i);
+            }
+
+            for (var i = 0; i < escapeIndices.Count; ++i)
+            {
+                // Index of char to escape, offset by number of escaped ones before
+                chars.Insert(escapeIndices[i] + i, '\\');
+            }
+
+            return new string(chars.ToArray());
+        }
 
         public static implicit operator Generex<T>(T value) => new Literal<T>(value);
 
@@ -58,11 +91,59 @@ namespace Generex
 
         public static implicit operator Generex<T>(T[] values) => values.Select(v => new Literal<T>(v)).ToArray();
 
-        public static Generex<T> operator &(Generex<T> leftAtom, Generex<T> rightAtom) => new Conjunction<T>(leftAtom, rightAtom);
+        public static Generex<T> operator &(Generex<T> leftAtom, Generex<T> rightAtom)
+        {
+            if (leftAtom is Conjunction<T> leftConjunction)
+            {
+                if (rightAtom is Conjunction<T> rightConjunction)
+                    return new Conjunction<T>(leftConjunction.Atoms.Concat(rightConjunction.Atoms));
 
-        public static Generex<T> operator *(Generex<T> leftAtom, Generex<T> rightAtom) => new Sequence<T>(leftAtom, rightAtom);
+                return new Conjunction<T>(leftConjunction.Atoms.Concat(rightAtom));
+            }
+            else
+            {
+                if (rightAtom is Conjunction<T> rightConjunction)
+                    return new Conjunction<T>(leftAtom.Yield().Concat(rightConjunction.Atoms));
 
-        public static Generex<T> operator |(Generex<T> leftAtom, Generex<T> rightAtom) => new Disjunction<T>(leftAtom, rightAtom); // only when not already alternatives
+                return new Conjunction<T>(leftAtom, rightAtom);
+            }
+        }
+
+        public static Generex<T> operator *(Generex<T> leftAtom, Generex<T> rightAtom)
+        {
+            if (leftAtom is Sequence<T> leftSequence)
+            {
+                if (rightAtom is Sequence<T> rightSequence)
+                    return new Sequence<T>(leftSequence.Atoms.Concat(rightSequence.Atoms));
+
+                return new Sequence<T>(leftSequence.Atoms.Concat(rightAtom));
+            }
+            else
+            {
+                if (rightAtom is Sequence<T> rightSequence)
+                    return new Sequence<T>(leftAtom.Yield().Concat(rightSequence.Atoms));
+
+                return new Sequence<T>(leftAtom, rightAtom);
+            }
+        }
+
+        public static Generex<T> operator |(Generex<T> leftAtom, Generex<T> rightAtom)
+        {
+            if (leftAtom is Disjunction<T> leftDisjunction)
+            {
+                if (rightAtom is Disjunction<T> rightDisjunction)
+                    return new Disjunction<T>(leftDisjunction.Atoms.Concat(rightDisjunction.Atoms));
+
+                return new Disjunction<T>(leftDisjunction.Atoms.Concat(rightAtom));
+            }
+            else
+            {
+                if (rightAtom is Disjunction<T> rightDisjunction)
+                    return new Disjunction<T>(leftAtom.Yield().Concat(rightDisjunction.Atoms));
+
+                return new Disjunction<T>(leftAtom, rightAtom);
+            }
+        }
 
         public bool HasMatch(IEnumerable<T> inputSequence, out Match<T>? match, bool fromStartOnly = false)
         {

@@ -256,8 +256,10 @@ namespace Generex
         public bool TryGetLatestCapture(CaptureReference<T> captureReference, out MatchedSequence<T> capture)
         {
             foreach (var matchElement in GetParentSequence())
+            {
                 if (matchElement.TryGetCapture(captureReference, out capture))
                     return true;
+            }
 
             capture = MatchedSequence<T>.Invalid;
             return false;
