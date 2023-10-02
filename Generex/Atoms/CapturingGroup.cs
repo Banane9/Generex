@@ -34,7 +34,7 @@ namespace Generex.Atoms
             {
                 nextMatch.SetCapture(CaptureReference,
                     nextMatch.GetParentSequence()
-                        .TakeUntil(match => match != currentMatch)
+                        .TakeUntil(match => match == currentMatch)
                         .Skip(1)
                         .Reverse());
 

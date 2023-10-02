@@ -25,7 +25,7 @@ namespace Generex.Atoms
             foreach (var nextMatch in continueMatch(Atom, currentMatch))
             {
                 foreach (var match in nextMatch.GetParentSequence()
-                                        .TakeUntil(match => match != currentMatch)
+                                        .TakeUntil(match => match == currentMatch)
                                         .Skip(1))
                     match.Capturing = false;
 
