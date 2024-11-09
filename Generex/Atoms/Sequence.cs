@@ -25,7 +25,7 @@ namespace Generex.Atoms
             if (Length == 1)
                 return Atoms.First().ToString(grouped);
 
-            var sequence = string.Join(sequenceSeparator, Atoms.Select(atom => atom.ToString(atom is not Sequence<T>)));
+            var sequence = string.Join(SequenceSeparator, Atoms.Select(atom => atom.ToString(atom is not Sequence<T>)));
 
             if (grouped)
                 return $"({sequence})";
@@ -33,7 +33,7 @@ namespace Generex.Atoms
                 return sequence;
         }
 
-        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
-            => Atoms.Aggregate(currentMatch.Yield(), (currentMatches, atom) => currentMatches.SelectMany(match => continueMatch(atom, match)));
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
+            => Atoms.Aggregate(currentMatch.Yield(), (currentMatches, atom) => currentMatches.SelectMany(match => ContinueMatch(atom, match)));
     }
 }

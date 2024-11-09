@@ -13,14 +13,14 @@ namespace Generex
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public sealed partial class MatchState<T>
     {
-        private readonly Dictionary<CaptureReference<T>, MatchedSequence<T>> captureState = [];
-        private readonly PeekAheadEnumerator peekAheadEnumerator;
+        private readonly Dictionary<CaptureReference<T>, MatchedSequence<T>> _captureState = [];
+        private readonly PeekAheadEnumerator _peekAheadEnumerator;
 
         /// <summary>
         /// Gets all captures of the current match.
         /// </summary>
         public IEnumerable<KeyValuePair<CaptureReference<T>, MatchedSequence<T>>> CaptureState
-            => captureState.AsSafeEnumerable();
+            => _captureState.AsSafeEnumerable();
 
         /// <summary>
         /// Gets or sets whether the <see cref="NextValue">NextValue</see> will be included in the final result.
@@ -68,9 +68,9 @@ namespace Generex
         /// <param name="inputSequence">The input sequence to attempt to find a match in.</param>
         public MatchState(IEnumerable<T> inputSequence)
         {
-            peekAheadEnumerator = new PeekAheadEnumerator(inputSequence);
-            IsInputEnd = !peekAheadEnumerator.MoveNextAndResetPeek();
-            NextValue = peekAheadEnumerator.Current;
+            _peekAheadEnumerator = new PeekAheadEnumerator(inputSequence);
+            IsInputEnd = !_peekAheadEnumerator.MoveNextAndResetPeek();
+            NextValue = _peekAheadEnumerator.Current;
             IsInputStart = true;
             IsMatchStart = true;
             Start = this;
@@ -79,9 +79,9 @@ namespace Generex
 
         private MatchState(MatchState<T> previous, bool newMatch)
         {
-            peekAheadEnumerator = previous.peekAheadEnumerator.Snapshot();
-            IsInputEnd = newMatch ? (!peekAheadEnumerator.MoveToCurrentPeekPosition() || previous.IsInputEnd) : !peekAheadEnumerator.MoveNext();
-            NextValue = peekAheadEnumerator.Current;
+            _peekAheadEnumerator = previous._peekAheadEnumerator.Snapshot();
+            IsInputEnd = newMatch ? (!_peekAheadEnumerator.MoveToCurrentPeekPosition() || previous.IsInputEnd) : !_peekAheadEnumerator.MoveNext();
+            NextValue = _peekAheadEnumerator.Current;
             Capturing = previous.Capturing || newMatch;
             IsMatchStart = newMatch;
             Start = newMatch ? this : previous.Start;
@@ -91,7 +91,7 @@ namespace Generex
 
         private MatchState(MatchState<T> template)
         {
-            peekAheadEnumerator = template.peekAheadEnumerator.Snapshot();
+            _peekAheadEnumerator = template._peekAheadEnumerator.Snapshot();
             IsInputEnd = template.IsInputEnd;
             NextValue = template.NextValue;
             Capturing = template.Capturing;
@@ -124,9 +124,9 @@ namespace Generex
             // Don't need to include start one, as it should not have capture state.
             while (!currentTarget!.IsMatchStart)
             {
-                foreach (var sourceCapture in currentSource!.captureState)
+                foreach (var sourceCapture in currentSource!._captureState)
                 {
-                    if (currentTarget.captureState.TryGetValue(sourceCapture.Key, out var targetCaptureSequence))
+                    if (currentTarget._captureState.TryGetValue(sourceCapture.Key, out var targetCaptureSequence))
                     {
                         if (!targetCaptureSequence.SequenceEqual(sourceCapture.Value))
                             throw new InvalidOperationException("MatchSequences for a given CaptureReference must be identical when they appear in the same MatchState position.");
@@ -134,7 +134,7 @@ namespace Generex
                             continue;
                     }
 
-                    currentTarget.captureState.Add(sourceCapture.Key, sourceCapture.Value);
+                    currentTarget._captureState.Add(sourceCapture.Key, sourceCapture.Value);
                 }
 
                 currentTarget = currentTarget.Previous;
@@ -226,7 +226,7 @@ namespace Generex
         /// <returns><c>true</c> if a state for the given capture reference was found on the current match, otherwise <c>false</c>.</returns>
         public bool TryGetCapture(CaptureReference<T> captureReference, out MatchedSequence<T> capture)
         {
-            if (captureState.TryGetValue(captureReference, out capture))
+            if (_captureState.TryGetValue(captureReference, out capture))
                 return true;
 
             capture = MatchedSequence<T>.Invalid;
@@ -262,7 +262,7 @@ namespace Generex
             if (!captureReference.TryGetCapture(capturedMatch, out var matchedSequence))
                 return false;
 
-            captureState[captureReference] = matchedSequence;
+            _captureState[captureReference] = matchedSequence;
 
             return true;
         }

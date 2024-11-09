@@ -21,18 +21,18 @@ namespace Generex.Atoms
         /// <inheritdoc/>
         public override string ToString() => Minimum == Maximum ? base.ToString() : $"{base.ToString()}?";
 
-        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
             if (Minimum == 0)
                 yield return currentMatch;
 
-            foreach (var quantityMatch in matchQuantity(currentMatch))
+            foreach (var quantityMatch in MatchQuantity(currentMatch))
                 yield return quantityMatch;
         }
 
-        private IEnumerable<MatchState<T>> matchQuantity(MatchState<T> currentMatch, int progress = 1, bool tryWithoutNext = true)
+        private IEnumerable<MatchState<T>> MatchQuantity(MatchState<T> currentMatch, int progress = 1, bool tryWithoutNext = true)
         {
-            foreach (var nextMatch in continueMatch(Atom, currentMatch))
+            foreach (var nextMatch in ContinueMatch(Atom, currentMatch))
             {
                 // Lazy order: shorter matches first
                 if (progress >= Minimum)
@@ -41,7 +41,7 @@ namespace Generex.Atoms
                 // Only recurse when it's not at the max number yet
                 if (progress < Maximum && (tryWithoutNext || !nextMatch.IsInputEnd))
                 {
-                    foreach (var futureMatch in matchQuantity(nextMatch, progress + 1, !nextMatch.IsInputEnd))
+                    foreach (var futureMatch in MatchQuantity(nextMatch, progress + 1, !nextMatch.IsInputEnd))
                         yield return futureMatch;
                 }
             }

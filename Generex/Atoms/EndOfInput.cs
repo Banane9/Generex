@@ -14,7 +14,7 @@ namespace Generex.Atoms
         /// <inheritdoc/>
         public override string ToString() => "$";
 
-        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
             if (currentMatch.IsInputEnd)
                 yield return currentMatch;

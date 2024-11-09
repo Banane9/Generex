@@ -296,10 +296,11 @@ namespace Generex.Fluent
         IAdditionRepeatStart<T>, IAdditionRepeatEnd<T>,
         ISequenceRepeatStart<T>, ISequenceRepeatEnd<T>
     {
-        private readonly bool lazy;
-        private IFinishableAtom<T> atom;
-        private int maximum = -1;
-        private int minimum = -1;
+        private readonly bool _lazy;
+        private IFinishableAtom<T> _atom;
+        private int _maximum = -1;
+        private int _minimum = -1;
+
         ISequenceAtom<T> ISequenceRepeatStart<T>.AnyNumber => (ISequenceAtom<T>)AnyNumber;
         IAlternativeAtom<T> IAlternativeRepeatStart<T>.AnyNumber => (IAlternativeAtom<T>)AnyNumber;
         IAdditionAtom<T> IAdditionRepeatStart<T>.AnyNumber => (IAdditionAtom<T>)AnyNumber;
@@ -308,8 +309,8 @@ namespace Generex.Fluent
         {
             get
             {
-                minimum = 0;
-                maximum = int.MaxValue;
+                _minimum = 0;
+                _maximum = int.MaxValue;
                 return this;
             }
         }
@@ -318,23 +319,22 @@ namespace Generex.Fluent
         {
             get
             {
-                minimum = 1;
-                maximum = int.MaxValue;
+                _minimum = 1;
+                _maximum = int.MaxValue;
                 return this;
             }
         }
 
         IAlternativeAtom<T> IAlternativeRepeatStart<T>.AtLeastOnce => (IAlternativeAtom<T>)AtLeastOnce;
         IAdditionAtom<T> IAdditionRepeatStart<T>.AtLeastOnce => (IAdditionAtom<T>)AtLeastOnce;
-
         ISequenceAtom<T> ISequenceRepeatStart<T>.AtLeastOnce => (ISequenceAtom<T>)AtLeastOnce;
 
         public IAtom<T> AtMostOnce
         {
             get
             {
-                minimum = 0;
-                maximum = 1;
+                _minimum = 0;
+                _maximum = 1;
                 return this;
             }
         }
@@ -345,13 +345,13 @@ namespace Generex.Fluent
 
         public Repeat(IParentAtom<T>? parent, IFinishableAtom<T> atom, bool lazy) : base(parent)
         {
-            this.atom = atom;
-            this.lazy = lazy;
+            _atom = atom;
+            _lazy = lazy;
         }
 
         public IAtom<T> And(int maximum)
         {
-            this.maximum = maximum;
+            _maximum = maximum;
             return this;
         }
 
@@ -366,8 +366,8 @@ namespace Generex.Fluent
 
         public IAtom<T> AtLeast(int minimum)
         {
-            this.minimum = minimum;
-            maximum = int.MaxValue;
+            _minimum = minimum;
+            _maximum = int.MaxValue;
             return this;
         }
 
@@ -382,8 +382,8 @@ namespace Generex.Fluent
 
         public IAtom<T> AtMost(int maximum)
         {
-            minimum = 1;
-            this.maximum = maximum;
+            _minimum = 1;
+            _maximum = maximum;
             return this;
         }
 
@@ -398,7 +398,7 @@ namespace Generex.Fluent
 
         public IRepeatEnd<T> Between(int minimum)
         {
-            this.minimum = minimum;
+            _minimum = minimum;
             return this;
         }
 
@@ -413,8 +413,8 @@ namespace Generex.Fluent
 
         public IAtom<T> Exactly(int times)
         {
-            minimum = times;
-            maximum = times;
+            _minimum = times;
+            _maximum = times;
             return this;
         }
 
@@ -429,8 +429,8 @@ namespace Generex.Fluent
 
         public IAtom<T> MaybeAtMost(int maximum)
         {
-            minimum = 0;
-            this.maximum = maximum;
+            _minimum = 0;
+            _maximum = maximum;
             return this;
         }
 
@@ -446,7 +446,7 @@ namespace Generex.Fluent
         public IRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child)
         {
             var repeat = new Repeat<T>(this, child, false);
-            atom = repeat;
+            _atom = repeat;
 
             return repeat;
         }
@@ -454,7 +454,7 @@ namespace Generex.Fluent
         public IGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var group = new Grouping<T>(this, child);
-            atom = group;
+            _atom = group;
 
             return group;
         }
@@ -462,13 +462,13 @@ namespace Generex.Fluent
         public IRepeatStart<T> WrapInLazyRepeat(IFinishableAtom<T> child)
         {
             var repeat = new Repeat<T>(this, child, true);
-            atom = repeat;
+            _atom = repeat;
 
             return repeat;
         }
 
-        protected override Generex<T> finishInternal()
-            => lazy ? new LazyQuantifier<T>(finishInternal(atom), minimum, maximum)
-                : new GreedyQuantifier<T>(finishInternal(atom), minimum, maximum);
+        protected override Generex<T> FinishInternal()
+            => _lazy ? new LazyQuantifier<T>(FinishInternal(_atom), _minimum, _maximum)
+                : new GreedyQuantifier<T>(FinishInternal(_atom), _minimum, _maximum);
     }
 }

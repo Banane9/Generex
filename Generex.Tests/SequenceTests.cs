@@ -9,13 +9,13 @@ namespace Generex.Tests
 {
     public class SequenceTests
     {
-        private readonly Generex<int> fiveFivesMatcher = Enumerable.Repeat(5, 5).ToArray();
+        private readonly Generex<int> _fiveFivesMatcher = Enumerable.Repeat(5, 5).ToArray();
 
         [TestCase(new int[] { 5, 5, 5, -1000, 5, 5 }, ExpectedResult = 0)]
         [TestCase(new int[] { 5000, 5, 5, 5, 5, 5, 10, -5, 5, 6, 5, 5, 5, 5, 5, 5 }, ExpectedResult = 3)]
         public int MatchesCount(int[] sequence)
         {
-            var results = fiveFivesMatcher.MatchAll(sequence).ToArray();
+            var results = _fiveFivesMatcher.MatchAll(sequence).ToArray();
 
             Assert.That(results.SelectMany(result => result), Has.All.EqualTo(5));
 
@@ -25,7 +25,7 @@ namespace Generex.Tests
         [TestCase(new int[] { 5000, 5, 5, 5, 5, 5, 10, -5, 5, 6, 5, 5, 5, 5, 5, 5 }, ExpectedResult = 1)]
         public int MatchesStartIndex(int[] sequence)
         {
-            var result = fiveFivesMatcher.MatchAll(sequence).FirstOrDefault();
+            var result = _fiveFivesMatcher.MatchAll(sequence).FirstOrDefault();
 
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Length, Is.EqualTo(5));

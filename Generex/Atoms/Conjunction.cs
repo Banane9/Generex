@@ -33,21 +33,23 @@ namespace Generex.Atoms
                 return conjuncts;
         }
 
-        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
             if (Length == 0)
                 return currentMatch.AllNext();
 
             if (Length == 1)
-                return continueMatch(Atoms.First(), currentMatch);
+                return ContinueMatch(Atoms.First(), currentMatch);
 
-            var results = Atoms.Select(atom => continueMatch(atom, currentMatch)).ToArray();
+            var results = Atoms.Select(atom => ContinueMatch(atom, currentMatch)).ToArray();
 
             var i = -1;
             var result = new List<MatchState<T>>(results[0]);
             var resultTemp = new List<MatchState<T>>(result.Count);
             var conjuncts = results.Skip(1).Select(r => r.ToDictionary(m => m)).ToArray();
 
+            // Filter through all resulting Match states to
+            // only take the ones returned by all conjuncted Atoms
             while (result.Count > 0 && ++i < conjuncts.Length)
             {
                 var conjunct = conjuncts[i];

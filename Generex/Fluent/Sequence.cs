@@ -103,14 +103,14 @@ namespace Generex.Fluent
 
     internal class Sequence<T> : Atom<T>, IParentAtom<T>, ISequenceParentAtom<T>
     {
-        private readonly List<IFinishableAtom<T>> atoms = [];
+        private readonly List<IFinishableAtom<T>> _atoms = [];
 
         public ISequenceCapturedGroupStart<T> CapturedGroup
         {
             get
             {
                 var capturedGroup = new CapturedGroup<T>(this);
-                atoms.Add(capturedGroup);
+                _atoms.Add(capturedGroup);
                 return capturedGroup;
             }
         }
@@ -120,7 +120,7 @@ namespace Generex.Fluent
             get
             {
                 var literal = new Literal<T>(this);
-                atoms.Add(literal);
+                _atoms.Add(literal);
                 return literal;
             }
         }
@@ -130,7 +130,7 @@ namespace Generex.Fluent
             get
             {
                 var range = new Range<T>(true, this);
-                atoms.Add(range);
+                _atoms.Add(range);
                 return range;
             }
         }
@@ -140,7 +140,7 @@ namespace Generex.Fluent
             get
             {
                 var range = new Range<T>(false, this);
-                atoms.Add(range);
+                _atoms.Add(range);
                 return range;
             }
         }
@@ -150,26 +150,26 @@ namespace Generex.Fluent
             get
             {
                 var wildcard = new Wildcard<T>(this);
-                atoms.Add(wildcard);
+                _atoms.Add(wildcard);
                 return wildcard;
             }
         }
 
         public Sequence(IFinishableAtom<T> atom) : base(null)
         {
-            atoms.Add(atom);
+            _atoms.Add(atom);
         }
 
-        public void Add(IFinishableAtom<T> atom) => atoms.Add(atom);
+        public void Add(IFinishableAtom<T> atom) => _atoms.Add(atom);
 
         public void AddRange(IEnumerable<IFinishableAtom<T>> atoms)
-            => this.atoms.AddRange(atoms);
+            => _atoms.AddRange(atoms);
 
         public ISequenceRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child)
         {
-            var index = atoms.LastIndexOf(child);
+            var index = _atoms.LastIndexOf(child);
             var repeat = new Repeat<T>(this, child, false);
-            atoms[index] = repeat;
+            _atoms[index] = repeat;
 
             return repeat;
         }
@@ -179,9 +179,9 @@ namespace Generex.Fluent
 
         public ISequenceGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
-            var index = atoms.LastIndexOf(child);
+            var index = _atoms.LastIndexOf(child);
             var group = new Grouping<T>(this, child);
-            atoms[index] = group;
+            _atoms[index] = group;
 
             return group;
         }
@@ -191,9 +191,9 @@ namespace Generex.Fluent
 
         public ISequenceRepeatStart<T> WrapInLazyRepeat(IFinishableAtom<T> child)
         {
-            var index = atoms.LastIndexOf(child);
+            var index = _atoms.LastIndexOf(child);
             var repeat = new Repeat<T>(this, child, true);
-            atoms[index] = repeat;
+            _atoms[index] = repeat;
 
             return repeat;
         }
@@ -201,12 +201,12 @@ namespace Generex.Fluent
         IRepeatStart<T> IParentAtom<T>.WrapInLazyRepeat(IFinishableAtom<T> child)
             => (IRepeatStart<T>)WrapInLazyRepeat(child);
 
-        protected override Generex<T> finishInternal()
+        protected override Generex<T> FinishInternal()
         {
-            if (atoms.Count == 1)
-                return finishInternal(atoms[0]);
+            if (_atoms.Count == 1)
+                return FinishInternal(_atoms[0]);
 
-            return new Atoms.Sequence<T>(atoms.Select(finishInternal));
+            return new Atoms.Sequence<T>(_atoms.Select(FinishInternal));
         }
     }
 }

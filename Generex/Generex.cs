@@ -48,7 +48,7 @@ namespace Generex
             '.', '\\', '+', '*', '?', '^', '$'
         ];
 
-        protected static string sequenceSeparator { get; } = isChar ? "" : "⋅";
+        protected static string SequenceSeparator { get; } = isChar ? "" : "⋅";
 
         static Generex()
         {
@@ -168,7 +168,7 @@ namespace Generex
                 wasEnd = startMatch.IsInputEnd;
                 var hadSuccessfulMatch = false;
 
-                var matches = continueMatchInternal(startMatch);
+                var matches = ContinueMatchInternal(startMatch);
 
                 if (returnEveryMatch)
                 {
@@ -216,9 +216,9 @@ namespace Generex
         /// <returns>A string that represents the current pattern.</returns>
         public virtual string ToString(bool grouped) => ToString();
 
-        protected static IEnumerable<MatchState<T>> continueMatch(Generex<T> instance, MatchState<T> currentMatch)
-            => instance.continueMatchInternal(currentMatch);
+        protected static IEnumerable<MatchState<T>> ContinueMatch(Generex<T> instance, MatchState<T> currentMatch)
+            => instance.ContinueMatchInternal(currentMatch);
 
-        protected abstract IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch);
+        protected abstract IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch);
     }
 }

@@ -13,7 +13,7 @@ namespace Generex.Atoms
     /// <inheritdoc/>
     public class Range<T> : Generex<T>
     {
-        private readonly LiteralRange<T>[] ranges;
+        private readonly LiteralRange<T>[] _ranges;
 
         /// <summary>
         /// Gets the number of ranges.
@@ -29,7 +29,7 @@ namespace Generex.Atoms
         /// <summary>
         /// Gets the ranges in the order of their appearance.
         /// </summary>
-        public IEnumerable<LiteralRange<T>> Ranges => ranges.AsSafeEnumerable();
+        public IEnumerable<LiteralRange<T>> Ranges => _ranges.AsSafeEnumerable();
 
         public Range(IEnumerable<LiteralRange<T>> ranges) : this(false, ranges)
         { }
@@ -44,18 +44,18 @@ namespace Generex.Atoms
 
         public Range(bool negated, IEnumerable<LiteralRange<T>> ranges)
         {
-            this.ranges = ranges.ToArray();
-            Count = this.ranges.Length;
+            this._ranges = ranges.ToArray();
+            Count = this._ranges.Length;
             Negated = negated;
         }
 
         /// <inheritdoc/>
         public override string ToString()
-            => $"[{(Negated ? "^" : "")}{string.Join(sequenceSeparator, ranges.Select(range => range.ToString()))}]";
+            => $"[{(Negated ? "^" : "")}{string.Join(SequenceSeparator, _ranges.Select(range => range.ToString()))}]";
 
-        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            if (!currentMatch.IsInputEnd && (Negated ^ ranges.Any(range => range.Contains(currentMatch.NextValue))))
+            if (!currentMatch.IsInputEnd && (Negated ^ _ranges.Any(range => range.Contains(currentMatch.NextValue))))
                 yield return currentMatch.Next();
         }
     }

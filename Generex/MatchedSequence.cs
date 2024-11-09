@@ -8,17 +8,17 @@ namespace Generex
 {
     public class MatchedSequence<T> : IEnumerable<T>
     {
-        private readonly T[] sequence;
+        private readonly T[] _sequence;
 
         public static MatchedSequence<T> Invalid { get; } = new MatchedSequence<T>(-1);
 
         public int EndIndex { get; }
 
-        public int Length => sequence.Length;
+        public int Length => _sequence.Length;
 
         public int StartIndex { get; }
 
-        public T this[int index] => sequence[index];
+        public T this[int index] => _sequence[index];
 
         internal MatchedSequence(IEnumerable<MatchState<T>> matchSequence)
         {
@@ -27,20 +27,20 @@ namespace Generex
             if (matches.Length == 0)
                 throw new ArgumentOutOfRangeException(nameof(matchSequence), "Match Sequence must have at least one element!");
 
-            sequence = matchSequence.Select(match => match.NextValue).ToArray();
+            _sequence = matchSequence.Select(match => match.NextValue).ToArray();
             StartIndex = matches[0].Index;
             EndIndex = matches[^1].Index;
         }
 
         internal MatchedSequence(int index)
         {
-            sequence = [];
+            _sequence = [];
             StartIndex = index;
             EndIndex = index;
         }
 
-        public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)sequence).GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)_sequence).GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator() => sequence.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => _sequence.GetEnumerator();
     }
 }

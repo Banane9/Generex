@@ -154,7 +154,7 @@ namespace Generex.Fluent
         public IAlternativeRepeatStart<T> WrapInGreedyRepeat(IFinishableAtom<T> child)
         {
             var repeat = new Repeat<T>(this, child, false);
-            setParent(child, repeat);
+            SetParent(child, repeat);
 
             var index = atoms.LastIndexOf(child);
             atoms[index] = repeat;
@@ -168,7 +168,7 @@ namespace Generex.Fluent
         public IAlternativeGroup<T> WrapInGroup(IFinishableAtom<T> child)
         {
             var group = new Grouping<T>(this, child);
-            setParent(child, group);
+            SetParent(child, group);
 
             var index = atoms.LastIndexOf(child);
             atoms[index] = group;
@@ -185,7 +185,7 @@ namespace Generex.Fluent
         public IAlternativeRepeatStart<T> WrapInLazyRepeat(IFinishableAtom<T> child)
         {
             var repeat = new Repeat<T>(this, child, true);
-            setParent(child, repeat);
+            SetParent(child, repeat);
 
             var index = atoms.LastIndexOf(child);
             atoms[index] = repeat;
@@ -193,12 +193,12 @@ namespace Generex.Fluent
             return repeat;
         }
 
-        protected override Generex<T> finishInternal()
+        protected override Generex<T> FinishInternal()
         {
             if (atoms.Count == 1)
-                return finishInternal(atoms[0]);
+                return FinishInternal(atoms[0]);
 
-            return new Disjunction<T>(atoms.Select(finishInternal));
+            return new Disjunction<T>(atoms.Select(FinishInternal));
         }
     }
 

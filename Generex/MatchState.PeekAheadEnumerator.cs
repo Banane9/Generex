@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Text;
 
 namespace Generex
 {
@@ -10,18 +7,20 @@ namespace Generex
     {
         private sealed class PeekAheadEnumerator : IEnumerator<T>
         {
-            private readonly IEnumerator<T> enumerator;
-            private readonly List<T> peekedElements = [default!];
-            private int currentIndex = 0;
+            private readonly IEnumerator<T> _enumerator;
+            private readonly List<T> _peekedElements = [default!];
+            private int _currentIndex = 0;
 
-            public T Current => peekedElements[currentIndex];
+            /// <inheritdoc cref="IEnumerator.Current"/>
+            public T Current => _peekedElements[_currentIndex];
 
             object IEnumerator.Current => Current!;
-            private int CurrentMaxPeakIndex => peekedElements.Count - 1;
+
+            private int CurrentMaxPeakIndex => _peekedElements.Count - 1;
 
             public PeekAheadEnumerator(IEnumerator<T> enumerator)
             {
-                this.enumerator = enumerator;
+                _enumerator = enumerator;
             }
 
             public PeekAheadEnumerator(IEnumerable<T> enumerable)
@@ -30,66 +29,66 @@ namespace Generex
 
             private PeekAheadEnumerator(PeekAheadEnumerator template)
             {
-                enumerator = template.enumerator;
-                peekedElements = template.peekedElements;
-                currentIndex = template.currentIndex;
+                _enumerator = template._enumerator;
+                _peekedElements = template._peekedElements;
+                _currentIndex = template._currentIndex;
             }
 
-            public void Dispose() => enumerator.Dispose();
+            public void Dispose() => _enumerator.Dispose();
 
             public bool MoveNext()
             {
-                lock (peekedElements)
+                lock (_peekedElements)
                 {
-                    if (currentIndex == CurrentMaxPeakIndex)
+                    if (_currentIndex == CurrentMaxPeakIndex)
                     {
-                        ++currentIndex;
+                        ++_currentIndex;
 
-                        if (enumerator.MoveNext())
+                        if (_enumerator.MoveNext())
                         {
-                            peekedElements.Add(enumerator.Current);
+                            _peekedElements.Add(_enumerator.Current);
                             return true;
                         }
 
-                        peekedElements.Add(default!);
+                        _peekedElements.Add(default!);
                         return false;
                     }
 
                     // When currentIndex before the end of peekedElements
-                    ++currentIndex;
+                    ++_currentIndex;
                     return true;
                 }
             }
 
             public bool MoveNextAndResetPeek()
             {
-                lock (peekedElements)
+                lock (_peekedElements)
                 {
                     ResetPeek();
 
                     if (CurrentMaxPeakIndex == 0)
                     {
-                        if (enumerator.MoveNext())
+                        if (_enumerator.MoveNext())
                         {
-                            peekedElements[0] = enumerator.Current;
+                            _peekedElements[0] = _enumerator.Current;
                             return true;
                         }
 
-                        peekedElements[0] = default!;
+                        _peekedElements[0] = default!;
                         return false;
                     }
 
                     // When peekedElements.Count > 1
-                    peekedElements.RemoveAt(0);
+                    _peekedElements.RemoveAt(0);
                     return true;
                 }
             }
 
             public bool MoveToCurrentPeekPosition()
             {
-                lock (peekedElements)
+                lock (_peekedElements)
                 {
-                    peekedElements.RemoveRange(0, currentIndex);
+                    _peekedElements.RemoveRange(0, _currentIndex);
                     ResetPeek();
                     return true;
                 }
@@ -97,16 +96,16 @@ namespace Generex
 
             public void Reset()
             {
-                lock (peekedElements)
+                lock (_peekedElements)
                 {
                     ResetPeek();
-                    enumerator.Reset();
-                    peekedElements.Clear();
-                    peekedElements.Add(default!);
+                    _enumerator.Reset();
+                    _peekedElements.Clear();
+                    _peekedElements.Add(default!);
                 }
             }
 
-            public void ResetPeek() => currentIndex = 0;
+            public void ResetPeek() => _currentIndex = 0;
 
             public PeekAheadEnumerator Snapshot() => new(this);
         }

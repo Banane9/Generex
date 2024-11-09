@@ -33,21 +33,21 @@ namespace Generex.Atoms
                 return disjuncts;
         }
 
-        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
             if (Length == 0)
                 return [];
 
             if (Length == 1)
-                return continueMatch(Atoms.First(), currentMatch);
+                return ContinueMatch(Atoms.First(), currentMatch);
 
-            return matchDisjunctions(currentMatch);
+            return MatchDisjunctions(currentMatch);
         }
 
-        private IEnumerable<MatchState<T>> matchDisjunctions(MatchState<T> currentMatch)
+        private IEnumerable<MatchState<T>> MatchDisjunctions(MatchState<T> currentMatch)
         {
             var results = new HashSet<MatchState<T>>();
-            foreach (var nextMatch in Atoms.SelectMany(atom => continueMatch(atom, currentMatch)))
+            foreach (var nextMatch in Atoms.SelectMany(atom => ContinueMatch(atom, currentMatch)))
             {
                 if (results.Add(nextMatch))
                     yield return nextMatch;

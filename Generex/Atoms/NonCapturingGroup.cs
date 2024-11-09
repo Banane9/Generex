@@ -15,18 +15,17 @@ namespace Generex.Atoms
         { }
 
         /// <inheritdoc/>
-        public override string ToString()
-        {
-            return $"(?:{Atom})";
-        }
+        public override string ToString() => $"(?:{Atom})";
 
-        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            foreach (var nextMatch in continueMatch(Atom, currentMatch))
+            foreach (var nextMatch in ContinueMatch(Atom, currentMatch))
             {
-                foreach (var match in nextMatch.GetParentSequence()
-                                        .TakeUntil(match => match == currentMatch)
-                                        .Skip(1))
+                var matchSequence = nextMatch.GetParentSequence()
+                    .TakeUntil(match => match == currentMatch)
+                    .Skip(1);
+
+                foreach (var match in matchSequence)
                     match.Capturing = false;
 
                 yield return nextMatch;

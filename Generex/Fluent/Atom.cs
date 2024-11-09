@@ -93,7 +93,7 @@ namespace Generex.Fluent
         /// </summary>
         /// <param name="name">The name to associate with the group.</param>
         /// <returns>The named capture group.</returns>
-        ICapturedAtom<T> Called(string name);
+        ICapturedAtom<T> CalledGrouping(string name);
     }
 
     internal abstract class Atom<T> : IAtom<T>, ICapturedAtom<T>,
@@ -101,114 +101,114 @@ namespace Generex.Fluent
         IAdditionAtom<T>, IAdditionCapturedAtom<T>,
         ISequenceAtom<T>, ISequenceCapturedAtom<T>
     {
-        private IParentAtom<T>? parent;
+        private IParentAtom<T>? _parent;
 
-        public IAdditionNext<T> Additionally => additionParent;
-        public IAlternativeNext<T> Alternatively => alternativeParent;
+        public IAdditionNext<T> Additionally => AdditionParent;
+        public IAlternativeNext<T> Alternatively => AlternativeParent;
 
         public IGroup<T> As
         {
             get
             {
                 var group = new Grouping<T>(null, this);
-                parent = group;
+                _parent = group;
 
                 return group;
             }
         }
 
-        IAlternativeGroup<T> IAlternativeAtom<T>.As => alternativeParent.WrapInGroup(this);
-        ISequenceGroup<T> ISequenceAtom<T>.As => sequenceParent.WrapInGroup(this);
-        IAdditionGroup<T> IAdditionAtom<T>.As => additionParent.WrapInGroup(this);
-        public ISequenceNext<T> FollowedBy => sequenceParent;
+        IAlternativeGroup<T> IAlternativeAtom<T>.As => AlternativeParent.WrapInGroup(this);
+        ISequenceGroup<T> ISequenceAtom<T>.As => SequenceParent.WrapInGroup(this);
+        IAdditionGroup<T> IAdditionAtom<T>.As => AdditionParent.WrapInGroup(this);
+        public ISequenceNext<T> FollowedBy => SequenceParent;
 
         public IRepeatStart<T> GreedilyRepeat
         {
             get
             {
                 var repeat = new Repeat<T>(null, this, false);
-                parent = repeat;
+                _parent = repeat;
 
                 return repeat;
             }
         }
 
         ISequenceRepeatStart<T> ISequenceAtom<T>.GreedilyRepeat
-            => sequenceParent.WrapInGreedyRepeat(this);
+            => SequenceParent.WrapInGreedyRepeat(this);
 
         IAlternativeRepeatStart<T> IAlternativeAtom<T>.GreedilyRepeat
-            => alternativeParent.WrapInGreedyRepeat(this);
+            => AlternativeParent.WrapInGreedyRepeat(this);
 
         IAdditionRepeatStart<T> IAdditionAtom<T>.GreedilyRepeat
-            => additionParent.WrapInGreedyRepeat(this);
+            => AdditionParent.WrapInGreedyRepeat(this);
 
         public IRepeatStart<T> LazilyRepeat
         {
             get
             {
                 var repeat = new Repeat<T>(null, this, true);
-                parent = repeat;
+                _parent = repeat;
 
                 return repeat;
             }
         }
 
         IAlternativeRepeatStart<T> IAlternativeAtom<T>.LazilyRepeat
-            => alternativeParent.WrapInLazyRepeat(this);
+            => AlternativeParent.WrapInLazyRepeat(this);
 
         ISequenceRepeatStart<T> ISequenceAtom<T>.LazilyRepeat
-            => sequenceParent.WrapInLazyRepeat(this);
+            => SequenceParent.WrapInLazyRepeat(this);
 
-        IAdditionRepeatStart<T> IAdditionAtom<T>.LazilyRepeat => additionParent.WrapInLazyRepeat(this);
+        IAdditionRepeatStart<T> IAdditionAtom<T>.LazilyRepeat => AdditionParent.WrapInLazyRepeat(this);
 
-        private IAdditionParentAtom<T> additionParent
+        private IAdditionParentAtom<T> AdditionParent
         {
             get
             {
-                parent ??= new Addition<T>(this);
-                return (IAdditionParentAtom<T>)parent;
+                _parent ??= new Addition<T>(this);
+                return (IAdditionParentAtom<T>)_parent;
             }
         }
 
-        private IAlternativeParentAtom<T> alternativeParent
+        private IAlternativeParentAtom<T> AlternativeParent
         {
             get
             {
-                parent ??= new Alternative<T>(this);
-                return (IAlternativeParentAtom<T>)parent;
+                _parent ??= new Alternative<T>(this);
+                return (IAlternativeParentAtom<T>)_parent;
             }
         }
 
-        private ISequenceParentAtom<T> sequenceParent
+        private ISequenceParentAtom<T> SequenceParent
         {
             get
             {
-                parent ??= new Sequence<T>(this);
-                return (ISequenceParentAtom<T>)parent;
+                _parent ??= new Sequence<T>(this);
+                return (ISequenceParentAtom<T>)_parent;
             }
         }
 
         protected Atom(IParentAtom<T>? parent)
         {
-            this.parent = parent;
+            _parent = parent;
         }
 
         public Generex<T> Finish()
         {
             var current = this;
-            while (current.parent != null)
-                current = (Atom<T>)current.parent;
+            while (current._parent != null)
+                current = (Atom<T>)current._parent;
 
-            return current.finishInternal();
+            return current.FinishInternal();
         }
 
-        protected static Generex<T> finishInternal(IFinishableAtom<T> atom)
-            => ((Atom<T>)atom).finishInternal();
+        protected static Generex<T> FinishInternal(IFinishableAtom<T> atom)
+            => ((Atom<T>)atom).FinishInternal();
 
-        protected static void setParent(IFinishableAtom<T> atom, IParentAtom<T> parent)
-            => ((Atom<T>)atom).parent = parent;
+        protected static void SetParent(IFinishableAtom<T> atom, IParentAtom<T> parent)
+            => ((Atom<T>)atom)._parent = parent;
 
-        protected abstract Generex<T> finishInternal();
+        protected abstract Generex<T> FinishInternal();
     }
 
     internal interface IParentAtom<T> : IFinishableAtom<T>

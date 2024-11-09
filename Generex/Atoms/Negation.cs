@@ -17,9 +17,9 @@ namespace Generex.Atoms
 
         public override string ToString() => $"(?!:{Atom})";
 
-        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            var acceptableMatches = new HashSet<MatchState<T>>(continueMatch(Atom, currentMatch));
+            var acceptableMatches = new HashSet<MatchState<T>>(ContinueMatch(Atom, currentMatch));
 
             return currentMatch.AllNext().Where(match => !acceptableMatches.Contains(match));
         }

@@ -12,26 +12,26 @@ namespace Generex.Atoms
     /// <inheritdoc/>
     public abstract class Junction<T> : Generex<T>
     {
-        private readonly Generex<T>[] atoms;
+        private readonly Generex<T>[] _atoms;
 
         /// <summary>
         /// Gets the sub-patterns in the order of their appearance.
         /// </summary>
-        public IEnumerable<Generex<T>> Atoms => atoms.AsSafeEnumerable();
+        public IEnumerable<Generex<T>> Atoms => _atoms.AsSafeEnumerable();
 
         /// <summary>
         /// Gets the number of sub-patterns.
         /// </summary>
-        public int Length => atoms.Length;
+        public int Length => _atoms.Length;
 
         protected Junction(Generex<T> atom, params Generex<T>[] furtherAtoms)
         {
-            atoms = [atom, .. furtherAtoms];
+            _atoms = [atom, .. furtherAtoms];
         }
 
         protected Junction(IEnumerable<Generex<T>> atoms)
         {
-            this.atoms = atoms.ToArray();
+            this._atoms = atoms.ToArray();
         }
 
         /// <inheritdoc/>

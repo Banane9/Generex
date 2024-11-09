@@ -9,6 +9,6 @@ namespace Generex.Fluent
         public Wildcard(IParentAtom<T>? parent = null) : base(parent)
         { }
 
-        protected override Generex<T> finishInternal() => new Atoms.Wildcard<T>();
+        protected override Generex<T> FinishInternal() => new Atoms.Wildcard<T>();
     }
 }

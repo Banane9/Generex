@@ -309,25 +309,25 @@ namespace Generex.Fluent
         IAdditionRangeStart<T>, IAdditionRange<T>, IAdditionOpenRange<T>, IAdditionRangeAddition<T>,
         ISequenceRangeStart<T>, ISequenceRange<T>, ISequenceOpenRange<T>, ISequenceRangeAddition<T>
     {
-        private readonly List<T> literals = [];
-        private readonly bool negated;
-        private readonly List<LiteralRange<T>> ranges = [];
-        private T? capturedMinimum;
-        private IComparer<T> comparer = Comparer<T>.Default;
-        public IRangeAddition<T> And => this;
+        private readonly List<T> _literals = [];
+        private readonly bool _negated;
+        private readonly List<LiteralRange<T>> _ranges = [];
+        private T? _capturedMinimum;
+        private IComparer<T> _comparer = Comparer<T>.Default;
 
+        public IRangeAddition<T> And => this;
         IAlternativeRangeAddition<T> IAlternativeRange<T>.And => this;
         IAdditionRangeAddition<T> IAdditionRange<T>.And => this;
         ISequenceRangeAddition<T> ISequenceRange<T>.And => this;
 
         public Range(bool negated, IParentAtom<T>? parentSequence = null) : base(parentSequence)
         {
-            this.negated = negated;
+            _negated = negated;
         }
 
         public IOpenRange<T> From(T minimum)
         {
-            capturedMinimum = minimum;
+            _capturedMinimum = minimum;
             return this;
         }
 
@@ -362,8 +362,8 @@ namespace Generex.Fluent
 
         public IRange<T> To(T maximum)
         {
-            ranges.Add(new LiteralRange<T>(capturedMinimum!, maximum, comparer));
-            capturedMinimum = default;
+            _ranges.Add(new LiteralRange<T>(_capturedMinimum!, maximum, _comparer));
+            _capturedMinimum = default;
 
             return this;
         }
@@ -379,7 +379,7 @@ namespace Generex.Fluent
 
         public IRangeAddition<T> Using(IComparer<T> comparer)
         {
-            this.comparer = comparer;
+            _comparer = comparer;
             return this;
         }
 
@@ -394,7 +394,7 @@ namespace Generex.Fluent
 
         public IRange<T> With(T exactly)
         {
-            literals.Add(exactly);
+            _literals.Add(exactly);
             return this;
         }
 
@@ -407,7 +407,7 @@ namespace Generex.Fluent
         ISequenceRange<T> ISequenceRangeAddition<T>.With(T exactly)
             => (ISequenceRange<T>)With(exactly);
 
-        protected override Generex<T> finishInternal()
-            => new Atoms.Range<T>(negated, ranges);
+        protected override Generex<T> FinishInternal()
+            => new Atoms.Range<T>(_negated, _ranges);
     }
 }

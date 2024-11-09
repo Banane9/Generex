@@ -23,20 +23,18 @@ namespace Generex.Atoms
         }
 
         /// <inheritdoc/>
-        public override string ToString()
-        {
-            return $"(?<{CaptureReference}>{Atom})";
-        }
+        public override string ToString() => $"(?<{CaptureReference}>{Atom})";
 
-        protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
+        protected override IEnumerable<MatchState<T>> ContinueMatchInternal(MatchState<T> currentMatch)
         {
-            foreach (var nextMatch in continueMatch(Atom, currentMatch))
+            foreach (var nextMatch in ContinueMatch(Atom, currentMatch))
             {
-                if (nextMatch.TrySetCapture(CaptureReference,
-                    nextMatch.GetParentSequence()
-                        .TakeUntil(match => match == currentMatch)
-                        .Skip(1)
-                        .Reverse()))
+                var matchSequence = nextMatch.GetParentSequence()
+                    .TakeUntil(match => match == currentMatch)
+                    .Skip(1)
+                    .Reverse();
+
+                if (nextMatch.TrySetCapture(CaptureReference, matchSequence))
                     yield return nextMatch;
             }
         }

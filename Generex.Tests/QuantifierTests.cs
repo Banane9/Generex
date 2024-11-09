@@ -10,13 +10,13 @@ namespace Generex.Tests
 {
     public class QuantifierTests
     {
-        private readonly Generex<int> fiveFivesMatcher = new GreedyQuantifier<int>(5, 5);
+        private readonly Generex<int> _fiveFivesMatcher = new GreedyQuantifier<int>(5, 5);
 
         [TestCase(new int[] { 5, 5, 5, -1000, 5, 5 }, ExpectedResult = 0)]
         [TestCase(new int[] { 5000, 5, 5, 5, 5, 5, 10, -5, 5, 6, 5, 5, 5, 5, 5, 5 }, ExpectedResult = 3)]
         public int MatchesCount(int[] sequence)
         {
-            var result = fiveFivesMatcher.MatchAll(sequence).ToArray();
+            var result = _fiveFivesMatcher.MatchAll(sequence).ToArray();
 
             Assert.That(result.SelectMany(result => result), Has.All.EqualTo(5));
 
@@ -26,7 +26,7 @@ namespace Generex.Tests
         [TestCase(new int[] { 5000, 5, 5, 5, 5, 5, 10, -5, 5, 6, 5, 5, 5, 5, 5, 5 }, ExpectedResult = 1)]
         public int MatchesStartIndex(int[] sequence)
         {
-            Assert.That(fiveFivesMatcher.HasMatch(sequence, out var result), Is.True);
+            Assert.That(_fiveFivesMatcher.HasMatch(sequence, out var result), Is.True);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Length, Is.EqualTo(5));
             Assert.That(result.StartIndex + 4, Is.EqualTo(result.EndIndex));

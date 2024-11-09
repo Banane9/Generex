@@ -127,47 +127,47 @@ namespace Generex.Fluent
         IAdditionCapturedGroupStart<T>, IAdditionCapturedGroupEnd<T>,
         ISequenceCapturedGroupStart<T>, ISequenceCapturedGroupEnd<T>
     {
-        private CaptureReference<T>? captureReference;
-        private IEqualityComparer<T>? equalityComparer;
+        private CaptureReference<T>? _captureReference;
+        private IEqualityComparer<T>? _equalityComparer;
 
         public CapturedGroup(IParentAtom<T>? parent = null) : base(parent)
         { }
 
         public ICapturedGroupEnd<T> ReferringBackTo(CaptureReference<T> captureReference)
-            => referringBackTo(captureReference);
+            => ReferringBackToReference(captureReference);
 
         ISequenceCapturedGroupEnd<T> ISequenceCapturedGroupStart<T>.ReferringBackTo(CaptureReference<T> captureReference)
-            => referringBackTo(captureReference);
+            => ReferringBackToReference(captureReference);
 
         IAdditionCapturedGroupEnd<T> IAdditionCapturedGroupStart<T>.ReferringBackTo(CaptureReference<T> captureReference)
-            => referringBackTo(captureReference);
+            => ReferringBackToReference(captureReference);
 
         IAlternativeCapturedGroupEnd<T> IAlternativeCapturedGroupStart<T>.ReferringBackTo(CaptureReference<T> captureReference)
-            => referringBackTo(captureReference);
+            => ReferringBackToReference(captureReference);
 
-        public IAtom<T> Using(IEqualityComparer<T> equalityComparer) => @using(equalityComparer);
+        public IAtom<T> Using(IEqualityComparer<T> equalityComparer) => UsingComparer(equalityComparer);
 
         IAdditionAtom<T> IAdditionCapturedGroupEnd<T>.Using(IEqualityComparer<T> equalityComparer)
-            => @using(equalityComparer);
+            => UsingComparer(equalityComparer);
 
         IAlternativeAtom<T> IAlternativeCapturedGroupEnd<T>.Using(IEqualityComparer<T> equalityComparer)
-            => @using(equalityComparer);
+            => UsingComparer(equalityComparer);
 
         ISequenceAtom<T> ISequenceCapturedGroupEnd<T>.Using(IEqualityComparer<T> equalityComparer)
-            => @using(equalityComparer);
+            => UsingComparer(equalityComparer);
 
-        protected override Generex<T> finishInternal()
-            => new Atoms.CapturedGroup<T>(captureReference!, equalityComparer);
+        protected override Generex<T> FinishInternal()
+            => new Atoms.CapturedGroup<T>(_captureReference!, _equalityComparer);
 
-        private CapturedGroup<T> @using(IEqualityComparer<T> equalityComparer)
+        private CapturedGroup<T> ReferringBackToReference(CaptureReference<T> captureReference)
         {
-            this.equalityComparer = equalityComparer;
+            _captureReference = captureReference;
             return this;
         }
 
-        private CapturedGroup<T> referringBackTo(CaptureReference<T> captureReference)
+        private CapturedGroup<T> UsingComparer(IEqualityComparer<T> equalityComparer)
         {
-            this.captureReference = captureReference;
+            _equalityComparer = equalityComparer;
             return this;
         }
     }
