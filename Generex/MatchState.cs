@@ -219,15 +219,6 @@ namespace Generex
         public MatchState<T> Next() => new(this, false);
 
         /// <summary>
-        /// Sets the latest capture for the given capture reference.<br/>
-        /// Should be used on the <see cref="Next"/> match state after the capture.
-        /// </summary>
-        /// <param name="captureReference">The reference to set the capture for.</param>
-        /// <param name="capture">The captured sequence.</param>
-        public void SetCapture(CaptureReference<T> captureReference, IEnumerable<MatchState<T>> capture)
-            => captureState[captureReference] = new MatchedSequence<T>(capture);
-
-        /// <summary>
         /// Attempts to get the state for the given capture reference on the current match only.
         /// </summary>
         /// <param name="captureReference">The reference to get the capture for.</param>
@@ -258,6 +249,22 @@ namespace Generex
 
             capture = MatchedSequence<T>.Invalid;
             return false;
+        }
+
+        /// <summary>
+        /// Sets the latest capture for the given capture reference.<br/>
+        /// Should be used on the <see cref="Next"/> match state after the capture.
+        /// </summary>
+        /// <param name="captureReference">The reference to set the capture for.</param>
+        /// <param name="capturedMatch">The captured match sequence.</param>
+        public bool TrySetCapture(CaptureReference<T> captureReference, IEnumerable<MatchState<T>> capturedMatch)
+        {
+            if (!captureReference.TryGetCapture(capturedMatch, out var matchedSequence))
+                return false;
+
+            captureState[captureReference] = matchedSequence;
+
+            return true;
         }
 
         internal MatchState<T> AsStart() => new(this, true);

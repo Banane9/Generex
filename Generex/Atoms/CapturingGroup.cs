@@ -32,13 +32,12 @@ namespace Generex.Atoms
         {
             foreach (var nextMatch in continueMatch(Atom, currentMatch))
             {
-                nextMatch.SetCapture(CaptureReference,
+                if (nextMatch.TrySetCapture(CaptureReference,
                     nextMatch.GetParentSequence()
                         .TakeUntil(match => match == currentMatch)
                         .Skip(1)
-                        .Reverse());
-
-                yield return nextMatch;
+                        .Reverse()))
+                    yield return nextMatch;
             }
         }
     }
