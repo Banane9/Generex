@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EnumerableToolkit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
@@ -12,20 +13,14 @@ namespace Generex
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public sealed partial class MatchState<T>
     {
-        private readonly Dictionary<CaptureReference<T>, MatchedSequence<T>> captureState = new();
+        private readonly Dictionary<CaptureReference<T>, MatchedSequence<T>> captureState = [];
         private readonly PeekAheadEnumerator peekAheadEnumerator;
 
         /// <summary>
         /// Gets all captures of the current match.
         /// </summary>
         public IEnumerable<KeyValuePair<CaptureReference<T>, MatchedSequence<T>>> CaptureState
-        {
-            get
-            {
-                foreach (var entry in captureState)
-                    yield return entry;
-            }
-        }
+            => captureState.AsSafeEnumerable();
 
         /// <summary>
         /// Gets or sets whether the <see cref="NextValue">NextValue</see> will be included in the final result.

@@ -1,4 +1,4 @@
-﻿using Generex.Atoms;
+﻿using EnumerableToolkit;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,16 +10,10 @@ namespace Generex
     public sealed class Match<T> : MatchedSequence<T>
     {
         private readonly Dictionary<CaptureReference<T>, CaptureGroup> capturedGroups;
+
         public MatchedSequence<T> FullMatch { get; }
 
-        public IEnumerable<CaptureGroup> Groups
-        {
-            get
-            {
-                foreach (var group in capturedGroups.Values)
-                    yield return group;
-            }
-        }
+        public IEnumerable<CaptureGroup> Groups => capturedGroups.Values.AsSafeEnumerable();
 
         public CaptureGroup this[CaptureReference<T> captureReference] => capturedGroups[captureReference];
 
@@ -33,7 +27,7 @@ namespace Generex
         internal Match(int index) : base(index)
         {
             FullMatch = new(index);
-            capturedGroups = new();
+            capturedGroups = [];
         }
 
         internal Match(IEnumerable<MatchState<T>> fullMatchSequence, int index) : base(index)
@@ -49,7 +43,7 @@ namespace Generex
                     {
                         if (!state.TryGetValue(capture.Key, out var matches))
                         {
-                            matches = new List<MatchedSequence<T>>();
+                            matches = [];
                             state.Add(capture.Key, matches);
                         }
 
@@ -64,6 +58,8 @@ namespace Generex
             private readonly MatchedSequence<T>[] captures;
 
             public CaptureReference<T> CaptureReference { get; }
+
+            public MatchedSequence<T> First => captures[0];
 
             public MatchedSequence<T> Last => captures[^1];
 

@@ -34,7 +34,7 @@ namespace Generex
 
         internal MatchedSequence(int index)
         {
-            sequence = Array.Empty<T>();
+            sequence = [];
             StartIndex = index;
             EndIndex = index;
         }

@@ -36,7 +36,7 @@ namespace Generex.Atoms
         protected override IEnumerable<MatchState<T>> continueMatchInternal(MatchState<T> currentMatch)
         {
             if (Length == 0)
-                return Enumerable.Empty<MatchState<T>>();
+                return [];
 
             if (Length == 1)
                 return continueMatch(Atoms.First(), currentMatch);

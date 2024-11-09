@@ -103,7 +103,7 @@ namespace Generex.Fluent
 
     internal class Sequence<T> : Atom<T>, IParentAtom<T>, ISequenceParentAtom<T>
     {
-        private readonly List<IFinishableAtom<T>> atoms = new();
+        private readonly List<IFinishableAtom<T>> atoms = [];
 
         public ISequenceCapturedGroupStart<T> CapturedGroup
         {

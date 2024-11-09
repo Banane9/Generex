@@ -94,7 +94,7 @@ namespace Generex.Fluent
 
     internal class Addition<T> : Atom<T>, IParentAtom<T>, IAdditionParentAtom<T>
     {
-        private readonly List<IFinishableAtom<T>> atoms = new();
+        private readonly List<IFinishableAtom<T>> atoms = [];
 
         public IAdditionCapturedGroupStart<T> CapturedGroup
         {

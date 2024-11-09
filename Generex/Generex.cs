@@ -1,4 +1,5 @@
-﻿using Generex.Atoms;
+﻿using EnumerableToolkit;
+using Generex.Atoms;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -41,11 +42,11 @@ namespace Generex
     {
         protected static readonly bool isChar = typeof(T) == typeof(char);
 
-        protected static HashSet<char> metaCharacters = new()
-        {
+        protected static HashSet<char> metaCharacters =
+        [
             '(', ')', '[', ']', '{', '}', '|', '&',
             '.', '\\', '+', '*', '?', '^', '$'
-        };
+        ];
 
         protected static string sequenceSeparator { get; } = isChar ? "" : "⋅";
 
@@ -82,12 +83,12 @@ namespace Generex
                 chars.Insert(escapeIndices[i] + i, '\\');
             }
 
-            return new string(chars.ToArray());
+            return new string([.. chars]);
         }
 
         public static implicit operator Generex<T>(T value) => new Literal<T>(value);
 
-        public static implicit operator Generex<T>(Generex<T>[] atoms) => new Sequence<T>((IEnumerable<Generex<T>>)atoms);
+        public static implicit operator Generex<T>(Generex<T>[] atoms) => new Atoms.Sequence<T>((IEnumerable<Generex<T>>)atoms);
 
         public static implicit operator Generex<T>(T[] values) => values.Select(v => new Literal<T>(v)).ToArray();
 
@@ -111,19 +112,19 @@ namespace Generex
 
         public static Generex<T> operator *(Generex<T> leftAtom, Generex<T> rightAtom)
         {
-            if (leftAtom is Sequence<T> leftSequence)
+            if (leftAtom is Atoms.Sequence<T> leftSequence)
             {
-                if (rightAtom is Sequence<T> rightSequence)
-                    return new Sequence<T>(leftSequence.Atoms.Concat(rightSequence.Atoms));
+                if (rightAtom is Atoms.Sequence<T> rightSequence)
+                    return new Atoms.Sequence<T>(leftSequence.Atoms.Concat(rightSequence.Atoms));
 
-                return new Sequence<T>(leftSequence.Atoms.Concat(rightAtom));
+                return new Atoms.Sequence<T>(leftSequence.Atoms.Concat(rightAtom));
             }
             else
             {
-                if (rightAtom is Sequence<T> rightSequence)
-                    return new Sequence<T>(leftAtom.Yield().Concat(rightSequence.Atoms));
+                if (rightAtom is Atoms.Sequence<T> rightSequence)
+                    return new Atoms.Sequence<T>(leftAtom.Yield().Concat(rightSequence.Atoms));
 
-                return new Sequence<T>(leftAtom, rightAtom);
+                return new Atoms.Sequence<T>(leftAtom, rightAtom);
             }
         }
 

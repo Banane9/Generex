@@ -11,7 +11,7 @@ namespace Generex
         private sealed class PeekAheadEnumerator : IEnumerator<T>
         {
             private readonly IEnumerator<T> enumerator;
-            private readonly List<T> peekedElements = new() { default! };
+            private readonly List<T> peekedElements = [default!];
             private int currentIndex = 0;
 
             public T Current => peekedElements[currentIndex];

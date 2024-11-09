@@ -309,9 +309,9 @@ namespace Generex.Fluent
         IAdditionRangeStart<T>, IAdditionRange<T>, IAdditionOpenRange<T>, IAdditionRangeAddition<T>,
         ISequenceRangeStart<T>, ISequenceRange<T>, ISequenceOpenRange<T>, ISequenceRangeAddition<T>
     {
-        private readonly List<T> literals = new();
+        private readonly List<T> literals = [];
         private readonly bool negated;
-        private readonly List<LiteralRange<T>> ranges = new();
+        private readonly List<LiteralRange<T>> ranges = [];
         private T? capturedMinimum;
         private IComparer<T> comparer = Comparer<T>.Default;
         public IRangeAddition<T> And => this;

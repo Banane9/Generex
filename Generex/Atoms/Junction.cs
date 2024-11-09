@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EnumerableToolkit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,14 +17,7 @@ namespace Generex.Atoms
         /// <summary>
         /// Gets the sub-patterns in the order of their appearance.
         /// </summary>
-        public IEnumerable<Generex<T>> Atoms
-        {
-            get
-            {
-                foreach (var atom in atoms)
-                    yield return atom;
-            }
-        }
+        public IEnumerable<Generex<T>> Atoms => atoms.AsSafeEnumerable();
 
         /// <summary>
         /// Gets the number of sub-patterns.
@@ -31,8 +25,9 @@ namespace Generex.Atoms
         public int Length => atoms.Length;
 
         protected Junction(Generex<T> atom, params Generex<T>[] furtherAtoms)
-            : this(atom.Yield().Concat(furtherAtoms))
-        { }
+        {
+            atoms = [atom, .. furtherAtoms];
+        }
 
         protected Junction(IEnumerable<Generex<T>> atoms)
         {

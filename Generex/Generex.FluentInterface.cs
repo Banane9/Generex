@@ -1,4 +1,5 @@
-﻿using Generex.Atoms;
+﻿using EnumerableToolkit;
+using Generex.Atoms;
 using Generex.Fluent;
 using System;
 using System.Collections.Generic;
@@ -22,13 +23,13 @@ namespace Generex
         {
             public static Generex<T> Alternatives<T>(IEnumerable<Generex<T>> atoms) => Disjuncts(atoms);
 
-            public static Generex<T> Alternatives<T>(Generex<T> atom, params Generex<T>[] furtherAtoms) => Disjuncts(atom.Yield().Concat(furtherAtoms));
+            public static Generex<T> Alternatives<T>(Generex<T> atom, params Generex<T>[] furtherAtoms) => Disjuncts([atom, .. furtherAtoms]);
 
-            public static Generex<T> Conjuncts<T>(Generex<T> atom, params Generex<T>[] furtherAtoms) => Conjuncts(atom.Yield().Concat(furtherAtoms));
+            public static Generex<T> Conjuncts<T>(Generex<T> atom, params Generex<T>[] furtherAtoms) => Conjuncts([atom, .. furtherAtoms]);
 
             public static Generex<T> Conjuncts<T>(IEnumerable<Generex<T>> atoms) => new Conjunction<T>(atoms);
 
-            public static Generex<T> Disjuncts<T>(Generex<T> atom, params Generex<T>[] furtherAtoms) => Disjuncts(atom.Yield().Concat(furtherAtoms));
+            public static Generex<T> Disjuncts<T>(Generex<T> atom, params Generex<T>[] furtherAtoms) => Disjuncts([atom, .. furtherAtoms]);
 
             public static Generex<T> Disjuncts<T>(IEnumerable<Generex<T>> atoms) => new Disjunction<T>(atoms);
 
@@ -38,13 +39,13 @@ namespace Generex
 
             public static Generex<T> Literals<T>(T literal, params T[] extraLiterals) => Literals(literal.Yield().Concat(extraLiterals));
 
-            public static Generex<T> Requirements<T>(Generex<T> atom, params Generex<T>[] furtherAtoms) => Conjuncts(atom.Yield().Concat(furtherAtoms));
+            public static Generex<T> Requirements<T>(Generex<T> atom, params Generex<T>[] furtherAtoms) => Conjuncts([atom, .. furtherAtoms]);
 
             public static Generex<T> Requirements<T>(IEnumerable<Generex<T>> atoms) => new Conjunction<T>(atoms);
 
             public static Generex<T> Sequence<T>(IEnumerable<Generex<T>> atoms) => new Atoms.Sequence<T>(atoms);
 
-            public static Generex<T> Sequence<T>(Generex<T> atom, params Generex<T>[] furtherAtoms) => Sequence(atom.Yield().Concat(furtherAtoms));
+            public static Generex<T> Sequence<T>(Generex<T> atom, params Generex<T>[] furtherAtoms) => Sequence([atom, .. furtherAtoms]);
         }
 
         public static class Literal

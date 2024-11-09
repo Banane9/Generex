@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EnumerableToolkit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -246,7 +247,7 @@ namespace Generex.Fluent
         IAdditionLiteral<T>, IAdditionLiteralStart<T>,
         ISequenceLiteral<T>, ISequenceLiteralStart<T>
     {
-        private readonly List<T> literals = new();
+        private readonly List<T> literals = [];
         private IEqualityComparer<T> equalityComparer = EqualityComparer<T>.Default;
 
         public Literal(IParentAtom<T>? parent = null) : base(parent)

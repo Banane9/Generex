@@ -8,7 +8,7 @@ namespace Generex
     /// Represents a reference to a capture group.
     /// </summary>
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
-    public sealed class CaptureReference<T>
+    public class CaptureReference<T>
     {
         /// <summary>
         /// Gets the name of the capture group.

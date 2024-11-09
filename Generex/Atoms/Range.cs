@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EnumerableToolkit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -28,14 +29,7 @@ namespace Generex.Atoms
         /// <summary>
         /// Gets the ranges in the order of their appearance.
         /// </summary>
-        public IEnumerable<LiteralRange<T>> Ranges
-        {
-            get
-            {
-                foreach (var range in ranges)
-                    yield return range;
-            }
-        }
+        public IEnumerable<LiteralRange<T>> Ranges => ranges.AsSafeEnumerable();
 
         public Range(IEnumerable<LiteralRange<T>> ranges) : this(false, ranges)
         { }
