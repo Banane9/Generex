@@ -13,13 +13,13 @@ namespace Generex
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public sealed partial class MatchState<T>
     {
-        private readonly Dictionary<CaptureReference<T>, MatchedSequence<T>> _captureState = [];
+        private readonly Dictionary<ICaptureReference<T>, MatchedSequence<T>> _captureState = [];
         private readonly PeekAheadEnumerator _peekAheadEnumerator;
 
         /// <summary>
         /// Gets all captures of the current match.
         /// </summary>
-        public IEnumerable<KeyValuePair<CaptureReference<T>, MatchedSequence<T>>> CaptureState
+        public IEnumerable<KeyValuePair<ICaptureReference<T>, MatchedSequence<T>>> CaptureState
             => _captureState.AsSafeEnumerable();
 
         /// <summary>
