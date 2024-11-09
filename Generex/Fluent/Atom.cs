@@ -93,7 +93,7 @@ namespace Generex.Fluent
         /// </summary>
         /// <param name="name">The name to associate with the group.</param>
         /// <returns>The named capture group.</returns>
-        ICapturedAtom<T> CalledGrouping(string name);
+        ICapturedAtom<T> Called(string name);
     }
 
     internal abstract class Atom<T> : IAtom<T>, ICapturedAtom<T>,

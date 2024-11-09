@@ -59,7 +59,7 @@ namespace Generex.Tests
         [TestCase("152455", ExpectedResult = new[] { 1, 5, 2, 4, 55, 5 })]
         public int[] RepdigitFluentBuilder(string input)
         {
-            var repdigitMatcher = Generex.Range.From('0').To('9').As.CapturingGroup(out var digit).CalledGrouping("digit")
+            var repdigitMatcher = Generex.Range.From('0').To('9').As.CapturingGroup(out var digit).Called("digit")
                 .FollowedBy.CapturedGroup.ReferringBackTo(digit).GreedilyRepeat.AnyNumber
                 .Finish();
 

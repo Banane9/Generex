@@ -134,38 +134,38 @@ namespace Generex.Fluent
         { }
 
         public ICapturedGroupEnd<T> ReferringBackTo(CaptureReference<T> captureReference)
-            => ReferringBackToReference(captureReference);
+            => ReferringBackToInternal(captureReference);
 
         ISequenceCapturedGroupEnd<T> ISequenceCapturedGroupStart<T>.ReferringBackTo(CaptureReference<T> captureReference)
-            => ReferringBackToReference(captureReference);
+            => ReferringBackToInternal(captureReference);
 
         IAdditionCapturedGroupEnd<T> IAdditionCapturedGroupStart<T>.ReferringBackTo(CaptureReference<T> captureReference)
-            => ReferringBackToReference(captureReference);
+            => ReferringBackToInternal(captureReference);
 
         IAlternativeCapturedGroupEnd<T> IAlternativeCapturedGroupStart<T>.ReferringBackTo(CaptureReference<T> captureReference)
-            => ReferringBackToReference(captureReference);
+            => ReferringBackToInternal(captureReference);
 
-        public IAtom<T> Using(IEqualityComparer<T> equalityComparer) => UsingComparer(equalityComparer);
+        public IAtom<T> Using(IEqualityComparer<T> equalityComparer) => UsingInternal(equalityComparer);
 
         IAdditionAtom<T> IAdditionCapturedGroupEnd<T>.Using(IEqualityComparer<T> equalityComparer)
-            => UsingComparer(equalityComparer);
+            => UsingInternal(equalityComparer);
 
         IAlternativeAtom<T> IAlternativeCapturedGroupEnd<T>.Using(IEqualityComparer<T> equalityComparer)
-            => UsingComparer(equalityComparer);
+            => UsingInternal(equalityComparer);
 
         ISequenceAtom<T> ISequenceCapturedGroupEnd<T>.Using(IEqualityComparer<T> equalityComparer)
-            => UsingComparer(equalityComparer);
+            => UsingInternal(equalityComparer);
 
         protected override Generex<T> FinishInternal()
             => new Atoms.CapturedGroup<T>(_captureReference!, _equalityComparer);
 
-        private CapturedGroup<T> ReferringBackToReference(CaptureReference<T> captureReference)
+        private CapturedGroup<T> ReferringBackToInternal(CaptureReference<T> captureReference)
         {
             _captureReference = captureReference;
             return this;
         }
 
-        private CapturedGroup<T> UsingComparer(IEqualityComparer<T> equalityComparer)
+        private CapturedGroup<T> UsingInternal(IEqualityComparer<T> equalityComparer)
         {
             _equalityComparer = equalityComparer;
             return this;

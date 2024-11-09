@@ -254,62 +254,62 @@ namespace Generex.Fluent
         { }
 
         ISequenceLiteral<T> ISequenceLiteral<T>.And(T literal, params T[] furtherLiterals)
-            => AndLiterals(literal.Yield().Concat(furtherLiterals));
+            => AndInternal(literal.Yield().Concat(furtherLiterals));
 
         ISequenceLiteral<T> ISequenceLiteral<T>.And(IEnumerable<T> literals)
-            => AndLiterals(literals);
+            => AndInternal(literals);
 
         IAdditionLiteral<T> IAdditionLiteral<T>.And(T literal, params T[] furtherLiterals)
-            => AndLiterals(literal.Yield().Concat(furtherLiterals));
+            => AndInternal(literal.Yield().Concat(furtherLiterals));
 
         IAdditionLiteral<T> IAdditionLiteral<T>.And(IEnumerable<T> literals)
-            => AndLiterals(literals);
+            => AndInternal(literals);
 
         IAlternativeLiteral<T> IAlternativeLiteral<T>.And(T literal, params T[] furtherLiterals)
-            => AndLiterals(literal.Yield().Concat(furtherLiterals));
+            => AndInternal(literal.Yield().Concat(furtherLiterals));
 
         IAlternativeLiteral<T> IAlternativeLiteral<T>.And(IEnumerable<T> literals)
-            => AndLiterals(literals);
+            => AndInternal(literals);
 
         public ILiteral<T> And(T literal, params T[] furtherLiterals)
-            => AndLiterals(literal.Yield().Concat(furtherLiterals));
+            => AndInternal(literal.Yield().Concat(furtherLiterals));
 
-        public ILiteral<T> And(IEnumerable<T> literals) => AndLiterals(literals);
+        public ILiteral<T> And(IEnumerable<T> literals) => AndInternal(literals);
 
         ISequenceLiteral<T> ISequenceComparingLiteral<T>.Of(IEnumerable<T> literals)
-            => AndLiterals(literals);
+            => AndInternal(literals);
 
         ISequenceLiteral<T> ISequenceComparingLiteral<T>.Of(T literal, params T[] furtherLiterals)
-            => AndLiterals(literal.Yield().Concat(furtherLiterals));
+            => AndInternal(literal.Yield().Concat(furtherLiterals));
 
-        public ILiteral<T> Of(IEnumerable<T> literals) => AndLiterals(literals);
+        public ILiteral<T> Of(IEnumerable<T> literals) => AndInternal(literals);
 
         public ILiteral<T> Of(T literal, params T[] furtherLiterals)
-            => AndLiterals(literal.Yield().Concat(furtherLiterals));
+            => AndInternal(literal.Yield().Concat(furtherLiterals));
 
         IAdditionLiteral<T> IAdditionComparingLiteral<T>.Of(IEnumerable<T> literals)
-            => AndLiterals(literals);
+            => AndInternal(literals);
 
         IAdditionLiteral<T> IAdditionComparingLiteral<T>.Of(T literal, params T[] furtherLiterals)
-            => AndLiterals(literal.Yield().Concat(furtherLiterals));
+            => AndInternal(literal.Yield().Concat(furtherLiterals));
 
         IAlternativeLiteral<T> IAlternativeComparingLiteral<T>.Of(IEnumerable<T> literals)
-            => AndLiterals(literals);
+            => AndInternal(literals);
 
         IAlternativeLiteral<T> IAlternativeComparingLiteral<T>.Of(T literal, params T[] furtherLiterals)
-            => AndLiterals(literal.Yield().Concat(furtherLiterals));
+            => AndInternal(literal.Yield().Concat(furtherLiterals));
 
         public IComparingLiteral<T> Using(IEqualityComparer<T> equalityComparer)
-            => UsingComparer(equalityComparer);
+            => UsingInternal(equalityComparer);
 
         IAdditionComparingLiteral<T> IAdditionLiteralStart<T>.Using(IEqualityComparer<T> equalityComparer)
-            => UsingComparer(equalityComparer);
+            => UsingInternal(equalityComparer);
 
         IAlternativeComparingLiteral<T> IAlternativeLiteralStart<T>.Using(IEqualityComparer<T> equalityComparer)
-            => UsingComparer(equalityComparer);
+            => UsingInternal(equalityComparer);
 
         ISequenceComparingLiteral<T> ISequenceLiteralStart<T>.Using(IEqualityComparer<T> equalityComparer)
-            => UsingComparer(equalityComparer);
+            => UsingInternal(equalityComparer);
 
         protected override Generex<T> FinishInternal()
         {
@@ -319,13 +319,13 @@ namespace Generex.Fluent
             return new Atoms.Sequence<T>(_literals.Select(literal => new Atoms.Literal<T>(literal, _equalityComparer)));
         }
 
-        private Literal<T> AndLiterals(IEnumerable<T> literals)
+        private Literal<T> AndInternal(IEnumerable<T> literals)
         {
             _literals.AddRange(literals);
             return this;
         }
 
-        private Literal<T> UsingComparer(IEqualityComparer<T> equalityComparer)
+        private Literal<T> UsingInternal(IEqualityComparer<T> equalityComparer)
         {
             _equalityComparer = equalityComparer;
             return this;

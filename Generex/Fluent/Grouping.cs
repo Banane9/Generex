@@ -305,15 +305,15 @@ namespace Generex.Fluent
         }
 
         IAdditionCapturedAtom<T> IAdditionUnnamedCapturedAtom<T>.Called(string name)
-            => Called(name);
+            => CalledInternal(name);
 
         IAlternativeCapturedAtom<T> IAlternativeUnnamedCapturedAtom<T>.Called(string name)
-            => Called(name);
+            => CalledInternal(name);
 
         ISequenceCapturedAtom<T> ISequenceUnnamedCapturedAtom<T>.Called(string name)
-            => Called(name);
+            => CalledInternal(name);
 
-        public ICapturedAtom<T> CalledGrouping(string name) => Called(name);
+        public ICapturedAtom<T> Called(string name) => CalledInternal(name);
 
         public IUnnamedCapturedAtom<T> CapturingGroup(out CaptureReference<T> captureReference)
             => CapturingGrouping(out captureReference);
@@ -397,7 +397,7 @@ namespace Generex.Fluent
             return nested;
         }
 
-        private Grouping<T> Called(string name)
+        private Grouping<T> CalledInternal(string name)
         {
             _captureReference!.Name = name;
             return this;
