@@ -8,11 +8,12 @@ namespace Generex
 {
     /// <summary>
     /// Represents a reference to a capture group that
-    /// transforms its captured match into another object.
+    /// transforms its captured match sequences into another object representing them.
     /// </summary>
     /// <remarks>
     /// If the transformation fails, the match will not be returned.
     /// </remarks>
+    /// <typeparam name="TOut">The type of the objects that the matched sequences are transformed into.</typeparam>
     /// <inheritdoc/>
     public class TransformingCaptureReference<TIn, TOut>
         : CaptureReferenceBase<TIn, TransformedMatchedSequence<TIn, TOut>, TransformingCaptureReference<TIn, TOut>, TransformedCaptureGroup<TIn, TOut>>

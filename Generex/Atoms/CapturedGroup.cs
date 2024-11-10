@@ -5,16 +5,18 @@ using System.Text;
 namespace Generex.Atoms
 {
     /// <summary>
-    /// Represents a pattern that matches a back-reference to the latest capture of another capturing group, that is, a repetition of the sub-sequence.
+    /// Represents a pattern that matches a back-reference to
+    /// the latest capture of another capturing group with the same
+    /// <see cref="ICaptureReference{T}"/>, that is, a repetition of the sub-sequence.
     /// </summary>
     /// <inheritdoc/>
     public class CapturedGroup<T> : Generex<T>
     {
-        public CaptureReference<T> CaptureReference { get; }
+        public ICaptureReference<T> CaptureReference { get; }
 
         public IEqualityComparer<T> EqualityComparer { get; }
 
-        public CapturedGroup(CaptureReference<T> captureReference, IEqualityComparer<T>? equalityComparer = null)
+        public CapturedGroup(ICaptureReference<T> captureReference, IEqualityComparer<T>? equalityComparer = null)
         {
             CaptureReference = captureReference;
             EqualityComparer = equalityComparer ?? EqualityComparer<T>.Default;

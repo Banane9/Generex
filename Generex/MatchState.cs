@@ -224,7 +224,7 @@ namespace Generex
         /// <param name="captureReference">The reference to get the capture for.</param>
         /// <param name="capture">The captured sequence if this returns <c>true</c>, otherwise <see cref="MatchedSequence{T}.Invalid"/>.</param>
         /// <returns><c>true</c> if a state for the given capture reference was found on the current match, otherwise <c>false</c>.</returns>
-        public bool TryGetCapture(CaptureReference<T> captureReference, out MatchedSequence<T> capture)
+        public bool TryGetCapture(ICaptureReference<T> captureReference, out MatchedSequence<T> capture)
         {
             if (_captureState.TryGetValue(captureReference, out capture))
                 return true;
@@ -239,7 +239,7 @@ namespace Generex
         /// <param name="captureReference">The reference to get the capture for.</param>
         /// <param name="capture">The captured sequence if this returns <c>true</c>, otherwise <see cref="MatchedSequence{T}.Invalid"/>.</param>
         /// <returns><c>true</c> if a state for the given capture reference was found, otherwise <c>false</c>.</returns>
-        public bool TryGetLatestCapture(CaptureReference<T> captureReference, out MatchedSequence<T> capture)
+        public bool TryGetLatestCapture(ICaptureReference<T> captureReference, out MatchedSequence<T> capture)
         {
             foreach (var matchElement in GetParentSequence())
             {
@@ -257,7 +257,7 @@ namespace Generex
         /// </summary>
         /// <param name="captureReference">The reference to set the capture for.</param>
         /// <param name="capturedMatch">The captured match sequence.</param>
-        public bool TrySetCapture(CaptureReference<T> captureReference, IEnumerable<MatchState<T>> capturedMatch)
+        public bool TrySetCapture(ICaptureReference<T> captureReference, IEnumerable<MatchState<T>> capturedMatch)
         {
             if (!captureReference.TryGetCapture(capturedMatch, out var matchedSequence))
                 return false;

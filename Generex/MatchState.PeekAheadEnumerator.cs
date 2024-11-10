@@ -11,7 +11,7 @@ namespace Generex
             private readonly List<T> _peekedElements = [default!];
             private int _currentIndex = 0;
 
-            /// <inheritdoc cref="IEnumerator.Current"/>
+            /// <inheritdoc/>
             public T Current => _peekedElements[_currentIndex];
 
             object IEnumerator.Current => Current!;
@@ -34,6 +34,7 @@ namespace Generex
                 _currentIndex = template._currentIndex;
             }
 
+            /// <inheritdoc/>
             public void Dispose() => _enumerator.Dispose();
 
             public bool MoveNext()
