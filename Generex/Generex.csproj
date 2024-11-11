@@ -6,6 +6,24 @@
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  
+  <PropertyGroup>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Generex</Title>
+    <Authors>Banane9</Authors>
+    <Version>1.0.0</Version>
+    <Description>This library allows for the creation of regex-like patterns, which can be used to find sequences of values in an input sequence that fulfill specific conditions.</Description>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageProjectUrl>https://github.com/Banane9/Generex</PackageProjectUrl>
+    <RepositoryUrl>$(PackageProjectUrl).git</RepositoryUrl>
+    <!--<PackageIconUrl></PackageIconUrl>
+    <PackageIconUrl>/Icon.png</PackageIconUrl>-->
+    <PackageTags>IEnumerable; enumerable; tool; tools; regex; pattern; patterns; arbitrary; generic; input; sequence; sequences; condition; conditions; match; matches</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="EnumerableToolkit" Version="1.3.1" />

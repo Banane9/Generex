@@ -11,32 +11,33 @@ namespace Generex
     /// <summary>
     /// Represents a regex-like pattern, which can be used to find sequences of values in an input sequence, that fulfill specific conditions.
     /// </summary>
-    /// <remarks>
+    /// <remarks><para>
     /// To optimize the performance of finding matches in a sequence, the most important criterium is to minimize backtracking.
     /// Backtracking happens whenever the matching process has to move back to a previous state, change it, and then try matching forward again.
     /// The most common reason for this to happen are quantifiers, which can match less or more than they're intended to,
     /// forcing the matching process to return to them before eventually matching the right amount.<br/>
     /// The most efficient patterns are thus <i>deterministic</i> ones. To be deterministic, there can't be any uncertainty
     /// as to which sub-pattern a value in the input sequence has to be matched to at any point.
-    /// <para/>
+    /// </para><para>
     /// To match a sequence consisting only of the characters <c>a</c> and <c>b</c>, in which no <c>b</c> follows a <c>b</c>,
     /// one could use the pattern: <c>b?(a|ab)*</c>. This ensures a <c>b</c> can only follow an <c>a</c> after the first letter, so there can't be any <c>bb</c>s.<br/>
     /// However for each <c>a</c> in the sequence, it's unclear whether it should be matched to the first or second option.
-    /// Specifically, it requires backtracking whenever a <c>b</c> appears (since the first option will be tried first).<br/>
+    /// Specifically, it requires backtracking whenever a <c>b</c> appears (since the first option will be tried first).
+    /// </para><para>
     /// While this might not seem like a big problem in this small example, it can become much worse with
     /// more complex sub-patterns and even little slowdowns can add up over enough time.<br/>
-    /// In this case, the problem could be avoided, by instead specifying the pattern as: <c>(a|ba?)*</c>.<br/>
-    /// This way, each <c>b</c> must be matched to the second option, and each <c>a</c> either follows a <c>b</c>
-    /// or must be matched to the first option. The <c>?</c> is only there to allow a <c>b</c> as the end of the sequence.<br/>
-    /// Non-determinism can't always be avoided, as only a subset of regular expressions is expressible deterministically.
-    /// However it still makes sense to consider where patterns can be made as deterministic as possible.
-    /// <para/>
-    /// Matches get evaluated lazily, so as long as the matches themselves are finite, infinite input sequences pose no problem.
+    /// In this case, the problem could be avoided as well, by instead specifying the pattern as: <c>b?(a+b)*</c>.<br/>
+    /// This way, each <c>b</c> after the first character must be preceeded by <c>a</c>s - no <c>b</c>s.
+    /// </para><para>
+    /// Non-determinism can't always be avoided, as only a subset of regular expressions is expressible deterministically.<br/>
+    /// However, it still makes sense to consider where patterns can be made as deterministic as possible to improve performance.
+    /// </para><para>
+    /// Matches get evaluated lazily, so as long as the matches themselves are always finite, infinite input sequences pose no problem.
     /// However this also applies to sub-matches, which means that unlimited <see cref="GreedyQuantifier{T}"/>s should only be used,
     /// when it's known that there will never be an infinite sequence of matches for it.<br/>
     /// This is especially important for the <see cref="Wildcard{T}"/> pattern, which should only be used with <see cref="LazyQuantifier{T}"/>s
     /// or a hard cap for the maximum number of matched input values.
-    /// </remarks>
+    /// </para></remarks>
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public abstract partial class Generex<T>
     {
