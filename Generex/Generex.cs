@@ -41,14 +41,28 @@ namespace Generex
     /// <typeparam name="T">The type of elements in the input sequence.</typeparam>
     public abstract partial class Generex<T>
     {
+        /// <summary>
+        /// Whether <typeparamref name="T"/> is <see cref="char"/>.
+        /// </summary>
         protected static readonly bool isChar = typeof(T) == typeof(char);
 
+        /// <summary>
+        /// Contains all meta characters that need to be escaped
+        /// when applying <see cref="ToString()"/> to a pattern.
+        /// </summary>
         protected static HashSet<char> metaCharacters =
         [
             '(', ')', '[', ']', '{', '}', '|', '&',
             '.', '\\', '+', '*', '?', '^', '$'
         ];
 
+        /// <summary>
+        /// The string used to separate sequences of literals.
+        /// </summary>
+        /// <remarks>
+        /// Space for <see cref="char">characters</see>;
+        /// otherwise, the <c>⋅</c> character used in computer science.
+        /// </remarks>
         protected static string SequenceSeparator { get; } = isChar ? "" : "⋅";
 
         static Generex()
@@ -58,11 +72,14 @@ namespace Generex
         }
 
         /// <summary>
-        /// Replaces any occurences of the sequence separator character by an escaped version.<br/>
-        /// Used by the <see cref="ToString"/> implementations for some pattern.
+        /// Escapes any occurences of <see cref="metaCharacters">meta characters</see>
+        /// in the string representation of a <paramref name="literal"/>.
         /// </summary>
-        /// <param name="literal"></param>
-        /// <returns></returns>
+        /// <remarks>
+        /// Used by the <see cref="ToString()"/> implementations for some patterns.
+        /// </remarks>
+        /// <param name="literal">The string representation of a literal that should be escaped.</param>
+        /// <returns>The escaped representation of the literal.</returns>
         [return: NotNullIfNotNull(nameof(literal))]
         public static string? EscapeLiteral(string? literal)
         {
@@ -87,12 +104,30 @@ namespace Generex
             return new string([.. chars]);
         }
 
+        /// <summary>
+        /// Converts the given literal <paramref name="value"/> into a <see cref="Literal{T}"/> atom.
+        /// </summary>
+        /// <param name="value">The literal to convert into an atom.</param>
         public static implicit operator Generex<T>(T value) => new Literal<T>(value);
 
+        /// <summary>
+        /// Groups the given sequence of atoms into a <see cref="Atoms.Sequence{T}"/>.
+        /// </summary>
+        /// <param name="atoms">The atoms to group into a sequence.</param>
         public static implicit operator Generex<T>(Generex<T>[] atoms) => new Atoms.Sequence<T>((IEnumerable<Generex<T>>)atoms);
 
+        /// <summary>
+        /// Converts the given sequence of literals into a <see cref="Atoms.Sequence{T}"/> of <see cref="Literal{T}"/> atoms.
+        /// </summary>
+        /// <param name="values">The sequence of literals to convert into an atom.</param>
         public static implicit operator Generex<T>(T[] values) => values.Select(v => new Literal<T>(v)).ToArray();
 
+        /// <summary>
+        /// Joins the given atoms into a <see cref="Conjunction{T}"/>.
+        /// </summary>
+        /// <param name="leftAtom">The left atom.</param>
+        /// <param name="rightAtom">The right atom.</param>
+        /// <returns>The joined atoms.</returns>
         public static Generex<T> operator &(Generex<T> leftAtom, Generex<T> rightAtom)
         {
             if (leftAtom is Conjunction<T> leftConjunction)
@@ -111,6 +146,15 @@ namespace Generex
             }
         }
 
+        /// <summary>
+        /// Joins the given atoms into a <see cref="Atoms.Sequence{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// This references the <c>⋅</c> character used in computer science.
+        /// </remarks>
+        /// <param name="leftAtom">The left atom.</param>
+        /// <param name="rightAtom">The right atom.</param>
+        /// <returns>The joined atoms.</returns>
         public static Generex<T> operator *(Generex<T> leftAtom, Generex<T> rightAtom)
         {
             if (leftAtom is Atoms.Sequence<T> leftSequence)
@@ -129,6 +173,12 @@ namespace Generex
             }
         }
 
+        /// <summary>
+        /// Joins the given atoms into a <see cref="Disjunction{T}"/>.
+        /// </summary>
+        /// <param name="leftAtom">The left atom.</param>
+        /// <param name="rightAtom">The right atom.</param>
+        /// <returns>The joined atoms.</returns>
         public static Generex<T> operator |(Generex<T> leftAtom, Generex<T> rightAtom)
         {
             if (leftAtom is Disjunction<T> leftDisjunction)
@@ -147,19 +197,37 @@ namespace Generex
             }
         }
 
-        public bool HasMatch(IEnumerable<T> inputSequence, out Match<T>? match, bool fromStartOnly = false)
+        /// <summary>
+        /// Determines if this pattern has a match in the given <paramref name="inputSequence"/>.
+        /// </summary>
+        /// <param name="inputSequence">The sequence to match against this pattern.</param>
+        /// <param name="match">The first match found; otherwise, <c>null</c>.</param>
+        /// <param name="fromStartOnly"><c>true</c> if only matches starting at the first element in the sequence should be considered.</param>
+        /// <returns></returns>
+        public bool HasMatch(IEnumerable<T> inputSequence, [NotNullWhen(true)] out Match<T>? match, bool fromStartOnly = false)
         {
             match = MatchAll(inputSequence, false, true, fromStartOnly).FirstOrDefault();
             return match != null;
         }
 
+        /// <inheritdoc cref="HasMatch(IEnumerable{T}, out Match{T}?, bool)"/>
+        public bool HasMatch(IEnumerable<T> inputSequence, bool fromStartOnly = false)
+            => HasMatch(inputSequence, out _, fromStartOnly);
+
         public IEnumerable<Match<T>> Match(IEnumerable<T> inputSequence, bool fromStartOnly = false)
             => MatchAll(inputSequence, false, true, fromStartOnly);
 
-        public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, bool returnEveryMatch = true, bool restartFromEveryValue = true, bool fromStartOnly = false)
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="inputSequence">The sequence to match against this pattern.</param>
+        /// <param name="restartingBehavior">Defines which elements in the sequence matching will restart from.</param>
+        /// <param name="returnEveryMatch"><c>true</c> if every match from every considered starting element in the sequence should be returned.</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
+        public IEnumerable<Match<T>> MatchAll(IEnumerable<T> inputSequence, MatchRestartingBehavior restartingBehavior = MatchRestartingBehavior.FromEveryElement, bool returnEveryMatch = true)
         {
-            if (returnEveryMatch && !restartFromEveryValue)
-                throw new InvalidOperationException($"{nameof(restartFromEveryValue)} must be true when {nameof(returnEveryMatch)} is.");
+            var fromStartOnly = restartingBehavior == MatchRestartingBehavior.FromStartOnly;
 
             var startMatch = new MatchState<T>(inputSequence);
             bool wasEnd;
@@ -175,9 +243,6 @@ namespace Generex
                 {
                     foreach (var match in matches)
                         yield return match.GetMatch();
-
-                    if (fromStartOnly)
-                        yield break;
 
                     startMatch = startMatch.Next().AsStart();
                 }
